@@ -38,7 +38,7 @@ public class BadgeImage {
         this.originalFilename = originalFilename;
         this.savedFilename = savedFilename;
         this.awsS3SavedFileURL = awsS3SavedFileURL;
-        this.member = member;
+        this.assignMember(member);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 않고 해당 메서드를 활용하여 엔티티 생성
@@ -49,5 +49,18 @@ public class BadgeImage {
                 .awsS3SavedFileURL(awsS3SavedFileURL)
                 .member(member)
                 .build();
+    }
+
+    // BadgeImage N <-> 1 Member
+    // 양방향 연관관계 편의 메서드
+    public void assignMember(Member member) {
+        if (this.member != null) {
+            this.member.getBadgeImages().remove(this);
+        }
+        this.member = member;
+
+        if (!member.getBadgeImages().contains(this)) {
+            member.addBadgeImage(this);
+        }
     }
 }

@@ -159,7 +159,7 @@ public class Member {
         this.description = description;
         this.rank = rank;
         this.memberRole = memberRole;
-        this.profileImage = profileImage;
+        this.assignProfileImage(profileImage);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
@@ -185,5 +185,51 @@ public class Member {
                 .memberRole(memberRole)
                 .profileImage(profileImage)
                 .build();
+    }
+
+    // Member 1 -> 1 ProfileImage
+    // 단방향 연관관계 편의 메서드
+    public void assignProfileImage(ProfileImage profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    // Member 1 <-> N MemberGatherArticle
+    // 양방향 연관관계 편의 메서드
+    public void addMemberGatherArticle(MemberGatherArticle memberGatherArticle) {
+        this.memberGatherArticles.add(memberGatherArticle);
+
+        if (memberGatherArticle.getMember() != this) {
+            memberGatherArticle.assignMember(this);
+        }
+    }
+
+    // Member 1 <-> N Comment
+    // 양방향 연관관계 편의 메서드
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+
+        if (comment.getMember() != this) {
+            comment.assignMember(this);
+        }
+    }
+
+    // Member 1 <-> N MemberChatRoom
+    // 양방향 연관관계 편의 메서드
+    public void addMemberChatRoom(MemberChatRoom memberChatRoom) {
+        this.memberChatRooms.add(memberChatRoom);
+
+        if (memberChatRoom.getMember() != this) {
+            memberChatRoom.assignMember(this);
+        }
+    }
+
+    // Member 1 <-> N BadgeImage
+    // 양방향 연관관계 편의 메서드
+    public void addBadgeImage(BadgeImage badgeImage) {
+        this.badgeImages.add(badgeImage);
+
+        if (badgeImage.getMember() != this) {
+            badgeImage.assignMember(this);
+        }
     }
 }

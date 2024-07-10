@@ -34,7 +34,7 @@ public class ChatRoom {
 
     @Builder
     public ChatRoom(GatherArticle gatherArticle) {
-        this.gatherArticle = gatherArticle;
+        this.assignGatherArticle(gatherArticle);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
@@ -42,5 +42,37 @@ public class ChatRoom {
         return ChatRoom.builder()
                 .gatherArticle(gatherArticle)
                 .build();
+    }
+
+    // ChatRoom 1 <-> 1 GatherArticle
+    // 양방향 연관관계 편의 메서드
+    public void assignGatherArticle(GatherArticle gatherArticle) {
+        if (this.gatherArticle != null) {
+            this.gatherArticle.assignChatRoom(null);
+        }
+        this.gatherArticle = gatherArticle;
+        if (gatherArticle != null && gatherArticle.getChatRoom() != this) {
+            gatherArticle.assignChatRoom(this);
+        }
+    }
+
+    // ChatRoom 1 <-> N ChatMessage
+    // 양방향 연관관계 편의 메서드
+    public void addChatMessage(ChatMessage chatMessage) {
+        this.chatMessages.add(chatMessage);
+
+        if (chatMessage.getChatRoom() != this) {
+            chatMessage.assignChatRoom(this);
+        }
+    }
+
+    // ChatRoom 1 <-> N MemberChatRoom
+    // 양방향 연관관계 편의 메서드
+    public void addMemberChatRoom(MemberChatRoom memberChatRoom) {
+        this.memberChatRooms.add(memberChatRoom);
+
+        if (memberChatRoom.getChatRoom() != this) {
+            memberChatRoom.assignChatRoom(this);
+        }
     }
 }

@@ -27,10 +27,6 @@ public class ProfileImage {
     @Column(nullable = false)
     private String awsS3SavedFileURL;
 
-    // 양방향 연관관계
-    @OneToOne(mappedBy = "profileImage")
-    private Member member;
-
     @Builder
     public ProfileImage(String originalFilename, String savedFilename, String awsS3SavedFileURL) {
         this.originalFilename = originalFilename;

@@ -70,4 +70,36 @@ public class GatherArticle extends BaseTimeEntity {
                 .meetingLocation(meetingLocation)
                 .build();
     }
+
+    // GatherArticle 1 <-> 1 Member
+    // 양방향 연관관계 편의 메서드
+    public void assignChatRoom(ChatRoom chatRoom) {
+        if (this.chatRoom != null) {
+            this.chatRoom.assignGatherArticle(null);
+        }
+        this.chatRoom = chatRoom;
+        if (chatRoom != null && chatRoom.getGatherArticle() != this) {
+            chatRoom.assignGatherArticle(this);
+        }
+    }
+
+    // GatherArticle 1 <-> N MemberGatherArticle
+    // 양방향 연관관계 편의 메서드
+    public void addMemberGatherArticle(MemberGatherArticle memberGatherArticle) {
+        this.memberGatherArticles.add(memberGatherArticle);
+
+        if (memberGatherArticle.getGatherArticle() != this) {
+            memberGatherArticle.assignGatherArticle(this);
+        }
+    }
+
+    // GatherArticle 1 <-> N Comment
+    // 양방향 연관관계 편의 메서드
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+
+        if (comment.getGatherArticle() != this) {
+            comment.assignGatherArticle(this);
+        }
+    }
 }

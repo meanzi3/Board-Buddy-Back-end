@@ -49,11 +49,17 @@ public class Member {
     @Column(nullable = false)
     private String phoneNumber;
 
-    // 사용자 거주지
+    // 사용자가 거주하는 oo시, oo도
     // 일반 로그인 = 회원가입시 설정 가능
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
     @Column(nullable = false)
-    private String location;
+    private String sido;
+
+    // 사용자가 거주하는 oo동
+    // 일반 로그인 = 회원가입시 설정 가능
+    // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
+    @Column(nullable = false)
+    private String dong;
 
     // 사용자가 위치한 위도
     // 일반 로그인 = 회원가입시 설정 가능
@@ -66,6 +72,12 @@ public class Member {
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
     @Column(nullable = false)
     private String longitude;
+
+    // 사용자 위치를 기준으로 주변 범위를 조절하기 위한 필드
+    // 일반 로그인 = 회원가입시 설정 가능
+    // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
+    @Column(nullable = false)
+    private Integer radius;
 
     // 사용자의 버디지수
     // 일반 로그인, 소셜 로그인 별도 설정 필요 없음
@@ -140,15 +152,17 @@ public class Member {
     private List<BadgeImage> badgeImages = new ArrayList<>();
 
     @Builder
-    public Member(String username, String password, String nickname, String email, String phoneNumber, String location, String latitude, String longitude, Integer buddyScore, Integer monthlyJoinCount, Integer totalJoinCount, Integer excellentCount, Integer goodCount, Integer badCount, Integer noShowCount, String description, Integer rank, MemberRole memberRole, ProfileImage profileImage) {
+    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String dong, String latitude, String longitude, Integer radius, Integer buddyScore, Integer monthlyJoinCount, Integer totalJoinCount, Integer excellentCount, Integer goodCount, Integer badCount, Integer noShowCount, String description, Integer rank, MemberRole memberRole, ProfileImage profileImage) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.location = location;
+        this.sido = sido;
+        this.dong = dong;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.radius = radius;
         this.buddyScore = buddyScore;
         this.monthlyJoinCount = monthlyJoinCount;
         this.totalJoinCount = totalJoinCount;
@@ -163,16 +177,18 @@ public class Member {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Member createMember(String username, String password, String nickname, String email, String phoneNumber, String location, String latitude, String longitude, Integer buddyScore, Integer monthlyJoinCount, Integer totalJoinCount, Integer excellentCount, Integer goodCount, Integer badCount, Integer noShowCount, String description, Integer rank, MemberRole memberRole, ProfileImage profileImage) {
+    public static Member createMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String dong, String latitude, String longitude, Integer radius, Integer buddyScore, Integer monthlyJoinCount, Integer totalJoinCount, Integer excellentCount, Integer goodCount, Integer badCount, Integer noShowCount, String description, Integer rank, MemberRole memberRole, ProfileImage profileImage) {
         return Member.builder()
                 .username(username)
                 .password(password)
                 .nickname(nickname)
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .location(location)
+                .sido(sido)
+                .dong(dong)
                 .latitude(latitude)
                 .longitude(longitude)
+                .radius(radius)
                 .buddyScore(buddyScore)
                 .monthlyJoinCount(monthlyJoinCount)
                 .totalJoinCount(totalJoinCount)

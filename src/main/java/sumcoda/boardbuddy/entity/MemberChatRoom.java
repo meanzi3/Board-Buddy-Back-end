@@ -43,8 +43,8 @@ public class MemberChatRoom {
     public MemberChatRoom(LocalDateTime joinedAt, ChatRoomRole chatRoomRole, Member member, ChatRoom chatRoom) {
         this.joinedAt = joinedAt;
         this.chatRoomRole = chatRoomRole;
-        this.member = member;
-        this.chatRoom = chatRoom;
+        this.assignMember(member);
+        this.assignChatRoom(chatRoom);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
@@ -57,5 +57,30 @@ public class MemberChatRoom {
                 .build();
     }
 
+    // MemberChatRoom N <-> 1 Member
+    // 양방향 연관관계 편의 메서드
+    public void assignMember(Member member) {
+        if (this.member != null) {
+            this.member.getMemberChatRooms().remove(this);
+        }
+        this.member = member;
+
+        if (!member.getMemberChatRooms().contains(this)) {
+            member.addMemberChatRoom(this);
+        }
+    }
+
+    // MemberChatRoom N <-> 1 ChatRoom
+    // 양방향 연관관계 편의 메서드
+    public void assignChatRoom(ChatRoom chatRoom) {
+        if (this.chatRoom != null) {
+            this.chatRoom.getMemberChatRooms().remove(this);
+        }
+        this.chatRoom = chatRoom;
+
+        if (!chatRoom.getMemberChatRooms().contains(this)) {
+            chatRoom.addMemberChatRoom(this);
+        }
+    }
 
 }

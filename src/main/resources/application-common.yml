@@ -1,11 +1,11 @@
 spring:
   application:
     name: BoardBuddy
-  profiles:
-    active: "common"
-#  config:
-#    activate:
-#      on-profile: "common"
+#  profiles:
+#    active: "common"
+  config:
+    activate:
+      on-profile: "common"
 
   jpa:
     hibernate:

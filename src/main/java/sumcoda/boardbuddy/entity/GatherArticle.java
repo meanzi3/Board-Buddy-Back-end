@@ -35,6 +35,10 @@ public class GatherArticle extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDateTime meetingDate;
 
+    // 해당 방의 헤어지는 시간(모임 예상 종료 시간)
+    @Column(nullable = false)
+    private LocalDateTime meetingEndDate;
+
     // 필터링 하기 위한 oo시, oo도
     @Column(nullable = false)
     private String sido;
@@ -60,23 +64,25 @@ public class GatherArticle extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public GatherArticle(String title, Integer memberCount, String description, LocalDateTime meetingDate, String sido, String dong, String meetingLocation) {
+    public GatherArticle(String title, Integer memberCount, String description, LocalDateTime meetingDate, LocalDateTime meetingEndDate, String sido, String dong, String meetingLocation) {
         this.title = title;
         this.memberCount = memberCount;
         this.description = description;
         this.meetingDate = meetingDate;
+        this.meetingEndDate = meetingEndDate;
         this.sido = sido;
         this.dong = dong;
         this.meetingLocation = meetingLocation;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static GatherArticle createGatherArticle(String title, Integer memberCount, String description, LocalDateTime meetingDate, String sido, String dong, String meetingLocation) {
+    public static GatherArticle createGatherArticle(String title, Integer memberCount, String description, LocalDateTime meetingDate, LocalDateTime meetingEndDate, String sido, String dong, String meetingLocation) {
         return GatherArticle.builder()
                 .title(title)
                 .memberCount(memberCount)
                 .description(description)
                 .meetingDate(meetingDate)
+                .meetingEndDate(meetingEndDate)
                 .sido(sido)
                 .dong(dong)
                 .meetingLocation(meetingLocation)

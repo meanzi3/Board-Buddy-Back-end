@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,9 +24,18 @@ public class GatherArticle extends BaseTimeEntity {
     @Column(nullable = false)
     private String title;
 
+    // 해당 모집글 현재 참가한 인원 (작성자를 포함하여 1로 초기화)
+    @Column(nullable = false)
+    private Integer currentParticipants = 1;
+
     // 해당 모집글 제한 인원
     @Column(nullable = false)
-    private Integer memberCount;
+    private Integer maxParticipants;
+
+    // 모집 상태 (모집중, 모집마감)
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private GatherArticleStatus status;
 
     // 모집글 설명
     @Column(nullable = false)
@@ -43,7 +53,11 @@ public class GatherArticle extends BaseTimeEntity {
     @Column(nullable = false)
     private String sido;
 
-    // 필터링 하기 위한 oo덩
+    // 필터링 하기 위한 oo시, oo구
+    @Column(nullable = false)
+    private String sigu;
+
+    // 필터링 하기 위한 oo동
     @Column(nullable = false)
     private String dong;
 
@@ -64,26 +78,30 @@ public class GatherArticle extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public GatherArticle(String title, Integer memberCount, String description, LocalDateTime meetingDate, LocalDateTime meetingEndDate, String sido, String dong, String meetingLocation) {
+    public GatherArticle(String title, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime meetingDate, LocalDateTime meetingEndDate, String sido, String sigu, String dong, String meetingLocation) {
         this.title = title;
-        this.memberCount = memberCount;
+        this.maxParticipants = maxParticipants;
+        this.status = status;
         this.description = description;
         this.meetingDate = meetingDate;
         this.meetingEndDate = meetingEndDate;
         this.sido = sido;
         this.dong = dong;
+        this.sigu = sigu;
         this.meetingLocation = meetingLocation;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static GatherArticle createGatherArticle(String title, Integer memberCount, String description, LocalDateTime meetingDate, LocalDateTime meetingEndDate, String sido, String dong, String meetingLocation) {
+    public static GatherArticle createGatherArticle(String title, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime meetingDate, LocalDateTime meetingEndDate, String sido, String sigu, String dong, String meetingLocation) {
         return GatherArticle.builder()
                 .title(title)
-                .memberCount(memberCount)
+                .maxParticipants(maxParticipants)
+                .status(status)
                 .description(description)
                 .meetingDate(meetingDate)
                 .meetingEndDate(meetingEndDate)
                 .sido(sido)
+                .sigu(sigu)
                 .dong(dong)
                 .meetingLocation(meetingLocation)
                 .build();

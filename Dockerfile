@@ -1,5 +1,5 @@
-# 공식 OpenJDK 런타임 이미지를 기반
-FROM openjdk:17-jdk-alpine
+# 공식 OpenJDK 런타임 이미지를 기반으로 실행
+FROM openjdk:21-jdk-alpine
 
 # 컨테이너 내 작업 디렉토리를 설정
 WORKDIR /app

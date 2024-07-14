@@ -71,9 +71,9 @@ jobs:
           echo SPRING_DATA_REDIS_HOST=${{ secrets.PROD_REDIS_HOST }} >> env.list
           echo SPRING_DATA_REDIS_PORT=${{ secrets.PROD_REDIS_PORT }} >> env.list
           echo SPRING_DATA_REDIS_PASSWORD=${{ secrets.PROD_REDIS_PASSWORD }} >> env.list
-          echo SPRING_COOLSMS_API_KEY=${{ secrets.PROD_SMS_API_KEY }} >> env.list
-          echo SPRING_COOLSMS_API_SECRET=${{ secrets.PROD_SMS_API_SECRET }} >> env.list
-          echo SPRING_COOLSMS_SENDER_NUMBER=${{ secrets.PROD_SMS_SENDER_NUMBER }} >> env.list
+          echo SPRING_COOL_SMS_API_KEY=${{ secrets.PROD_SMS_API_KEY }} >> env.list
+          echo SPRING_COOL_SMS_API_SECRET=${{ secrets.PROD_SMS_API_SECRET }} >> env.list
+          echo SPRING_COOL_SMS_SENDER_NUMBER=${{ secrets.PROD_SMS_SENDER_NUMBER }} >> env.list
           echo SPRING_PROFILES_ACTIVE=common,prod >> env.list
 
       # 파일을 EC2로 전송

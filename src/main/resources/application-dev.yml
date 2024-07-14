@@ -14,7 +14,7 @@ spring:
   coolSMS:
     apikey: ${DEV_SMS_API_KEY}
     apiSecret: ${DEV_SMS_API_SECRET}
-    senderNumber: ${SMS_SENDER_NUMBER}
+    senderNumber: ${DEV_SMS_SENDER_NUMBER}
 
   data:
     redis:

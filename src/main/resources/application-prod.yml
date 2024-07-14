@@ -26,3 +26,8 @@ spring:
       credentials:
         access-key: ${PROD_AWS_ACCESS_KEY}
         secret-key: ${PROD_AWS_SECRET_KEY}
+
+  coolSMS:
+    apikey: ${PROD_SMS_API_KEY}
+    apiSecret: ${PROD_SMS_API_SECRET}
+    senderNumber: ${PROD_SMS_SENDER_NUMBER}

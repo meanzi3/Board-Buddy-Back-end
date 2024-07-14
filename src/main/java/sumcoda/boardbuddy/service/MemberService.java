@@ -8,6 +8,7 @@ import sumcoda.boardbuddy.dto.MemberRequest;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.MemberRole;
 import sumcoda.boardbuddy.exception.member.MemberSaveException;
+import sumcoda.boardbuddy.exception.member.NicknameAlreadyExistsException;
 import sumcoda.boardbuddy.exception.member.UsernameAlreadyExistsException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 
@@ -33,6 +34,23 @@ public class MemberService {
 
         if (Boolean.TRUE.equals(isAlreadyExistsUsername)) {
             throw new UsernameAlreadyExistsException("동일한 아이디가 이미 존재합니다.");
+        }
+
+        return true;
+    }
+
+    /**
+     * 닉네임 중복검사
+     *
+     * @param verifyNicknameDuplicationDTO 사용자가 입력한 닉네임
+     * @return 닉네임이 존재하지 않으면 true, 이미 존재하면 false 를 프론트로 반환
+     **/
+    public Boolean verifyNicknameDuplication(MemberRequest.VerifyNicknameDuplicationDTO verifyNicknameDuplicationDTO) {
+
+        Boolean isAlreadyExistsNickname = memberRepository.existsByNickname(verifyNicknameDuplicationDTO.getNickname());
+
+        if (Boolean.TRUE.equals(isAlreadyExistsNickname)) {
+            throw new NicknameAlreadyExistsException("동일한 닉네임이 이미 존재합니다.");
         }
 
         return true;

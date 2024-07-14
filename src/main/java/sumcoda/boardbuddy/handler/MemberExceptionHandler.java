@@ -25,6 +25,17 @@ public class MemberExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(NicknameAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> nicknameAlreadyExistsExceptionHandler(NicknameAlreadyExistsException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("data", false);
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(MemberSaveException.class)
     public ResponseEntity<Map<String, Object>> memberSaveExceptionHandler(MemberSaveException ex) {
         Map<String, Object> response = new HashMap<>();

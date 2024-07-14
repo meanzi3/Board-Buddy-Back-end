@@ -42,6 +42,27 @@ public class MemberController {
     }
 
     /**
+     * 닉네임 중복 확인 요청
+     *
+     * @param verifyNicknameDuplicationDTO 사용자가 입력한 닉네임
+     **/
+    @PostMapping(value = "/api/auth/check-nickname")
+    public ResponseEntity<Map<String, Object>> verifyNicknameDuplication(
+            @RequestBody MemberRequest.VerifyNicknameDuplicationDTO verifyNicknameDuplicationDTO) {
+        log.info("verify nickname duplication is working");
+
+        Map<String, Object> response = new HashMap<>();
+
+        Boolean isNotDuplicate = memberService.verifyNicknameDuplication(verifyNicknameDuplicationDTO);
+
+        response.put("data", isNotDuplicate);
+
+        response.put("message", "사용가능한 닉네임 입니다.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
      * 회원가입 요청 캐치
      *
      * @param registerDTO 프론트로부터 전달받은 회원가입 정보

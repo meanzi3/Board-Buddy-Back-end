@@ -51,4 +51,16 @@ public class MemberRequest {
             this.username = username;
         }
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class VerifyNicknameDuplicationDTO {
+
+        private String nickname;
+
+        @Builder
+        public VerifyNicknameDuplicationDTO(String nickname) {
+            this.nickname = nickname;
+        }
+    }
 }

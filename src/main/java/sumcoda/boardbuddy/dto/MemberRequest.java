@@ -20,6 +20,8 @@ public class MemberRequest {
 
         private String sido;
 
+        private String sigu;
+
         private String dong;
 
         private String latitude;
@@ -27,13 +29,14 @@ public class MemberRequest {
         private String longitude;
 
         @Builder
-        public RegisterDTO(String username, String password, String nickname, String email, String phoneNumber, String sido, String dong, String latitude, String longitude) {
+        public RegisterDTO(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, String latitude, String longitude) {
             this.username = username;
             this.password = password;
             this.nickname = nickname;
             this.email = email;
             this.phoneNumber = phoneNumber;
             this.sido = sido;
+            this.sigu = sigu;
             this.dong = dong;
             this.latitude = latitude;
             this.longitude = longitude;

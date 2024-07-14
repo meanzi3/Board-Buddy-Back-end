@@ -1,11 +1,11 @@
 #server:
 #  port: 8080
-spring:
-  profiles:
-    active: "prod"
 
-#  config:
-#    location: file:/config/
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+    location: file:/config/
 
   datasource:
     url: ${PROD_DB_URL}
@@ -15,24 +15,16 @@ spring:
     hikari:
       connection-timeout: 3000
       maximum-pool-size: 10
+  data:
+    redis:
+      host: ${PROD_REDIS_HOST}
+      port: ${PROD_REDIS_PORT}
+      repositories:
+        enabled: false
+      password: ${PROD_REDIS_PASSWORD}
+
   cloud:
     aws:
-      s3:
-        bucket-name: ${PROD_S3_BUCKET_NAME}
-      stack:
-        auto: false
-      region:
-        static: ap-northeast-2
       credentials:
         access-key: ${PROD_AWS_ACCESS_KEY}
         secret-key: ${PROD_AWS_SECRET_KEY}
-  security:
-    oauth2:
-      client:
-        registration:
-          naver:
-            redirect-uri: http://ec2-52-79-123-145.ap-northeast-2.compute.amazonaws.com/login/oauth2/code/naver
-          google:
-            redirect-uri: http://ec2-52-79-123-145.ap-northeast-2.compute.amazonaws.com/login/oauth2/code/google
-          kakao:
-            redirect-uri: http://ec2-52-79-123-145.ap-northeast-2.compute.amazonaws.com/login/oauth2/code/kakao

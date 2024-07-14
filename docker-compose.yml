@@ -1,0 +1,32 @@
+version: '2.27.3'
+
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      REDIS_PASSWORD: ${PROD_REDIS_PASSWORD}
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+
+  spring-boot-app:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    depends_on:
+      - redis
+    environment:
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_REDIS_PASSWORD: ${PROD_REDIS_PASSWORD}
+
+networks:
+  app-network:
+    driver: bridge

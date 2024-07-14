@@ -1,9 +1,10 @@
 spring:
 #  profiles:
-#    active: "dev"
-  config:
-    activate:
-      on-profile: "dev"
+#    active: dev
+#  config:
+#    activate:
+#      on-profile: "dev"
+
   datasource:
     url: ${DEV_DB_URL}
     username: ${DEV_DB_USERNAME}

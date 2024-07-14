@@ -71,6 +71,7 @@ public class MemberService {
                 registerDTO.getEmail(),
                 registerDTO.getPhoneNumber(),
                 registerDTO.getSido(),
+                registerDTO.getSigu(),
                 registerDTO.getDong(),
                 Double.parseDouble(registerDTO.getLatitude()),
                 Double.parseDouble(registerDTO.getLongitude()),

@@ -14,13 +14,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class SMSCertificationUtil {
 
-    @Value("${spring.coolsms.api-key}")
+    @Value("${spring.cool-sms.api-key}")
     private String apiKey;
 
-    @Value("${spring.coolsms.api-secret}")
+    @Value("${spring.cool-sms.api-secret}")
     private String apiSecret;
 
-    @Value("${spring.coolsms.sender-number}")
+    @Value("${spring.cool-sms.sender-number}")
     private String senderNumber;
 
     DefaultMessageService messageService;

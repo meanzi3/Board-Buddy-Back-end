@@ -1,0 +1,107 @@
+name: Deploy Spring Boot APP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      REDIS_PASSWORD: ${{ secrets.PROD_REDIS_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Set up for Spring Boot app
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build Spring Boot app with Gradle
+        run: ./gradlew build -Dspring.profiles.active=common,prod
+
+      # Build Docker image for Spring Boot app
+      - name: Build Docker image for Spring Boot app
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest -f Dockerfile .
+
+      # Docker login
+      - name: Docker Login
+        run: echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      # Push Docker images
+      - name: Push Docker image for Spring Boot app
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
+
+      # Set up SSH key
+      - name: Add SSH Key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Create environment variables file
+      - name: Create environment variables file
+        run: |
+          echo SPRING_DATASOURCE_URL=${{ secrets.PROD_DB_URL }} > env.list
+          echo SPRING_DATASOURCE_USERNAME=${{ secrets.PROD_DB_USERNAME }} >> env.list
+          echo SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${{ secrets.PROD_AWS_ACCESS_KEY }} >> env.list
+          echo SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY=${{ secrets.PROD_AWS_SECRET_KEY }} >> env.list
+          echo SPRING_REDIS_HOST=${{ secrets.PROD_REDIS_HOST }} >> env.list
+          echo SPRING_REDIS_PORT=${{ secrets.PROD_REDIS_PORT }} >> env.list
+          echo SPRING_REDIS_PASSWORD=${{ secrets.PROD_REDIS_PASSWORD }} >> env.list
+          echo SPRING_PROFILES_ACTIVE=common,prod >> env.list
+          echo SPRING_CONFIG_LOCATION=/config/application-common.yml >> env.list
+          echo SPRING_CONFIG_LOCATION=/config/application-prod.yml >> env.list
+
+      # Transfer files to EC2
+      - name: Transfer files to EC2
+        run: |
+          scp -o StrictHostKeyChecking=no src/main/resources/application-common.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-common.yml
+          scp -o StrictHostKeyChecking-no src/main/resources/application-prod.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-prod.yml
+          scp -o StrictHostKeyChecking-no env.list ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/env.list
+          scp -o StrictHostKeyChecking-no docker-compose.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/docker-compose.yml
+          scp -o StrictHostKeyChecking-no redis.conf ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/redis.conf
+
+      # Deploy to EC2
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking-no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
+
+          # Create Docker network
+          sudo docker network create app-network || true
+
+          # Run Redis container
+          if [ $(sudo docker ps -a -q -f name=redis) ]; then
+              sudo docker stop redis
+              sudo docker rm redis
+          fi
+          sudo docker run -d --name redis \
+            -v /home/ubuntu/redis.conf:/usr/local/etc/redis/redis.conf \
+            --network app-network \
+            -e REDIS_PASSWORD=${REDIS_PASSWORD} \
+            -p 6379:6379 redis:latest redis-server /usr/local/etc/redis/redis.conf
+
+          # Run Spring Boot application container
+          if [ $(sudo docker ps -a -q -f name=spring-boot-app) ]; then
+              sudo docker stop spring-boot-app
+              sudo docker rm spring-boot-app
+          fi
+          sudo docker run -d --name spring-boot-app \
+            --env-file /home/ubuntu/env.list \
+            -v /home/ubuntu/application-common.yml:/config/application-common.yml \
+            -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
+            --network app-network \
+            -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
+
+          sudo docker exec spring-boot-app printenv | grep SPRING
+          sudo docker logs spring-boot-app
+          EOF

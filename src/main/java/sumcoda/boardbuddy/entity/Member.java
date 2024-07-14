@@ -71,13 +71,13 @@ public class Member {
     // 일반 로그인 = 회원가입시 설정 가능
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
     @Column(nullable = false)
-    private String latitude;
+    private Double latitude;
 
     // 사용자가 위치한 경도
     // 일반 로그인 = 회원가입시 설정 가능
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
     @Column(nullable = false)
-    private String longitude;
+    private Double longitude;
 
     // 사용자 위치를 기준으로 주변 범위를 조절하기 위한 필드
     // 일반 로그인 = 회원가입시 설정 가능
@@ -122,7 +122,6 @@ public class Member {
 
     // 자기소개
     // 일반 로그인, 소셜 로그인 마이페이지 설정 필요
-    @Column(nullable = false)
     private String description;
 
     // 저번 달 활동에 대한 랭크 (매월 1일마다 초기화될 예정)

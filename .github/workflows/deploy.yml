@@ -12,55 +12,65 @@ jobs:
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-      REDIS_PASSWORD: ${{ secrets.PROD_REDIS_PASSWORD }}
+      PROD_REDIS_PASSWORD: ${{ secrets.PROD_REDIS_PASSWORD }}
+      PROD_REDIS_HOST: ${{ secrets.PROD_REDIS_HOST }}
+      PROD_REDIS_PORT: ${{ secrets.PROD_REDIS_PORT }}
+      PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
+      PROD_DB_USERNAME: ${{ secrets.PROD_DB_USERNAME }}
+      PROD_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+      PROD_AWS_ACCESS_KEY: ${{ secrets.PROD_AWS_ACCESS_KEY }}
+      PROD_AWS_SECRET_KEY: ${{ secrets.PROD_AWS_SECRET_KEY }}
+      EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     steps:
+      # 리포지토리를 체크아웃합니다
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Set up for Spring Boot app
+      # Spring Boot 애플리케이션을 위한 JDK 21을 설정합니다
       - name: Set up JDK 21
         uses: actions/setup-java@v2
         with:
           java-version: '21'
           distribution: 'temurin'
 
+      # Gradle을 사용하여 Spring Boot 애플리케이션을 빌드합니다
       - name: Build Spring Boot app with Gradle
         run: ./gradlew build -Dspring.profiles.active=common,prod
 
-      # Build Docker image for Spring Boot app
+      # Spring Boot 애플리케이션을 위한 Docker 이미지를 빌드합니다
       - name: Build Docker image for Spring Boot app
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest -f Dockerfile .
 
-      # Docker login
+      # Docker에 로그인합니다
       - name: Docker Login
         run: echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      # Push Docker images
+      # Docker 이미지를 푸시합니다
       - name: Push Docker image for Spring Boot app
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
 
-      # Set up SSH key
+      # SSH 키를 설정합니다
       - name: Add SSH Key
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # Create environment variables file
+      # 환경 변수 파일을 생성합니다
       - name: Create environment variables file
         run: |
           echo SPRING_DATASOURCE_URL=${{ secrets.PROD_DB_URL }} > env.list
           echo SPRING_DATASOURCE_USERNAME=${{ secrets.PROD_DB_USERNAME }} >> env.list
+          echo SPRING_DATASOURCE_PASSWORD=${{ secrets.PROD_DB_PASSWORD }} >> env.list
           echo SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${{ secrets.PROD_AWS_ACCESS_KEY }} >> env.list
           echo SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY=${{ secrets.PROD_AWS_SECRET_KEY }} >> env.list
           echo SPRING_REDIS_HOST=${{ secrets.PROD_REDIS_HOST }} >> env.list
           echo SPRING_REDIS_PORT=${{ secrets.PROD_REDIS_PORT }} >> env.list
           echo SPRING_REDIS_PASSWORD=${{ secrets.PROD_REDIS_PASSWORD }} >> env.list
           echo SPRING_PROFILES_ACTIVE=common,prod >> env.list
-          echo SPRING_CONFIG_LOCATION=/config/application-common.yml >> env.list
-          echo SPRING_CONFIG_LOCATION=/config/application-prod.yml >> env.list
 
-      # Transfer files to EC2
+      # 파일을 EC2로 전송합니다
       - name: Transfer files to EC2
         run: |
           scp -o StrictHostKeyChecking=no src/main/resources/application-common.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-common.yml
@@ -69,17 +79,17 @@ jobs:
           scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/docker-compose.yml
           scp -o StrictHostKeyChecking=no redis.conf ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/redis.conf
 
-      # Deploy to EC2
+      # EC2에 배포합니다
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
           sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
 
-          # Create Docker network
+          # Docker 네트워크를 생성합니다
           sudo docker network create app-network || true
 
-          # Run Redis container
+          # Redis 컨테이너를 실행합니다
           if [ $(sudo docker ps -a -q -f name=redis) ]; then
               sudo docker stop redis
               sudo docker rm redis
@@ -87,10 +97,10 @@ jobs:
           sudo docker run -d --name redis \
             -v /home/ubuntu/redis.conf:/usr/local/etc/redis/redis.conf \
             --network app-network \
-            -e REDIS_PASSWORD=${REDIS_PASSWORD} \
+            -e REDIS_PASSWORD=${PROD_REDIS_PASSWORD} \
             -p 6379:6379 redis:latest redis-server /usr/local/etc/redis/redis.conf
 
-          # Run Spring Boot application container
+          # Spring Boot 애플리케이션 컨테이너를 실행합니다
           if [ $(sudo docker ps -a -q -f name=spring-boot-app) ]; then
               sudo docker stop spring-boot-app
               sudo docker rm spring-boot-app
@@ -100,8 +110,11 @@ jobs:
             -v /home/ubuntu/application-common.yml:/config/application-common.yml \
             -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
             --network app-network \
-            -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
+            -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
+            --spring.config.location=/config/application-common.yml,/config/application-prod.yml
 
-          sudo docker exec spring-boot-app printenv | grep SPRING
+          # 컨테이너 상태 확인
+          sudo docker ps -a
+          # Spring Boot 애플리케이션 로그 확인
           sudo docker logs spring-boot-app
           EOF

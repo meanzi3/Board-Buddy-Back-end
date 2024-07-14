@@ -39,4 +39,16 @@ public class MemberRequest {
             this.longitude = longitude;
         }
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class VerifyUsernameDuplicationDTO {
+
+        private String username;
+
+        @Builder
+        public VerifyUsernameDuplicationDTO(String username) {
+            this.username = username;
+        }
+    }
 }

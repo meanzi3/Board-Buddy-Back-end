@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class AuthReqeust {
+public class AuthRequest {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,12 +24,28 @@ public class AuthReqeust {
     public static class ValidateSMSCertificationDTO {
 
         private String phoneNumber;
+
         private String certificationNumber;
 
         @Builder
         public ValidateSMSCertificationDTO(String phoneNumber, String certificationNumber) {
             this.phoneNumber = phoneNumber;
             this.certificationNumber = certificationNumber;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class LoginDTO {
+
+        String username;
+
+        String password;
+
+        @Builder
+        public LoginDTO(String username, String password) {
+            this.username = username;
+            this.password = password;
         }
     }
 }

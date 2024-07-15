@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import sumcoda.boardbuddy.dto.AuthReqeust;
+import sumcoda.boardbuddy.dto.AuthRequest;
 import sumcoda.boardbuddy.service.AuthService;
 
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/api/auth/sms-certifications/send")
-    public ResponseEntity<Map<String, Object>> sendSMS(@RequestBody AuthReqeust.SendSMSCertificationDTO requestDto) {
+    public ResponseEntity<Map<String, Object>> sendSMS(@RequestBody AuthRequest.SendSMSCertificationDTO requestDto) {
         log.info("send sms is working");
 
         Map<String, Object> response = new HashMap<>();
@@ -37,7 +37,7 @@ public class AuthController {
 
     //인증번호 확인
     @PostMapping("/api/auth/sms-certifications/verify")
-    public ResponseEntity<Map<String, Object>> verifyCertificationNumber(@RequestBody AuthReqeust.ValidateSMSCertificationDTO requestDto) {
+    public ResponseEntity<Map<String, Object>> verifyCertificationNumber(@RequestBody AuthRequest.ValidateSMSCertificationDTO requestDto) {
         log.info("validate certification is working");
 
         Map<String, Object> response = new HashMap<>();

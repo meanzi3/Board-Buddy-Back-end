@@ -73,8 +73,6 @@ public class MemberService {
                 registerDTO.getSido(),
                 registerDTO.getSigu(),
                 registerDTO.getDong(),
-                Double.parseDouble(registerDTO.getLatitude()),
-                Double.parseDouble(registerDTO.getLongitude()),
                 5,
                 50,
                 0,

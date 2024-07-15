@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.boardbuddy.dto.AuthReqeust;
+import sumcoda.boardbuddy.dto.AuthRequest;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationAttemptExceededException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException;
@@ -27,7 +27,7 @@ public class AuthService {
      *
      * @param sendSMSCertificationDTO 사용자가 입력한 핸드폰 번호가 저장되어있는 DTO
      **/
-    public void sendSMS(AuthReqeust.SendSMSCertificationDTO sendSMSCertificationDTO){
+    public void sendSMS(AuthRequest.SendSMSCertificationDTO sendSMSCertificationDTO){
         String receivePhoneNumber = sendSMSCertificationDTO.getPhoneNumber();
 
         SecureRandom secureRandom = new SecureRandom();
@@ -47,7 +47,7 @@ public class AuthService {
      *
      * @param validateSMSCertificationDTO 사용자의 핸드폰 번호와 사용자에게 전송할 인증번호가 저장되어있는 DTO
      **/
-    public void validateCertificationNumber(AuthReqeust.ValidateSMSCertificationDTO validateSMSCertificationDTO) {
+    public void validateCertificationNumber(AuthRequest.ValidateSMSCertificationDTO validateSMSCertificationDTO) {
         String phoneNumber = validateSMSCertificationDTO.getPhoneNumber();
 
         checkAttemptCountExceeded(phoneNumber);
@@ -100,7 +100,7 @@ public class AuthService {
      * @param validateSMSCertificationDTO 사용자의 핸드폰 번호와 사용자에게 전송할 인증번호가 저장되어있는 DTO
      * @return 안증번호가 유효하다면 true 반환, 유요하지 않다면 false 반환
      **/
-    public boolean isCertificationNumberMatching(AuthReqeust.ValidateSMSCertificationDTO validateSMSCertificationDTO) {
+    public boolean isCertificationNumberMatching(AuthRequest.ValidateSMSCertificationDTO validateSMSCertificationDTO) {
         String phoneNumber = validateSMSCertificationDTO.getPhoneNumber();
         return !isCertificationNumberExpired(phoneNumber) &&
                 smsCertificationRepository.getSMSCertification(phoneNumber)

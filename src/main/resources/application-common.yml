@@ -8,6 +8,11 @@ spring:
 #      on-profile: "common"
   config:
     location: file:/config/
+  sql:
+    init:
+      platform: mariadb
+      mode: always
+      data-locations: classpath:data.sql
 
   jpa:
     hibernate:
@@ -19,6 +24,7 @@ spring:
         format_sql: true
         highlight_sql: true
         use_sql_comments: true
+    defer-datasource-initialization: true
 
 logging:
   level:

@@ -1,4 +1,4 @@
-package sumcoda.boardbuddy.handler;
+package sumcoda.boardbuddy.handler.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

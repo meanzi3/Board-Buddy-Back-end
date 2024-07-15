@@ -20,8 +20,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import sumcoda.boardbuddy.component.auth.CustomAccessDeniedHandler;
-import sumcoda.boardbuddy.component.auth.CustomAuthenticationEntryPoint;
+import sumcoda.boardbuddy.handler.auth.CustomAccessDeniedHandler;
+import sumcoda.boardbuddy.handler.auth.CustomUnAuthorizedHandler;
 import sumcoda.boardbuddy.handler.auth.CustomAuthenticationFailureHandler;
 import sumcoda.boardbuddy.filter.CustomAuthenticationFilter;
 import sumcoda.boardbuddy.handler.auth.CustomAuthenticationSuccessHandler;
@@ -39,7 +39,7 @@ public class SecurityConfig {
 
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
-    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomUnAuthorizedHandler customUnAuthorizedHandler;
 
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
@@ -113,7 +113,7 @@ public class SecurityConfig {
                 // 추가 코드
                 .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(config -> config
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .authenticationEntryPoint(customUnAuthorizedHandler)
                         .accessDeniedHandler(customAccessDeniedHandler))
                 // HTTP 응답 헤더를 설정한다.
                 // frameOptions 설정을 sameOrigin 으로 설정하여,

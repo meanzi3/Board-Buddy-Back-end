@@ -24,12 +24,8 @@ public class MemberRequest {
 
         private String dong;
 
-        private String latitude;
-
-        private String longitude;
-
         @Builder
-        public RegisterDTO(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, String latitude, String longitude) {
+        public RegisterDTO(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong) {
             this.username = username;
             this.password = password;
             this.nickname = nickname;
@@ -38,8 +34,6 @@ public class MemberRequest {
             this.sido = sido;
             this.sigu = sigu;
             this.dong = dong;
-            this.latitude = latitude;
-            this.longitude = longitude;
         }
     }
 

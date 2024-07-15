@@ -19,37 +19,37 @@ public class PublicDistrictData {
     @Column(nullable = false)
     private String sido;
 
-    // 시, 군, 구
+    // 시, 구
     @Column(nullable = false)
-    private String sgg;
+    private String sigu;
 
-    // 읍, 면, 동
+    // 동
     @Column(nullable = false)
-    private String emd;
+    private String dong;
 
     // 위도
     @Column(nullable = false)
-    private String latitude;
+    private Double latitude;
 
     // 경도
     @Column(nullable = false)
-    private String longitude;
+    private Double longitude;
 
     @Builder
-    public PublicDistrictData(String sido, String sgg, String emd, String latitude, String longitude) {
+    public PublicDistrictData(String sido, String sigu, String dong, Double latitude, Double longitude) {
         this.sido = sido;
-        this.sgg = sgg;
-        this.emd = emd;
+        this.sigu = sigu;
+        this.dong = dong;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static PublicDistrictData createPublicDistrictData(String sido, String sgg, String emd, String latitude, String longitude) {
+    public static PublicDistrictData createPublicDistrictData(String sido, String sigu, String dong, Double latitude, Double longitude) {
         return PublicDistrictData.builder()
                 .sido(sido)
-                .sgg(sgg)
-                .emd(emd)
+                .sigu(sigu)
+                .dong(dong)
                 .latitude(latitude)
                 .longitude(longitude)
                 .build();

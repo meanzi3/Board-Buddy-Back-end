@@ -143,10 +143,6 @@ public class Member {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<BadgeImage> badgeImages = new ArrayList<>();
 
-    // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<MemberNearDistrictData> memberNearDistricts = new ArrayList<>();
-
     @Builder
     public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Integer buddyScore, Integer monthlyJoinCount, Integer totalJoinCount, Integer excellentCount, Integer goodCount, Integer badCount, Integer noShowCount, String description, Integer rank, MemberRole memberRole, ProfileImage profileImage) {
         this.username = username;
@@ -240,16 +236,6 @@ public class Member {
 
         if (badgeImage.getMember() != this) {
             badgeImage.assignMember(this);
-        }
-    }
-
-    // Member 1 <-> N MemberNearDistrictData
-    // 양방향 연관관계 편의 메서드
-    public void addMemberNearDistrict(MemberNearDistrictData memberNearDistrictData) {
-        this.memberNearDistricts.add(memberNearDistrictData);
-
-        if (memberNearDistrictData.getMember() != this) {
-            memberNearDistrictData.assignMember(this);
         }
     }
 }

@@ -1,6 +1,8 @@
 package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +13,7 @@ import sumcoda.boardbuddy.exception.member.MemberSaveException;
 import sumcoda.boardbuddy.exception.member.NicknameAlreadyExistsException;
 import sumcoda.boardbuddy.exception.member.UsernameAlreadyExistsException;
 import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.util.AuthUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +76,7 @@ public class MemberService {
                 registerDTO.getSido(),
                 registerDTO.getSigu(),
                 registerDTO.getDong(),
-                5,
+                2,
                 50,
                 0,
                 0,
@@ -91,5 +94,26 @@ public class MemberService {
         }
 
         return memberId;
+    }
+
+    /**
+     * 소셜 로그인 사용자에 대한 추가적인 회원가입
+     *
+     * @param oAuth2RegisterDTO 소셜로그인 사용자에 대한 추가적인 회원가입 정보
+     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     **/
+    @Transactional
+    public Long registerOAuth2Member(MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {
+
+        String username = AuthUtil.getUserNameByLoginType(authentication);
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이름을 가진 멤버를 찾을 수 없습니다."));
+
+        member.assignPhoneNumber(oAuth2RegisterDTO.getPhoneNumber());
+        member.assignSido(oAuth2RegisterDTO.getSido());
+        member.assignSigu(oAuth2RegisterDTO.getSigu());
+        member.assignDong(oAuth2RegisterDTO.getDong());
+
+        return member.getId();
     }
 }

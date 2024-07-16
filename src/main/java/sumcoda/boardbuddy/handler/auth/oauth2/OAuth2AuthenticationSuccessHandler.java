@@ -28,13 +28,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        log.info("OAuth2 success handler is working");
 
         RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-        log.info("OAuth2 success handler is working");
         CustomOAuth2User user =  (CustomOAuth2User) authentication.getPrincipal();
         Boolean isPhoneNumberVerifiedMember = checkIsPhoneNumberVerifiedMember(user);
-
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

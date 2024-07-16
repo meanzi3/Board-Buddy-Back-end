@@ -4,10 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import sumcoda.boardbuddy.exception.auth.SMSCertificationAttemptExceededException;
-import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
-import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException;
-import sumcoda.boardbuddy.exception.auth.SMSSendingException;
+import sumcoda.boardbuddy.exception.auth.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +50,72 @@ public class AuthExceptionHandler {
         Map<String, Object> response = new HashMap<>();
 
         response.put("data", false);
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AuthenticationNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> authenticationNotSupportedExceptionHandler(AuthenticationNotSupportedException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("data", null);
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MissingCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> missingCredentialsExceptionHandler(MissingCredentialsException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("data", null);
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SocialUserInfoRetrievalException.class)
+    public ResponseEntity<Map<String, Object>> socialUserInfoRetrievalExceptionHandler(SocialUserInfoRetrievalException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("data", null);
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(ClientRegistrationRetrievalException.class)
+    public ResponseEntity<Map<String, Object>> clientRegistrationRetrievalExceptionHandler(ClientRegistrationRetrievalException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("data", null);
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<Map<String, Object>> invalidPasswordExceptionHandler(InvalidPasswordException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("data", null);
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthenticationMissingException.class)
+    public ResponseEntity<Map<String, Object>> authenticationMissingExceptionHandler(InvalidPasswordException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("data", null);
 
         response.put("message", ex.getMessage());
 

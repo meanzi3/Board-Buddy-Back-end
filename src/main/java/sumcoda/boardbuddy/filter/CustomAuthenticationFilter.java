@@ -9,12 +9,14 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.StringUtils;
 import sumcoda.boardbuddy.dto.AuthRequest;
 import sumcoda.boardbuddy.dto.auth.CustomAuthenticationToken;
+import sumcoda.boardbuddy.exception.auth.AuthenticationNotSupportedException;
+import sumcoda.boardbuddy.exception.auth.MissingCredentialsException;
+import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 
 import java.io.IOException;
 
@@ -35,7 +37,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
 
         // 해당 요청이 POST 인지 확인
         if(!isPost(request)) {
-            throw new IllegalStateException("Authentication is not supported");
+            throw new AuthenticationNotSupportedException("해당 요청은 인증이 지원되지 않는 요청입니다. POST 요청인지 확인하세요.");
         }
 
         // POST 이면 body 를 AccountDto( 로그인 정보 DTO ) 에 매핑
@@ -43,13 +45,13 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         try {
             loginDTO = objectMapper.readValue(request.getReader(), AuthRequest.LoginDTO.class);
         } catch (IOException e) {
-            throw new UsernameNotFoundException(e.getMessage());
+            throw new MemberNotFoundException(e.getMessage());
         }
 
         // ID, PASSWORD 가 있는지 확인
         if(!StringUtils.hasLength(loginDTO.getUsername())
                 || !StringUtils.hasLength(loginDTO.getPassword())) {
-            throw new IllegalArgumentException("username or password is empty");
+            throw new MissingCredentialsException("아이디나 비밀번호의 입력이 누락되었습니다. 아이디와 비밀번호를 올바르게 입력했는지 확인해주세요.");
         }
 
         // 처음에는 인증 되지 않은 토큰 생성

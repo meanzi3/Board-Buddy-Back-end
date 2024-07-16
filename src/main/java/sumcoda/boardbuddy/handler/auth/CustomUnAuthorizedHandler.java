@@ -28,11 +28,9 @@ public class CustomUnAuthorizedHandler implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        responseData.put("data", "error");
-        responseData.put("message", "UnAuthorized");
+        responseData.put("data", null);
+        responseData.put("message", "인증되지 않은 요청입니다.");
 
         objectMapper.writeValue(response.getWriter(), responseData);
-
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UnAuthorized");
     }
 }

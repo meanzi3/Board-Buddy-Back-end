@@ -25,6 +25,9 @@ import sumcoda.boardbuddy.handler.auth.CustomUnAuthorizedHandler;
 import sumcoda.boardbuddy.handler.auth.CustomAuthenticationFailureHandler;
 import sumcoda.boardbuddy.filter.CustomAuthenticationFilter;
 import sumcoda.boardbuddy.handler.auth.CustomAuthenticationSuccessHandler;
+import sumcoda.boardbuddy.handler.auth.oauth2.OAuth2AuthenticationFailureHandler;
+import sumcoda.boardbuddy.handler.auth.oauth2.OAuth2AuthenticationSuccessHandler;
+import sumcoda.boardbuddy.service.CustomOAuth2UserService;
 
 import java.util.List;
 
@@ -42,6 +45,12 @@ public class SecurityConfig {
     private final CustomUnAuthorizedHandler customUnAuthorizedHandler;
 
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
+    private final CustomOAuth2UserService customOAuth2UserService;
+
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -92,6 +101,7 @@ public class SecurityConfig {
 
         return source;
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 새로추가
@@ -124,6 +134,21 @@ public class SecurityConfig {
                                         HeadersConfigurer.FrameOptionsConfig::sameOrigin
                                 )
                 );
+
+        // oauth2 소셜 로그인 구현 코드
+        http
+                .oauth2Login(oauth2 -> oauth2
+//                        .loginPage("/auth/login")
+                        .authorizationEndpoint(oAuth2 -> oAuth2
+                                .baseUri("/api/oauth2/authorization"))
+                        .redirectionEndpoint(oAuth2 -> oAuth2
+                                .baseUri("https://boardbuddyapp.com/login/oauth2/code/**"))
+                        .userInfoEndpoint(userInfoEndpointConfig ->
+                                userInfoEndpointConfig
+                                        .userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler));
+
 
         http    // 하나의 아이디에 대해서 다중 로그인에 대한 처리
                 .sessionManagement(auth -> auth

@@ -51,19 +51,16 @@ public class Member {
     // 사용자가 거주하는 oo시, oo도
     // 일반 로그인 = 회원가입시 설정 가능
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
-    @Column(nullable = false)
     private String sido;
 
     // 사용자가 거주하는 oo시, oo구
     // 일반 로그인 = 회원가입시 설정 가능
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
-    @Column(nullable = false)
     private String sigu;
 
     // 사용자가 거주하는 oo동
     // 일반 로그인 = 회원가입시 설정 가능
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
-    @Column(nullable = false)
     private String dong;
 
     // 사용자 위치를 기준으로 주변 범위를 조절하기 위한 필드
@@ -237,5 +234,36 @@ public class Member {
         if (badgeImage.getMember() != this) {
             badgeImage.assignMember(this);
         }
+    }
+
+    // Member 1 <-> N MemberNearDistrictData
+    // 양방향 연관관계 편의 메서드
+    public void addMemberNearDistrict(MemberNearDistrictData memberNearDistrictData) {
+        this.memberNearDistricts.add(memberNearDistrictData);
+
+        if (memberNearDistrictData.getMember() != this) {
+            memberNearDistrictData.assignMember(this);
+        }
+    }
+
+    // 이메일 수정 메서드
+    public void assignEmail(String email) {
+        this.email = email;
+    }
+
+    public void assignPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void assignSido(String sido) {
+        this.sido = sido;
+    }
+
+    public void assignSigu(String sigu) {
+        this.sigu = sigu;
+    }
+
+    public void assignDong(String dong) {
+        this.dong = dong;
     }
 }

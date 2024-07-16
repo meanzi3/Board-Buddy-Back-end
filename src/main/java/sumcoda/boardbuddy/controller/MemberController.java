@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,7 +69,7 @@ public class MemberController {
      * @param registerDTO 프론트로부터 전달받은 회원가입 정보
      **/
     @PostMapping(value = "/api/auth/register")
-    public ResponseEntity<?> register(@RequestBody MemberRequest.RegisterDTO registerDTO) {
+    public ResponseEntity<Map<String, Object>> register(@RequestBody MemberRequest.RegisterDTO registerDTO) {
         log.info("register is working");
 
         Map<String, Object> response = new HashMap<>();
@@ -81,4 +82,25 @@ public class MemberController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    /**
+     * 첫 소셜 로그인 사용자의 회원가입 요청 캐치
+     *
+     * @param oAuth2RegisterDTO 프론트로부터 전달받은 회원가입 정보
+     **/
+    @PostMapping(value = "/api/auth/oauth2/register")
+    public ResponseEntity<Map<String, Object>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {
+        log.info("social register is working");
+
+        Map<String, Object> response = new HashMap<>();
+
+        Long memberId = memberService.registerOAuth2Member(oAuth2RegisterDTO, authentication);
+
+        response.put("data", memberId);
+
+        response.put("message", "회원가입이 완료되었습니다.");
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
 }

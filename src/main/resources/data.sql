@@ -1,6 +1,8 @@
-DROP TABLE IF EXISTS `public_district_data`;
+SET FOREIGN_KEY_CHECKS = 0;
 
-CREATE TABLE `public_district_data` (
+DROP TABLE IF EXISTS `public_district`;
+
+CREATE TABLE `public_district` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
     `sido` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     `sigu` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -10,9 +12,9 @@ CREATE TABLE `public_district_data` (
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3656 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-LOCK TABLES `public_district_data` WRITE;
+LOCK TABLES `public_district` WRITE;
 
-INSERT INTO `public_district_data` VALUES
+INSERT INTO `public_district` VALUES
 (1, '서울특별시', '종로구', '청운동', 37.58920545163482, 126.96932389009248),
 (2, '서울특별시', '종로구', '신교동', 37.58450634891726, 126.96794151918255),
 (3, '서울특별시', '종로구', '궁정동', 37.58469795480878, 126.9727063196789),
@@ -3670,3 +3672,5 @@ INSERT INTO `public_district_data` VALUES
 (3655, '전북특별자치도', '김제시', '양전동', 35.75382388550655, 126.90476187424147);
 
 UNLOCK TABLES;
+
+SET FOREIGN_KEY_CHECKS = 1;

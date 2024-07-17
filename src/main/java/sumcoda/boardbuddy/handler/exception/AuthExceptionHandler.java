@@ -112,13 +112,13 @@ public class AuthExceptionHandler {
     }
 
     @ExceptionHandler(AuthenticationMissingException.class)
-    public ResponseEntity<Map<String, Object>> authenticationMissingExceptionHandler(InvalidPasswordException ex) {
+    public ResponseEntity<Map<String, Object>> authenticationMissingExceptionHandler(AuthenticationMissingException ex) {
         Map<String, Object> response = new HashMap<>();
 
         response.put("data", null);
 
         response.put("message", ex.getMessage());
 
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

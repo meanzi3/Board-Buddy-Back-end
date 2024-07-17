@@ -32,7 +32,7 @@ public class GatherArticleExceptionHandler {
   // 모집글 조회 예외 처리 핸들러
   @ExceptionHandler(GatherArticleNotFoundException.class)
   public ResponseEntity<ApiResponse<String>> handleGatherArticleNotFoundException(GatherArticleNotFoundException e) {
-    return buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    return buildErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
   }
 
   // 모집글 수정 예외 처리 핸들러
@@ -44,7 +44,7 @@ public class GatherArticleExceptionHandler {
   // 작성자 확인 예외 처리 핸들러
   @ExceptionHandler(UnauthorizedActionException.class)
   public ResponseEntity<ApiResponse<String>> handleUnauthorizedActionException(UnauthorizedActionException e) {
-    return buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    return buildErrorResponse(e.getMessage(), HttpStatus.FORBIDDEN);
   }
 
   private ResponseEntity<ApiResponse<String>> buildErrorResponse(String message, HttpStatus status) {

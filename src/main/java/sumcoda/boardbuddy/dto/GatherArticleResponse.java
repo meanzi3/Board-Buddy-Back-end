@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
@@ -53,7 +52,7 @@ public class GatherArticleResponse {
     }
 
     @Getter
-    @Setter
+    @NoArgsConstructor
     public static class CreateDTO {
         private Long id;
 
@@ -70,7 +69,7 @@ public class GatherArticleResponse {
     }
 
     @Getter
-    @Setter
+    @NoArgsConstructor
     public static class ReadDTO {
         private String title;
         private String description;
@@ -123,7 +122,7 @@ public class GatherArticleResponse {
     }
 
     @Getter
-    @Setter
+    @NoArgsConstructor
     public static class AuthorDTO {
         private String nickname;
         private int rank;
@@ -150,7 +149,7 @@ public class GatherArticleResponse {
     }
 
     @Getter
-    @Setter
+    @NoArgsConstructor
     public static class UpdateDTO {
         private Long id;
 
@@ -168,7 +167,7 @@ public class GatherArticleResponse {
     }
 
     @Getter
-    @Setter
+    @NoArgsConstructor
     public static class DeleteDTO {
         private Long id;
 

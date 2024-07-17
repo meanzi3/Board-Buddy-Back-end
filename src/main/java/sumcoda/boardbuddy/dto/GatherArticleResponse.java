@@ -128,12 +128,12 @@ public class GatherArticleResponse {
     @NoArgsConstructor
     public static class AuthorDTO {
         private String nickname;
-        private int rank;
+        private Integer rank;
         private String profileURL;
         private String description;
 
         @Builder
-        public AuthorDTO(String nickname, int rank, String profileURL, String description) {
+        public AuthorDTO(String nickname, Integer rank, String profileURL, String description) {
             this.nickname = nickname;
             this.rank = rank;
             this.profileURL = profileURL;

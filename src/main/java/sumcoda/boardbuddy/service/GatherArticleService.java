@@ -12,7 +12,7 @@ import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleSaveException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleUpdateException;
 import sumcoda.boardbuddy.exception.gatherArticle.UnauthorizedActionException;
-import sumcoda.boardbuddy.exception.member.InvalidUserException;
+import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.MemberRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
@@ -44,7 +44,7 @@ public class GatherArticleService {
 
         // 사용자 검증
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new InvalidUserException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자입니다."));
 
         // 작성 요청 예외 검증, 처리
         validateCreateRequest(createRequest);
@@ -83,7 +83,7 @@ public class GatherArticleService {
 
         // 사용자 검증
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new InvalidUserException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자입니다."));
 
         // 사용자와 모집글의 관계 찾기
         String participationStatus = getParticipationStatus(gatherArticle, member);
@@ -110,7 +110,7 @@ public class GatherArticleService {
 
         // 사용자 검증
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new InvalidUserException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자입니다."));
 
         // 작성자 검증
         if (!memberGatherArticleRepository.isAuthor(id, member.getId())) {
@@ -141,7 +141,7 @@ public class GatherArticleService {
 
         // 사용자 검증
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new InvalidUserException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자입니다."));
 
         // 작성자인지 검증
         if (!memberGatherArticleRepository.isAuthor(id, member.getId())) {

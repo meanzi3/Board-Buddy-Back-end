@@ -27,7 +27,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final MemberRepository memberRepository;
     
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException{
         log.info("OAuth2 success handler is working");
 
         RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
@@ -35,15 +35,16 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         CustomOAuth2User user =  (CustomOAuth2User) authentication.getPrincipal();
         Boolean isPhoneNumberVerifiedMember = checkIsPhoneNumberVerifiedMember(user);
 
-        response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        // 최초 로그인 사용자가 아닌 사용자인 경우
+        // 기존 소셜 로그인 사용자인 경우
         if (Boolean.TRUE.equals(isPhoneNumberVerifiedMember)) {
+            response.setStatus(HttpStatus.OK.value());
             redirectStrategy.sendRedirect(request, response, "https://boardbuddyapp.vercel.app/login/oauth/callback?isLoginSucceed=true&isVerifiedMember=true&message=로그인에 성공하였습니다.");
-        // 최초 로그인 사용자인 경우
+        // 신규 소셜 로그인 사용자인 경우
         } else {
+            response.setStatus(HttpStatus.CREATED.value());
             redirectStrategy.sendRedirect(request, response , "https://boardbuddyapp.vercel.app/login/oauth/callback?isLoginSucceed=true&isVerifiedMember=false&message=로그인에 성공하였습니다.");
         }
     }

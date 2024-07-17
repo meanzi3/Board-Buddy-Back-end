@@ -22,7 +22,7 @@ public class GatherArticleService {
      * @return 내가 작성한 모집글 DTO 리스트
      **/
     @Transactional
-    public List<GatherArticleResponse.GatherArticleDTO> getMyGatherArticles(String username) {
+    public List<GatherArticleResponse.GatherArticleInfosDTO> getMyGatherArticles(String username) {
         return gatherArticleRepository.findGatherArticleDTOByUsername(username);
     }
 }

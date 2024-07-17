@@ -36,7 +36,7 @@ public class GatherArticleController {
 
         String username = userDetails.getUsername();
 
-        List<GatherArticleResponse.GatherArticleDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
+        List<GatherArticleResponse.GatherArticleInfosDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
 
         response.put("data", Map.of("posts", gatherArticles));
 

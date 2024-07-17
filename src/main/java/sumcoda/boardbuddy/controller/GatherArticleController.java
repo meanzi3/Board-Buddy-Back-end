@@ -10,9 +10,7 @@ import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.GatherArticleService;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -90,18 +88,13 @@ public class GatherArticleController {
      * @return 내가 작성한 모집글 리스트
      **/
     @GetMapping(value = "/api/my/gatherArticles")
-    public ResponseEntity<?> getMyGatherArticles (@ModelAttribute("username") String username) {
+    public ResponseEntity<ApiResponse<List<GatherArticleResponse.GatherArticleInfosDTO>>> getMyGatherArticles (
+            @ModelAttribute("username") String username) {
         log.info("get gather articles is working");
-
-        Map<String, Object> response = new HashMap<>();
 
         List<GatherArticleResponse.GatherArticleInfosDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
 
-        response.put("data", Map.of("posts", gatherArticles));
-
-        response.put("message", "내 모집글이 성공적으로 조회되었습니다.");
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(new ApiResponse<>(gatherArticles, "내 모집글이 성공적으로 조회되었습니다."));
     }
 
     /**
@@ -111,18 +104,13 @@ public class GatherArticleController {
      * @return 참가한 모집글 리스트
      **/
     @GetMapping(value = "/api/my/participations")
-    public ResponseEntity<?> getMyParticipations (@ModelAttribute("username") String username) {
+    public ResponseEntity<ApiResponse<List<GatherArticleResponse.GatherArticleInfosDTO>>> getMyParticipations (
+            @ModelAttribute("username") String username) {
         log.info("get my participations is working");
-
-        Map<String, Object> response = new HashMap<>();
 
         List<GatherArticleResponse.GatherArticleInfosDTO> participations = gatherArticleService.getMyParticipations(username);
 
-        response.put("data", Map.of("posts", participations));
-
-        response.put("message", "참가한 모집글이 성공적으로 조회되었습니다.");
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(new ApiResponse<>(participations, "참가한 모집글이 성공적으로 조회되었습니다."));
     }
 }
 

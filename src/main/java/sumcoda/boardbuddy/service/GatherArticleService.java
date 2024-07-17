@@ -87,7 +87,7 @@ public class GatherArticleService {
      */
     public GatherArticleResponse.ReadDTO getGatherArticle(Long id, String username) {
 
-        // // 존재하는 모집글인지 확인
+        // 존재하는 모집글인지 확인
         GatherArticle gatherArticle = gatherArticleRepository.findById(id)
                 .orElseThrow(() -> new GatherArticleNotFoundException("존재하지 않는 모집글입니다."));
 
@@ -132,9 +132,6 @@ public class GatherArticleService {
 
         // 수정
         updateRequest.updateEntity(gatherArticle);
-
-        // 저장
-        gatherArticleRepository.save(gatherArticle);
 
         return GatherArticleResponse.UpdateDTO.from(gatherArticle);
     }

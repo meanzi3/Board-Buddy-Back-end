@@ -24,9 +24,9 @@ public class GatherArticle extends BaseTimeEntity {
     @Column(nullable = false)
     private String title;
 
-    // 해당 모집글 현재 참가한 인원 (작성자를 포함하여 1로 초기화)
+    // 해당 모집글 현재 참가한 인원
     @Column(nullable = false)
-    private Integer currentParticipants = 1;
+    private Integer currentParticipants;
 
     // 해당 모집글 제한 인원
     @Column(nullable = false)
@@ -80,8 +80,9 @@ public class GatherArticle extends BaseTimeEntity {
     @Builder
     public GatherArticle(String title, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
         this.title = title;
+        this.currentParticipants = 1; // 작성자를 포함하여 1로 초기화
         this.maxParticipants = maxParticipants;
-        this.status = status;
+        this.status = GatherArticleStatus.OPEN; // 모집중으로 초기화
         this.description = description;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
@@ -92,11 +93,10 @@ public class GatherArticle extends BaseTimeEntity {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static GatherArticle createGatherArticle(String title, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
+    public static GatherArticle createGatherArticle(String title, Integer maxParticipants, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
         return GatherArticle.builder()
                 .title(title)
                 .maxParticipants(maxParticipants)
-                .status(status)
                 .description(description)
                 .startDateTime(startDateTime)
                 .endDateTime(endDateTime)
@@ -105,6 +105,19 @@ public class GatherArticle extends BaseTimeEntity {
                 .dong(dong)
                 .meetingLocation(meetingLocation)
                 .build();
+    }
+
+    // 수정 메서드
+    public void update(String title, String description, String location, String sido, String sigu, String dong, Integer maxParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        if (title != null) this.title = title;
+        if (description != null) this.description = description;
+        if (location != null) this.meetingLocation = location;
+        if (sido != null) this.sido = sido;
+        if (sigu != null) this.sigu = sigu;
+        if (dong != null) this.dong = dong;
+        if (maxParticipants != null) this.maxParticipants = maxParticipants;
+        if (startDateTime != null) this.startDateTime = startDateTime;
+        if (endDateTime != null) this.endDateTime = endDateTime;
     }
 
     // GatherArticle 1 <-> 1 Member

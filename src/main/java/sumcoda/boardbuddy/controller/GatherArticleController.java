@@ -6,14 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.GatherArticleRequest;
+import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.GatherArticleService;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static sumcoda.boardbuddy.dto.GatherArticleResponse.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,10 +29,10 @@ public class GatherArticleController {
      * @return
      */
     @PostMapping(value = "/api/gatherArticles")
-    public ResponseEntity<ApiResponse<CreateDTO>> createGatherArticle(
+    public ResponseEntity<ApiResponse<GatherArticleResponse.CreateDTO>> createGatherArticle(
             @RequestBody GatherArticleRequest.CreateDTO createRequest,
             @ModelAttribute("username") String username){
-        CreateDTO createResponse = gatherArticleService.createGatherArticle(createRequest, username);
+        GatherArticleResponse.CreateDTO createResponse = gatherArticleService.createGatherArticle(createRequest, username);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(createResponse, "모집글이 업로드 되었습니다"));
     }
 
@@ -45,10 +44,10 @@ public class GatherArticleController {
      * @return
      */
     @GetMapping(value = "/api/gatherArticles/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<ReadDTO>> getGatherArticle(
+    public ResponseEntity<ApiResponse<GatherArticleResponse.ReadDTO>> getGatherArticle(
             @PathVariable Long gatherArticleId,
             @ModelAttribute("username") String username) {
-        ReadDTO response = gatherArticleService.getGatherArticle(gatherArticleId, username);
+        GatherArticleResponse.ReadDTO response = gatherArticleService.getGatherArticle(gatherArticleId, username);
         return ResponseEntity.ok(new ApiResponse<>(response, "성공적으로 조회되었습니다."));
     }
 
@@ -61,11 +60,11 @@ public class GatherArticleController {
      * @return
      */
     @PutMapping(value = "/api/gatherArticles/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<UpdateDTO>> updateGatherArticle(
+    public ResponseEntity<ApiResponse<GatherArticleResponse.UpdateDTO>> updateGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestBody GatherArticleRequest.UpdateDTO updateRequest,
-            @ModelAttribute("username") String username){
-        UpdateDTO updateResponse = gatherArticleService.updateGatherArticle(gatherArticleId, updateRequest, username);
+            @ModelAttribute("username") String username) {
+        GatherArticleResponse.UpdateDTO updateResponse = gatherArticleService.updateGatherArticle(gatherArticleId, updateRequest, username);
         return ResponseEntity.ok(new ApiResponse<>(updateResponse, "모집글이 수정되었습니다."));
     }
 
@@ -77,10 +76,10 @@ public class GatherArticleController {
      * @return
      */
     @DeleteMapping(value = "/api/gatherArticles/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<DeleteDTO>> deleteGatherArticle(
+    public ResponseEntity<ApiResponse<GatherArticleResponse.DeleteDTO>> deleteGatherArticle(
             @PathVariable Long gatherArticleId,
             @ModelAttribute("username") String username){
-        DeleteDTO deleteResponse = gatherArticleService.deleteGatherArticle(gatherArticleId, username);
+        GatherArticleResponse.DeleteDTO deleteResponse = gatherArticleService.deleteGatherArticle(gatherArticleId, username);
         return ResponseEntity.ok(new ApiResponse<>(deleteResponse, "모집글이 삭제되었습니다."));
     }
 
@@ -96,7 +95,7 @@ public class GatherArticleController {
 
         Map<String, Object> response = new HashMap<>();
 
-        List<GatherArticleInfosDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
+        List<GatherArticleResponse.GatherArticleInfosDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
 
         response.put("data", Map.of("posts", gatherArticles));
 
@@ -117,7 +116,7 @@ public class GatherArticleController {
 
         Map<String, Object> response = new HashMap<>();
 
-        List<GatherArticleInfosDTO> participations = gatherArticleService.getMyParticipations(username);
+        List<GatherArticleResponse.GatherArticleInfosDTO> participations = gatherArticleService.getMyParticipations(username);
 
         response.put("data", Map.of("posts", participations));
 

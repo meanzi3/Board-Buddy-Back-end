@@ -1,11 +1,12 @@
 package sumcoda.boardbuddy.repository.gatherArticle;
 
+import sumcoda.boardbuddy.dto.GatherArticleResponse;
+
 import java.util.List;
 
-import static sumcoda.boardbuddy.dto.GatherArticleResponse.*;
 
 public interface GatherArticleRepositoryCustom {
-    List<GatherArticleInfosDTO> findGatherArticleInfosByUsername(String username);
+    List<GatherArticleResponse.GatherArticleInfosDTO> findGatherArticleInfosByUsername(String username);
 
-    List<GatherArticleInfosDTO> findParticipationsByUsername(String username);
+    List<GatherArticleResponse.GatherArticleInfosDTO> findParticipationsByUsername(String username);
 }

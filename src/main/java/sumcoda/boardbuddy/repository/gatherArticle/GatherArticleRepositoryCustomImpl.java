@@ -4,11 +4,11 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.enumerate.GatherArticleRole;
 
 import java.util.List;
 
-import static sumcoda.boardbuddy.dto.GatherArticleResponse.*;
 import static sumcoda.boardbuddy.entity.QGatherArticle.gatherArticle;
 import static sumcoda.boardbuddy.entity.QMember.member;
 import static sumcoda.boardbuddy.entity.QMemberGatherArticle.memberGatherArticle;
@@ -20,8 +20,8 @@ public class GatherArticleRepositoryCustomImpl implements sumcoda.boardbuddy.rep
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<GatherArticleInfosDTO> findGatherArticleInfosByUsername(String username) {
-        return jpaQueryFactory.select(Projections.fields(GatherArticleInfosDTO.class,
+    public List<GatherArticleResponse.GatherArticleInfosDTO> findGatherArticleInfosByUsername(String username) {
+        return jpaQueryFactory.select(Projections.fields(GatherArticleResponse.GatherArticleInfosDTO.class,
                         gatherArticle.id,
                         gatherArticle.title,
                         gatherArticle.description,
@@ -41,8 +41,8 @@ public class GatherArticleRepositoryCustomImpl implements sumcoda.boardbuddy.rep
     }
 
     @Override
-    public List<GatherArticleInfosDTO> findParticipationsByUsername(String username) {
-        return jpaQueryFactory.select(Projections.fields(GatherArticleInfosDTO.class,
+    public List<GatherArticleResponse.GatherArticleInfosDTO> findParticipationsByUsername(String username) {
+        return jpaQueryFactory.select(Projections.fields(GatherArticleResponse.GatherArticleInfosDTO.class,
                         gatherArticle.id,
                         gatherArticle.title,
                         gatherArticle.description,

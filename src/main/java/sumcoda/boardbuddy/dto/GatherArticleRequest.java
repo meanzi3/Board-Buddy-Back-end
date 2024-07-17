@@ -18,7 +18,7 @@ public class GatherArticleRequest {
 
     private String description;
 
-    private String location;
+    private String meetingLocation;
 
     private String sido;
 
@@ -29,28 +29,28 @@ public class GatherArticleRequest {
     private Integer maxParticipants;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime startTime;
+    private LocalDateTime startDateTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime endTime;
+    private LocalDateTime endDateTime;
 
     @Builder
-    public CreateDTO(String title, String description, String location, String sido, String sigu, String dong, Integer maxParticipants, LocalDateTime startTime, LocalDateTime endTime) {
+    public CreateDTO(String title, String description, String meetingLocation, String sido, String sigu, String dong, Integer maxParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime) {
       this.title = title;
       this.description = description;
-      this.location = location;
+      this.meetingLocation = meetingLocation;
       this.sido = sido;
       this.sigu = sigu;
       this.dong = dong;
       this.maxParticipants = maxParticipants;
-      this.startTime = startTime;
-      this.endTime = endTime;
+      this.startDateTime = startDateTime;
+      this.endDateTime = endDateTime;
     }
 
     // 엔티티로 변환
     public GatherArticle toEntity() {
-      return GatherArticle.createGatherArticle(this.title, this.maxParticipants, this.description, this.startTime, this.endTime,
-              this.sido, this. sigu, this.dong,  this.location);
+      return GatherArticle.createGatherArticle(this.title, this.maxParticipants, this.description, this.startDateTime, this.endDateTime,
+              this.sido, this. sigu, this.dong,  this.meetingLocation);
     }
   }
 
@@ -65,7 +65,7 @@ public class GatherArticleRequest {
 
     private String description;
 
-    private String location;
+    private String meetingLocation;
 
     private String sido;
 
@@ -76,27 +76,27 @@ public class GatherArticleRequest {
     private Integer maxParticipants;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime startTime;
+    private LocalDateTime startDateTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime endTime;
+    private LocalDateTime endDateTime;
 
     @Builder
-    public UpdateDTO(String title, String description, String location, String sido, String sigu, String dong, Integer maxParticipants, LocalDateTime startTime, LocalDateTime endTime) {
+    public UpdateDTO(String title, String description, String meetingLocation, String sido, String sigu, String dong, Integer maxParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime) {
       this.title = title;
       this.description = description;
-      this.location = location;
+      this.meetingLocation = meetingLocation;
       this.sido = sido;
       this.sigu = sigu;
       this.dong = dong;
       this.maxParticipants = maxParticipants;
-      this.startTime = startTime;
-      this.endTime = endTime;
+      this.startDateTime = startDateTime;
+      this.endDateTime = endDateTime;
     }
 
     // 엔티티 수정
     public void updateEntity(GatherArticle gatherArticle) {
-      gatherArticle.update(this.title, this.description, this.location, this.sido, this.sigu, this.dong, this.maxParticipants, this.startTime, this.endTime);
+      gatherArticle.update(this.title, this.description, this.meetingLocation, this.sido, this.sigu, this.dong, this.maxParticipants, this.startDateTime, this.endDateTime);
     }
 
   }

@@ -178,7 +178,7 @@ public class GatherArticleService {
         if (createRequest.getDescription() == null || createRequest.getDescription().isEmpty()) {
             throw new GatherArticleSaveException("설명이 입력되지 않았습니다.");
         }
-        if (createRequest.getLocation() == null || createRequest.getLocation().isEmpty()) {
+        if (createRequest.getMeetingLocation() == null || createRequest.getMeetingLocation().isEmpty()) {
             throw new GatherArticleSaveException("장소가 입력되지 않았습니다.");
         }
         if (createRequest.getSido() == null || createRequest.getSido().isEmpty()) {
@@ -190,10 +190,10 @@ public class GatherArticleService {
         if (createRequest.getDong() == null || createRequest.getDong().isEmpty()) {
             throw new GatherArticleSaveException("동이 입력되지 않았습니다.");
         }
-        if (createRequest.getStartTime() == null) {
+        if (createRequest.getStartDateTime() == null) {
             throw new GatherArticleSaveException("시작 시간이 입력되지 않았습니다.");
         }
-        if (createRequest.getEndTime() == null) {
+        if (createRequest.getEndDateTime() == null) {
             throw new GatherArticleSaveException("종료 시간이 입력되지 않았습니다.");
         }
         if (createRequest.getMaxParticipants() == null || createRequest.getMaxParticipants() <= 0) {
@@ -212,7 +212,7 @@ public class GatherArticleService {
         if (updateRequest.getDescription() == null || updateRequest.getDescription().isEmpty()) {
             throw new GatherArticleUpdateException("설명이 입력되지 않았습니다.");
         }
-        if (updateRequest.getLocation() == null || updateRequest.getLocation().isEmpty()) {
+        if (updateRequest.getMeetingLocation() == null || updateRequest.getMeetingLocation().isEmpty()) {
             throw new GatherArticleUpdateException("장소가 입력되지 않았습니다.");
         }
         if (updateRequest.getSido() == null || updateRequest.getSido().isEmpty()) {
@@ -224,10 +224,10 @@ public class GatherArticleService {
         if (updateRequest.getDong() == null || updateRequest.getDong().isEmpty()) {
             throw new GatherArticleUpdateException("동이 입력되지 않았습니다.");
         }
-        if (updateRequest.getStartTime() == null) {
+        if (updateRequest.getStartDateTime() == null) {
             throw new GatherArticleUpdateException("시작 시간이 입력되지 않았습니다.");
         }
-        if (updateRequest.getEndTime() == null) {
+        if (updateRequest.getEndDateTime() == null) {
             throw new GatherArticleUpdateException("종료 시간이 입력되지 않았습니다.");
         }
         if (updateRequest.getMaxParticipants() == null || updateRequest.getMaxParticipants() <= 0) {

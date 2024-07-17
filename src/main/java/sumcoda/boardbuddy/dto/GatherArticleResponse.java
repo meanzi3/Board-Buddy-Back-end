@@ -75,30 +75,30 @@ public class GatherArticleResponse {
         private String title;
         private String description;
         private GatherArticleResponse.AuthorDTO author;
-        private String location;
+        private String meetingLocation;
         private Integer maxParticipants;
         private Integer currentParticipants;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        private LocalDateTime startTime;
+        private LocalDateTime startDateTime;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        private LocalDateTime endTime;
+        private LocalDateTime endDateTime;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
         private LocalDateTime createdAt;
         private GatherArticleStatus status;
         private String participationStatus;
 
         @Builder
-        public ReadDTO(String title, String description, AuthorDTO author, String location,
-                       Integer maxParticipants, Integer currentParticipants, LocalDateTime startTime,
-                       LocalDateTime endTime, LocalDateTime createdAt, GatherArticleStatus status, String participationStatus) {
+        public ReadDTO(String title, String description, AuthorDTO author, String meetingLocation,
+                       Integer maxParticipants, Integer currentParticipants, LocalDateTime startDateTime,
+                       LocalDateTime endDateTime, LocalDateTime createdAt, GatherArticleStatus status, String participationStatus) {
             this.title = title;
             this.description = description;
             this.author = author;
-            this.location = location;
+            this.meetingLocation = meetingLocation;
             this.maxParticipants = maxParticipants;
             this.currentParticipants = currentParticipants;
-            this.startTime = startTime;
-            this.endTime = endTime;
+            this.startDateTime = startDateTime;
+            this.endDateTime = endDateTime;
             this.createdAt = createdAt;
             this.status = status;
             this.participationStatus = participationStatus;
@@ -106,15 +106,15 @@ public class GatherArticleResponse {
 
         // 엔티티를 response dto로 변환
         public static GatherArticleResponse.ReadDTO from(GatherArticle gatherArticle, Member member, String participationStatus) {
-            return GatherArticleResponse.ReadDTO.builder()
+            return ReadDTO.builder()
                     .title(gatherArticle.getTitle())
                     .description(gatherArticle.getDescription())
-                    .author(GatherArticleResponse.AuthorDTO.from(member))
-                    .location(gatherArticle.getMeetingLocation())
+                    .author(AuthorDTO.from(member))
+                    .meetingLocation(gatherArticle.getMeetingLocation())
                     .maxParticipants(gatherArticle.getMaxParticipants())
                     .currentParticipants(gatherArticle.getCurrentParticipants())
-                    .startTime(gatherArticle.getStartDateTime())
-                    .endTime(gatherArticle.getEndDateTime())
+                    .startDateTime(gatherArticle.getStartDateTime())
+                    .endDateTime(gatherArticle.getEndDateTime())
                     .createdAt(gatherArticle.getCreatedAt())
                     .status(gatherArticle.getStatus())
                     .participationStatus(participationStatus)

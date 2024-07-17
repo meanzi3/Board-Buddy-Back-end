@@ -236,16 +236,6 @@ public class Member {
         }
     }
 
-    // Member 1 <-> N MemberNearDistrictData
-    // 양방향 연관관계 편의 메서드
-    public void addMemberNearDistrict(MemberNearDistrictData memberNearDistrictData) {
-        this.memberNearDistricts.add(memberNearDistrictData);
-
-        if (memberNearDistrictData.getMember() != this) {
-            memberNearDistrictData.assignMember(this);
-        }
-    }
-
     // 이메일 수정 메서드
     public void assignEmail(String email) {
         this.email = email;

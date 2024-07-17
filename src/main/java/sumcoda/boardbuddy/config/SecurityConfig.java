@@ -52,11 +52,6 @@ public class SecurityConfig {
 
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

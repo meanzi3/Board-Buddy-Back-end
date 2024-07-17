@@ -66,6 +66,7 @@ public class MemberService {
      * 회원가입 요청 캐치
      *
      * @param registerDTO 전달받은 회원가입 정보
+     * @return 회원가입에 성공한 유저의 memberId
      **/
     @Transactional
     public Long registerMember(MemberRequest.RegisterDTO registerDTO) {
@@ -104,6 +105,7 @@ public class MemberService {
      *
      * @param oAuth2RegisterDTO 소셜로그인 사용자에 대한 추가적인 회원가입 정보
      * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @return 신규 소셜 로그인 사용자의 memberId
      **/
     @Transactional
     public Long registerOAuth2Member(MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {

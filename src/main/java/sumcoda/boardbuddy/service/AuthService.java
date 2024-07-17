@@ -2,13 +2,18 @@ package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.AuthRequest;
+import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationAttemptExceededException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException;
+import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
+import sumcoda.boardbuddy.repository.MemberRepository;
 import sumcoda.boardbuddy.repository.SMSCertificationRepository;
+import sumcoda.boardbuddy.util.AuthUtil;
 import sumcoda.boardbuddy.util.SMSCertificationUtil;
 
 import java.security.SecureRandom;
@@ -21,6 +26,10 @@ public class AuthService {
     private final SMSCertificationUtil smsCertificationUtil;
 
     private final SMSCertificationRepository smsCertificationRepository;
+
+    private final MemberRepository memberRepository;
+
+    private final AuthUtil authUtil;
 
     /**
      * 사용자가 입력한 휴대폰 번호로 6자리 인증번호 전송
@@ -105,5 +114,31 @@ public class AuthService {
         return !isCertificationNumberExpired(phoneNumber) &&
                 smsCertificationRepository.getSMSCertification(phoneNumber)
                         .equals(validateSMSCertificationDTO.getCertificationNumber());
+    }
+
+    /**
+     * 사용자의 로그인 상태를 확인
+     *
+     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @return 사용자가 로그인한 상태라면 해당 사용자의 프로필 반환 아니라면 null 반환
+     **/
+    public MemberResponse.ProfileDTO isAuthenticated(Authentication authentication) {
+        if (!authUtil.isAuthenticated(authentication)) {
+            return null;
+        }
+        String username = authUtil.getUserNameByLoginType(authentication);
+
+        MemberResponse.ProfileDTO profileDTO = memberRepository.findMemberDTOByUsername(username).orElseThrow(() ->
+                new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        return MemberResponse.ProfileDTO
+                .builder()
+                .nickname(profileDTO.getNickname())
+                .sido(profileDTO.getSido())
+                .sigu(profileDTO.getSigu())
+                .dong(profileDTO.getDong())
+                .isPhoneNumberVerified(profileDTO.getPhoneNumber() != null)
+                .awsS3SavedFileURL(profileDTO.getAwsS3SavedFileURL())
+                .build();
     }
 }

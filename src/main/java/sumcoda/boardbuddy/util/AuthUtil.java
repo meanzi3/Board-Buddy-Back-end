@@ -37,4 +37,19 @@ public class AuthUtil {
 
         return username;
     }
+
+    /**
+     * 로그인 유형에 따라 사용자의 이름을 반환
+     *
+     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @return 인증된 사용자인지 아닌지에 대한 ture or false 반환
+     */
+    public Boolean isAuthenticated(Authentication authentication) {
+
+        if (authentication == null) {
+            throw new AuthenticationMissingException("유효하지 않은 세션입니다.");
+        }
+
+        return true;
+    }
 }

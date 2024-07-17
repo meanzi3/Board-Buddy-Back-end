@@ -3,6 +3,7 @@ package sumcoda.boardbuddy.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import sumcoda.boardbuddy.entity.GatherArticle;
+import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 
 import java.time.LocalDateTime;
 
@@ -49,7 +50,7 @@ public class GatherArticleRequest {
 
     // 엔티티로 변환
     public GatherArticle toEntity() {
-      return GatherArticle.createGatherArticle(this.title, this.maxParticipants, this.description, this.startDateTime, this.endDateTime,
+      return GatherArticle.createGatherArticle(this.title, 1, this.maxParticipants, GatherArticleStatus.OPEN, this.description, this.startDateTime, this.endDateTime,
               this.sido, this. sigu, this.dong,  this.meetingLocation);
     }
   }

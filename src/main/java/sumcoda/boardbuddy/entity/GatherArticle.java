@@ -78,11 +78,11 @@ public class GatherArticle extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public GatherArticle(String title, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
+    public GatherArticle(String title, Integer currentParticipants, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
         this.title = title;
-        this.currentParticipants = 1; // 작성자를 포함하여 1로 초기화
+        this.currentParticipants = currentParticipants;
         this.maxParticipants = maxParticipants;
-        this.status = GatherArticleStatus.OPEN; // 모집중으로 초기화
+        this.status = status;
         this.description = description;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
@@ -93,10 +93,12 @@ public class GatherArticle extends BaseTimeEntity {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static GatherArticle createGatherArticle(String title, Integer maxParticipants, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
+    public static GatherArticle createGatherArticle(String title, Integer currentParticipants, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
         return GatherArticle.builder()
                 .title(title)
+                .currentParticipants(currentParticipants)
                 .maxParticipants(maxParticipants)
+                .status(status)
                 .description(description)
                 .startDateTime(startDateTime)
                 .endDateTime(endDateTime)

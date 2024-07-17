@@ -45,7 +45,7 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
-        redirectStrategy.sendRedirect(request, response, " https://boardbuddyapp.vercel.app/login/oauth/callback?isSuccess=false?message=" + errorMessage);
+        redirectStrategy.sendRedirect(request, response, "https://boardbuddyapp.vercel.app/login/oauth/callback?isSuccess=false?message=" + errorMessage);
     }
 
     private String getOAuth2ErrorMessage(String errorMessage) {

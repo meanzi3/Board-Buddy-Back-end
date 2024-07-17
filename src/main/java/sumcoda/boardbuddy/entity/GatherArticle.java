@@ -43,11 +43,11 @@ public class GatherArticle extends BaseTimeEntity {
 
     // 해당 방의 만나는 시간
     @Column(nullable = false)
-    private LocalDateTime meetingDate;
+    private LocalDateTime startDateTime;
 
     // 해당 방의 헤어지는 시간(모임 예상 종료 시간)
     @Column(nullable = false)
-    private LocalDateTime meetingEndDate;
+    private LocalDateTime endDateTime;
 
     // 필터링 하기 위한 oo시, oo도
     @Column(nullable = false)
@@ -78,13 +78,13 @@ public class GatherArticle extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public GatherArticle(String title, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime meetingDate, LocalDateTime meetingEndDate, String sido, String sigu, String dong, String meetingLocation) {
+    public GatherArticle(String title, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
         this.title = title;
         this.maxParticipants = maxParticipants;
         this.status = status;
         this.description = description;
-        this.meetingDate = meetingDate;
-        this.meetingEndDate = meetingEndDate;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
         this.sido = sido;
         this.dong = dong;
         this.sigu = sigu;
@@ -92,14 +92,14 @@ public class GatherArticle extends BaseTimeEntity {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static GatherArticle createGatherArticle(String title, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime meetingDate, LocalDateTime meetingEndDate, String sido, String sigu, String dong, String meetingLocation) {
+    public static GatherArticle createGatherArticle(String title, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
         return GatherArticle.builder()
                 .title(title)
                 .maxParticipants(maxParticipants)
                 .status(status)
                 .description(description)
-                .meetingDate(meetingDate)
-                .meetingEndDate(meetingEndDate)
+                .startDateTime(startDateTime)
+                .endDateTime(endDateTime)
                 .sido(sido)
                 .sigu(sigu)
                 .dong(dong)

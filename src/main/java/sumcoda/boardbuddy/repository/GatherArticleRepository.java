@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface GatherArticleRepository extends JpaRepository<GatherArticle, Long>, GatherArticleRepositoryCustom {
-    List<GatherArticleResponse.GatherArticleDTO> findGatherArticleDTOByUsername(String username);
+    List<GatherArticleResponse.GatherArticleInfosDTO> findGatherArticleDTOByUsername(String username);
 }

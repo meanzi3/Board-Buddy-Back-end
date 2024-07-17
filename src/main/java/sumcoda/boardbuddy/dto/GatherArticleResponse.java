@@ -11,7 +11,7 @@ public class GatherArticleResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class GatherArticleDTO {
+    public static class GatherArticleInfosDTO {
 
         private Long id;
 
@@ -25,24 +25,24 @@ public class GatherArticleResponse {
 
         private Integer currentParticipants;
 
-        private LocalDateTime meetingDate;
+        private LocalDateTime startDateTime;
 
-        private LocalDateTime meetingEndDate;
+        private LocalDateTime endDateTime;
 
         private LocalDateTime createdAt;
 
         private GatherArticleStatus status;
 
         @Builder
-        public GatherArticleDTO (Long id, String title, String description, String meetingLocation, Integer maxParticipants, Integer currentParticipants, LocalDateTime meetingDate, LocalDateTime meetingEndDate, LocalDateTime createdAt, GatherArticleStatus status) {
+        public GatherArticleInfosDTO(Long id, String title, String description, String meetingLocation, Integer maxParticipants, Integer currentParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime, LocalDateTime createdAt, GatherArticleStatus status) {
             this.id = id;
             this.title = title;
             this.description = description;
             this.meetingLocation = meetingLocation;
             this.maxParticipants = maxParticipants;
             this.currentParticipants = currentParticipants;
-            this.meetingDate = meetingDate;
-            this.meetingEndDate = meetingEndDate;
+            this.startDateTime = startDateTime;
+            this.endDateTime = endDateTime;
             this.createdAt = createdAt;
             this.status = status;
         }

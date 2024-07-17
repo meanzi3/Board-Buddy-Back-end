@@ -20,16 +20,16 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<GatherArticleResponse.GatherArticleDTO> findGatherArticleDTOByUsername(String username) {
-        return jpaQueryFactory.select(Projections.fields(GatherArticleResponse.GatherArticleDTO.class,
+    public List<GatherArticleResponse.GatherArticleInfosDTO> findGatherArticleDTOByUsername(String username) {
+        return jpaQueryFactory.select(Projections.fields(GatherArticleResponse.GatherArticleInfosDTO.class,
                         gatherArticle.id,
                         gatherArticle.title,
                         gatherArticle.description,
                         gatherArticle.meetingLocation,
                         gatherArticle.maxParticipants,
                         gatherArticle.currentParticipants,
-                        gatherArticle.meetingDate,
-                        gatherArticle.meetingEndDate,
+                        gatherArticle.startDateTime,
+                        gatherArticle.endDateTime,
                         gatherArticle.createdAt,
                         gatherArticle.status))
                 .from(member)

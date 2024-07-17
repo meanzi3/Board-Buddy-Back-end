@@ -25,6 +25,12 @@ jobs:
       PROD_SMS_SENDER_NUMBER: ${{ secrets.PROD_SMS_SENDER_NUMBER }}
       EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }} >> env.list
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }} >> env.list
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }} >> env.list
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }} >> env.list
+      KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }} >> env.list
+      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }} >> env.list
 
     steps:
       # 리포지토리를 체크아웃
@@ -74,6 +80,12 @@ jobs:
           echo SPRING_COOL_SMS_API_KEY=${{ secrets.PROD_SMS_API_KEY }} >> env.list
           echo SPRING_COOL_SMS_API_SECRET=${{ secrets.PROD_SMS_API_SECRET }} >> env.list
           echo SPRING_COOL_SMS_SENDER_NUMBER=${{ secrets.PROD_SMS_SENDER_NUMBER }} >> env.list
+          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} >> env.list
+          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} >> env.list
+          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} >> env.list
+          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} >> env.list
+          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} >> env.list
+          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} >> env.list
           echo SPRING_PROFILES_ACTIVE=common,prod >> env.list
 
       # 파일을 EC2로 전송
@@ -84,6 +96,7 @@ jobs:
           scp -o StrictHostKeyChecking=no env.list ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/env.list
           scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/docker-compose.yml
           scp -o StrictHostKeyChecking=no redis.conf ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/redis.conf
+          scp -o StrictHostKeyChecking=no nginx.conf ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/nginx.conf
 
       # EC2에 배포
       - name: Deploy to EC2
@@ -119,6 +132,16 @@ jobs:
             -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
             --spring.config.location=/config/application-common.yml,/config/application-prod.yml
 
+          # Nginx 설정 파일 복사 및 Nginx 재시작
+          sudo cp /home/ubuntu/nginx.conf /etc/nginx/sites-available/default
+          sudo nginx -t
+          sudo systemctl restart nginx
+
+          # Certbot 설치 및 인증서 갱신
+          sudo apt update
+          sudo apt install certbot python3-certbot-nginx -y
+          sudo certbot renew --nginx
+          
           # 컨테이너 상태 확인
           sudo docker ps -a
           # Spring Boot 애플리케이션 로그 확인

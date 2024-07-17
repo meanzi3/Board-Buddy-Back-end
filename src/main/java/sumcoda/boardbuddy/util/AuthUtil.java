@@ -3,8 +3,11 @@ package sumcoda.boardbuddy.util;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.dto.auth.oauth2.CustomOAuth2User;
+import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 
+@Component
 public class AuthUtil {
 
     /**
@@ -13,10 +16,10 @@ public class AuthUtil {
      * @param authentication 로그인 정보를 포함하는 사용자 객체
      * @return 사용자의 이름.
      */
-    public static String getUserNameByLoginType(Authentication authentication) {
+    public String getUserNameByLoginType(Authentication authentication) {
 
         if (authentication == null) {
-            throw new IllegalStateException("No authentication information found");
+            throw new AuthenticationMissingException("인증 객체가 누락되었습니다. 관리자에게 문의하세요.");
         }
 
         String username;

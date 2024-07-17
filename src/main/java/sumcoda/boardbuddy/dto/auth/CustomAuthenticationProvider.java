@@ -2,12 +2,14 @@ package sumcoda.boardbuddy.dto.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
+import sumcoda.boardbuddy.exception.auth.InvalidPasswordException;
+import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 
 @Component
 @RequiredArgsConstructor
@@ -19,13 +21,20 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-        String loginId = authentication.getName();
+        if (authentication == null) {
+            throw new AuthenticationMissingException("인증 객체가 누락되었습니다. 관리자에게 문의하세요.");
+        }
+
+        String username = authentication.getName();
         String password = (String) authentication.getCredentials();
 
-        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(loginId);
+        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+        if (userDetails == null) {
+            throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요.");
+        }
 
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("Invalid Password");
+            throw new InvalidPasswordException("유효하지 않은 비밀번호 입니다. 올바른 비밀번호를 입력하였는지 확인해주세요");
         }
 
         return new CustomAuthenticationToken(userDetails, null, userDetails.getAuthorities());

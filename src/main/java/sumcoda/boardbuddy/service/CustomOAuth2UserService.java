@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import sumcoda.boardbuddy.dto.auth.oauth2.*;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.MemberRole;
+import sumcoda.boardbuddy.exception.auth.ClientRegistrationRetrievalException;
+import sumcoda.boardbuddy.exception.auth.SocialUserInfoRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 
 import java.security.SecureRandom;
@@ -29,30 +31,35 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         // 리소스 서버에서 유저 정보 가져오기
         OAuth2User oAuth2User = super.loadUser(userRequest);
+        if (oAuth2User == null) {
+            throw new SocialUserInfoRetrievalException("소셜 리소스 서버에서 유저 정보를 가져오지 못했습니다. 잠시후 다시 시도해주세요.");
+        }
 
         log.info("oAuth2User = " + oAuth2User.getAttributes());
 
         // naver, google, kakao 등 값이 저장
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
+        if (registrationId == null) {
+            throw new ClientRegistrationRetrievalException("소셜 리소스 서버에서 클라이언트의 정보를 가져오지 못했습니다. 잠시후 다시 시도해주세요.");
+        }
+
         // 응답 받은 데이터 저장하기 위한 변수 생성
         OAuth2UserInfo oAuth2UserInfo;
 
         // 네이버에서 제공된 데이터라면
         switch (registrationId) {
+            // 네이버에서 제공된 데이터라면
             case "naver":
                 oAuth2UserInfo = new NaverUserInfo(oAuth2User.getAttributes());
-
-                // 구글에서 제공된 데이터라면
                 break;
+            // 구글에서 제공된 데이터라면
             case "google":
                 oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
-
-                // 카카오에서 제공된 데이터라면
                 break;
+            // 카카오에서 제공된 데이터라면
             case "kakao":
                 oAuth2UserInfo = new KakaoUserInfo(oAuth2User.getAttributes());
-
                 break;
             default:
                 return null;

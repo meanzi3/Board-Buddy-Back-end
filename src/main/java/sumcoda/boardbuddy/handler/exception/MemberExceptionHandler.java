@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberSaveException;
 import sumcoda.boardbuddy.exception.member.NicknameAlreadyExistsException;
 import sumcoda.boardbuddy.exception.member.UsernameAlreadyExistsException;
@@ -40,7 +41,18 @@ public class MemberExceptionHandler {
     public ResponseEntity<Map<String, Object>> memberSaveExceptionHandler(MemberSaveException ex) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("data", false);
+        response.put("data", null);
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MemberNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> memberNotFoundExceptionHandler(MemberNotFoundException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("data", null);
 
         response.put("message", ex.getMessage());
 

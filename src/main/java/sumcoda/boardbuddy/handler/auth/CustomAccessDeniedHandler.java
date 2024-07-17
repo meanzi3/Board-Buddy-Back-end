@@ -29,8 +29,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        responseData.put("data", "error");
-        responseData.put("message", "Access is denied");
+        responseData.put("data", null);
+        responseData.put("message", "접근이 거부된 요청입니다.");
 
         objectMapper.writeValue(response.getWriter(), responseData);
     }

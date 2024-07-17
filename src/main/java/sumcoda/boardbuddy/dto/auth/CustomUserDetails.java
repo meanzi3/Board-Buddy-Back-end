@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sumcoda.boardbuddy.dto.AuthResponse;
+import sumcoda.boardbuddy.exception.auth.MemberRoleMissingException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +17,9 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (profileDTO.getMemberRole() == null) {
+            throw new MemberRoleMissingException("사용자의 권한이 누락되었습니다. 관리자에게 문의하세요.");
+        }
         Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
         grantedAuthorities.add((GrantedAuthority) () -> profileDTO.getMemberRole().getValue());

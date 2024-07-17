@@ -2,18 +2,19 @@ package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.MemberRequest;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.MemberRole;
+import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberSaveException;
 import sumcoda.boardbuddy.exception.member.NicknameAlreadyExistsException;
 import sumcoda.boardbuddy.exception.member.UsernameAlreadyExistsException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 import sumcoda.boardbuddy.util.AuthUtil;
+
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,8 @@ public class MemberService {
 
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final AuthUtil authUtil;
 
     /**
      * 아이디 중복검사
@@ -105,9 +108,10 @@ public class MemberService {
     @Transactional
     public Long registerOAuth2Member(MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {
 
-        String username = AuthUtil.getUserNameByLoginType(authentication);
+        String username = authUtil.getUserNameByLoginType(authentication);
+
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 이름을 가진 멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         member.assignPhoneNumber(oAuth2RegisterDTO.getPhoneNumber());
         member.assignSido(oAuth2RegisterDTO.getSido());

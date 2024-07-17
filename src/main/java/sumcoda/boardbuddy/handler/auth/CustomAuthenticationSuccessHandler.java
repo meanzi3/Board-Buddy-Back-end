@@ -1,7 +1,6 @@
 package sumcoda.boardbuddy.handler.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final MemberRepository memberRepository;
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         log.info("success handler is working");
 
         final ObjectMapper objectMapper = new ObjectMapper();

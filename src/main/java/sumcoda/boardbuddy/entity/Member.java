@@ -256,4 +256,11 @@ public class Member {
     public void assignDong(String dong) {
         this.dong = dong;
     }
+
+    // Member 위치 수정 메서드
+    public void assignLocation(String sido, String sigu, String dong) {
+        this.sido = sido;
+        this.sigu = sigu;
+        this.dong = dong;
+    }
 }

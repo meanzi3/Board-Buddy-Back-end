@@ -38,7 +38,7 @@ public class SecurityConfig {
 
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
-    private final CustomUnAuthorizedHandler customUnAuthorizedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
@@ -116,7 +116,7 @@ public class SecurityConfig {
                 // 추가 코드
                 .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(config -> config
-                        .authenticationEntryPoint(customUnAuthorizedHandler)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
                 // HTTP 응답 헤더를 설정한다.
                 // frameOptions 설정을 sameOrigin 으로 설정하여,

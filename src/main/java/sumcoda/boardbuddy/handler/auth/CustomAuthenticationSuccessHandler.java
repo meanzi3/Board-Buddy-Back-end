@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 
 import java.io.IOException;
@@ -28,6 +29,10 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         log.info("success handler is working");
+
+        if (authentication == null) {
+            throw new AuthenticationMissingException("인증 객체가 누락되었습니다. 관리자에게 문의하세요.");
+        }
 
         final ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> responseData = new HashMap<>();

@@ -16,20 +16,24 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class CustomUnAuthorizedHandler implements AuthenticationEntryPoint {
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         log.info("unauthorized handler is working");
 
         ObjectMapper objectMapper = new ObjectMapper();
+
         Map<String, Object> responseData = new HashMap<>();
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
         response.setCharacterEncoding("UTF-8");
 
         responseData.put("data", null);
-        responseData.put("message", "인증되지 않은 요청입니다.");
+
+        responseData.put("message", "인증되지 않은 사용자의 요청입니다.");
 
         objectMapper.writeValue(response.getWriter(), responseData);
     }

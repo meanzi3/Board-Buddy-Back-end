@@ -6,14 +6,21 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.MemberRequest;
+import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
+import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.MemberRole;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberSaveException;
 import sumcoda.boardbuddy.exception.member.NicknameAlreadyExistsException;
 import sumcoda.boardbuddy.exception.member.UsernameAlreadyExistsException;
+import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictNotFoundException;
 import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 import sumcoda.boardbuddy.util.AuthUtil;
+
+import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -22,6 +29,10 @@ import sumcoda.boardbuddy.util.AuthUtil;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+
+    private final PublicDistrictRepository publicDistrictRepository;
+
+    private final NearPublicDistrictService nearPublicDistrictService;
 
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -121,5 +132,33 @@ public class MemberService {
         member.assignDong(oAuth2RegisterDTO.getDong());
 
         return member.getId();
+    }
+
+    /**
+     * 멤버 위치 설정 요청 캐치
+     *
+     * @param locationDTO 사용자가 입력한 위치 정보
+     **/
+    @Transactional
+    public Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> updateMemberLocation(MemberRequest.LocationDTO locationDTO, String username) {
+
+        // 사용자가 입력한 시도, 시구, 동
+        String sido = locationDTO.getSido();
+        String sigu = locationDTO.getSigu();
+        String dong = locationDTO.getDong();
+
+        // 사용자 조회
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자입니다."));
+
+        // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
+        PublicDistrictResponse.LocationDTO baseLocationRequestDTO = publicDistrictRepository.findOneBySidoAndSiguAndDong(sido, sigu, dong)
+                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보가 올바르지 않습니다."));
+
+        // 멤버의 위치 업데이트
+        member.assignLocation(sido, sigu, dong);
+
+        // 사용자가 입력한 주변 시도, 시구, 동에 대한 주변 시도, 시구, 동을 반환하기 위해 findNearbyLocations() 메서드 실행 후 응답 반환
+        return nearPublicDistrictService.findNearbyLocations(baseLocationRequestDTO);
     }
 }

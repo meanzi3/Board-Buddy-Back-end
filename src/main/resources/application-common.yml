@@ -70,4 +70,7 @@ logging:
       springframework:
         security: DEBUG
         web: DEBUG
+        jdbc:
+          core:
+            JdbcTemplate: DEBUG
 

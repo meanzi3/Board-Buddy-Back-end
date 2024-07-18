@@ -39,7 +39,7 @@ public class PublicDistrict {
     private Double longitude;
 
     // 연관 관계 설정
-    @OneToMany(mappedBy = "publicDistrict", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "publicDistrict")
     private List<NearPublicDistrict> nearPublicDistricts = new ArrayList<>();
 
     @Builder

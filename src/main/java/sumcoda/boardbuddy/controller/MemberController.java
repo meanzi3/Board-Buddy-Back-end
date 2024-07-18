@@ -5,13 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import sumcoda.boardbuddy.dto.MemberRequest;
+import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
+import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.MemberService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -103,4 +107,19 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * 멤버 위치 설정 요청 캐치
+     *
+     * @param locationDTO 사용자가 입력한 위치 정보
+     **/
+    @PostMapping("/api/locations")
+    public ResponseEntity<ApiResponse<Map<Integer, List<NearPublicDistrictResponse.LocationDTO>>>> updateMemberLocation(
+            @RequestBody MemberRequest.LocationDTO locationDTO,
+            @ModelAttribute("username") String username) {
+        log.info("updateMemberLocation is working");
+
+        Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> response = memberService.updateMemberLocation(locationDTO, username);
+
+        return ResponseEntity.ok(new ApiResponse<>(response, "위치 정보 설정을 성공하였습니다."));
+    }
 }

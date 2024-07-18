@@ -84,4 +84,26 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
+
+    /**
+     * 사용자의 비밀번호 검증 요청 캐치
+     *
+     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @return 사용자가 비밀번호 검증에 성공했다면 true 반환, 아니라면 false 반환
+     **/
+    @PostMapping("/api/auth/password")
+    public ResponseEntity<?> validatePassword(
+            @RequestBody AuthRequest.ValidatePasswordDTO validatePasswordDTO,
+            Authentication authentication) {
+
+        Map<String, Object> responseData = new HashMap<>();
+
+        Boolean validateResult = authService.validatePassword(validatePasswordDTO, authentication);
+
+        responseData.put("data", validateResult);
+
+        responseData.put("message", "비밀번호 검증이 완료되었습니다.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseData);
+    }
 }

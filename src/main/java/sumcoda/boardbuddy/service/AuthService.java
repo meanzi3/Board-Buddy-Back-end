@@ -3,10 +3,13 @@ package sumcoda.boardbuddy.service;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.AuthRequest;
+import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.exception.auth.InvalidPasswordException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationAttemptExceededException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException;
@@ -30,6 +33,8 @@ public class AuthService {
     private final MemberRepository memberRepository;
 
     private final AuthUtil authUtil;
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     /**
      * 사용자가 입력한 휴대폰 번호로 6자리 인증번호 전송
@@ -140,5 +145,26 @@ public class AuthService {
                 .isPhoneNumberVerified(profileDTO.getPhoneNumber() != null)
                 .awsS3SavedFileURL(profileDTO.getAwsS3SavedFileURL())
                 .build();
+    }
+
+    /**
+     * 입력된 비밀번호가 현재 로그인된 사용자의 비밀번호와 일치하는지 확인
+     * @param validatePasswordDTO 입력된 비밀번호가 저장된 DTO
+     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @return 비밀번호가 일치하면 true, 그렇지 않으면 false
+     */
+    public Boolean validatePassword(AuthRequest.ValidatePasswordDTO validatePasswordDTO, Authentication authentication) {
+        String username = authUtil.getUserNameByLoginType(authentication);
+        AuthResponse.ProfileDTO profileDTO = memberRepository.findAuthDTOByUsername(username).orElseThrow(() ->
+                new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        // DB에 저장된 암호화된 비밀번호와 입력된 비밀번호를 비교
+        boolean isValidate = bCryptPasswordEncoder.matches(validatePasswordDTO.getPassword(), profileDTO.getPassword());
+
+        if (!isValidate) {
+            throw new InvalidPasswordException("입력하신 비밀번호가 올바르지 않습니다.");
+        }
+
+        return true;
     }
 }

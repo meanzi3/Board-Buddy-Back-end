@@ -15,9 +15,9 @@ public class NearPublicDistrictRepositoryCustomImpl implements NearPublicDistric
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<NearPublicDistrictResponse.NearPublicDistrictDTO> findByPublicDistrictId(Long publicDistrictId) {
+    public List<NearPublicDistrictResponse.NearPublicDistrictInfoDTO> findByPublicDistrictId(Long publicDistrictId) {
         return jpaQueryFactory
-                .select(Projections.fields(NearPublicDistrictResponse.NearPublicDistrictDTO.class,
+                .select(Projections.fields(NearPublicDistrictResponse.NearPublicDistrictInfoDTO.class,
                         nearPublicDistrict.sido,
                         nearPublicDistrict.sigu,
                         nearPublicDistrict.dong,

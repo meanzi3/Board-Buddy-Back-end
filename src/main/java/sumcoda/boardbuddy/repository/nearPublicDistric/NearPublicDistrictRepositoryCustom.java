@@ -5,5 +5,5 @@ import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import java.util.List;
 
 public interface NearPublicDistrictRepositoryCustom {
-    List<NearPublicDistrictResponse.NearPublicDistrictDTO> findByPublicDistrictId(Long publicDistrictId);
+    List<NearPublicDistrictResponse.NearPublicDistrictInfoDTO> findByPublicDistrictId(Long publicDistrictId);
 }

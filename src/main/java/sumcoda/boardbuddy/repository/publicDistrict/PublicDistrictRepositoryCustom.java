@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface PublicDistrictRepositoryCustom {
     Optional<PublicDistrictResponse.LocationDTO> findOneBySidoAndSiguAndDong(String sido, String sigu, String dong);
-    List<PublicDistrictResponse.PublicDistrictDTO> findAllDistricts();
+    List<PublicDistrictResponse.PublicDistrictInfoDTO> findAllDistricts();
 }

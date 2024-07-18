@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.GatherArticleRequest;
+import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
@@ -19,8 +20,6 @@ import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepo
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static sumcoda.boardbuddy.dto.GatherArticleResponse.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +39,7 @@ public class GatherArticleService {
      * @return
      */
     @Transactional
-    public CreateDTO createGatherArticle(GatherArticleRequest.CreateDTO createRequest, String username){
+    public GatherArticleResponse.CreateDTO createGatherArticle(GatherArticleRequest.CreateDTO createRequest, String username){
 
         // 사용자 검증
         Member member = memberRepository.findByUsername(username)
@@ -67,7 +66,7 @@ public class GatherArticleService {
         // 저장
         memberGatherArticleRepository.save(memberGatherArticle);
 
-        return CreateDTO.from(gatherArticle);
+        return GatherArticleResponse.CreateDTO.from(gatherArticle);
     }
 
     /**
@@ -75,7 +74,7 @@ public class GatherArticleService {
      * @param id
      * @return
      */
-    public ReadDTO getGatherArticle(Long id, String username) {
+    public GatherArticleResponse.ReadDTO getGatherArticle(Long id, String username) {
 
         // 존재하는 모집글인지 확인
         GatherArticle gatherArticle = gatherArticleRepository.findById(id)
@@ -91,7 +90,7 @@ public class GatherArticleService {
         // 작성자 가져오기
         Member author = memberGatherArticleRepository.findAuthorByGatherArticleId(id);
 
-        return ReadDTO.from(gatherArticle, author, participationStatus);
+        return GatherArticleResponse.ReadDTO.from(gatherArticle, author, participationStatus);
     }
 
     /**
@@ -102,7 +101,7 @@ public class GatherArticleService {
      * @return
      */
     @Transactional
-    public UpdateDTO updateGatherArticle(Long id, GatherArticleRequest.UpdateDTO updateRequest, String username) {
+    public GatherArticleResponse.UpdateDTO updateGatherArticle(Long id, GatherArticleRequest.UpdateDTO updateRequest, String username) {
 
         // 존재하는 모집글인지 확인
         GatherArticle gatherArticle = gatherArticleRepository.findById(id)
@@ -123,7 +122,7 @@ public class GatherArticleService {
         // 수정
         updateRequest.updateEntity(gatherArticle);
 
-        return UpdateDTO.from(gatherArticle);
+        return GatherArticleResponse.UpdateDTO.from(gatherArticle);
     }
 
     /**
@@ -133,7 +132,7 @@ public class GatherArticleService {
      * @return
      */
     @Transactional
-    public DeleteDTO deleteGatherArticle(Long id, String username) {
+    public GatherArticleResponse.DeleteDTO deleteGatherArticle(Long id, String username) {
 
         // 존재하는 모집글인지 확인
         GatherArticle gatherArticle = gatherArticleRepository.findById(id)
@@ -151,7 +150,7 @@ public class GatherArticleService {
         // 삭제
         gatherArticleRepository.delete(gatherArticle);
 
-        return DeleteDTO.from(gatherArticle);
+        return GatherArticleResponse.DeleteDTO.from(gatherArticle);
     }
 
     /**
@@ -258,7 +257,7 @@ public class GatherArticleService {
      * @return 내가 작성한 모집글 DTO 리스트
      **/
     @Transactional
-    public List<GatherArticleInfosDTO> getMyGatherArticles(String username) {
+    public List<GatherArticleResponse.GatherArticleInfosDTO> getMyGatherArticles(String username) {
         return gatherArticleRepository.findGatherArticleInfosByUsername(username);
     }
 
@@ -269,7 +268,7 @@ public class GatherArticleService {
      * @return 참가한 모집글 DTO 리스트
      **/
     @Transactional
-    public List<GatherArticleInfosDTO> getMyParticipations(String username) {
+    public List<GatherArticleResponse.GatherArticleInfosDTO> getMyParticipations(String username) {
         return gatherArticleRepository.findParticipationsByUsername(username);
     }
 }

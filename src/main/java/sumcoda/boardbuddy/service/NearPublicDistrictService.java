@@ -12,6 +12,7 @@ import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictNotFoundExcepti
 import sumcoda.boardbuddy.repository.nearPublicDistric.NearPublicDistrictJdbcRepository;
 import sumcoda.boardbuddy.repository.nearPublicDistric.NearPublicDistrictRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
+import sumcoda.boardbuddy.util.GeoUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,12 +32,6 @@ public class NearPublicDistrictService {
     // bulk insert query 를 실행하기 위해 NearPublicDistrictJdbcRepository 주입
     private final NearPublicDistrictJdbcRepository nearPublicDistrictJdbcRepository;
 
-    // 지구의 반경
-    private static final int EARTH_RADIUS = 6371;
-    // 계산에 사용되는 숫자
-    private static final int ONE = 1;
-    private static final int TWO = 2;
-
     /**
      * 주어진 위치를 기준으로 주변 행정 구역을 찾는 메서드
      * @param baseLocation 기준 위치
@@ -52,14 +47,14 @@ public class NearPublicDistrictService {
                 .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보가 올바르지 않습니다."));
 
         // 기존에 저장된 주변 행정 구역 정보 조회
-        List<NearPublicDistrictResponse.NearPublicDistrictDTO> existingNearbyDistricts = nearPublicDistrictRepository.findByPublicDistrictId(publicDistrict.getId());
+        List<NearPublicDistrictResponse.NearPublicDistrictInfoDTO> existingNearbyDistricts = nearPublicDistrictRepository.findByPublicDistrictId(publicDistrict.getId());
 
         // 기존 주변 구역이 있다면 해당 정보를 맵에 담아 반환
         if (!existingNearbyDistricts.isEmpty()) {
             existingNearbyDistricts.forEach(existingNearbyDistrict -> {
                 List<NearPublicDistrictResponse.LocationDTO> locationDTOs = existingNearbyDistricts.stream()
-                        .map(nearPublicDistrictDTO -> new NearPublicDistrictResponse
-                                .LocationDTO(nearPublicDistrictDTO.getSido(), nearPublicDistrictDTO.getSigu(), nearPublicDistrictDTO.getDong()))
+                        .map(nearPublicDistrictInfoDTO -> new NearPublicDistrictResponse
+                                .LocationDTO(nearPublicDistrictInfoDTO.getSido(), nearPublicDistrictInfoDTO.getSigu(), nearPublicDistrictInfoDTO.getDong()))
                         .collect(Collectors.toList());
                 nearbyLocations.put(existingNearbyDistrict.getRadius(), locationDTOs);
             });
@@ -70,7 +65,7 @@ public class NearPublicDistrictService {
         // 추후 로직 적용
 
         // mariadb 를 사용해서 모든 행정 구역 정보를 조회(redis 장애 시 mariadb 에서 조회)
-        List<PublicDistrictResponse.PublicDistrictDTO> allLocations = publicDistrictRepository.findAllDistricts();
+        List<PublicDistrictResponse.PublicDistrictInfoDTO> allLocations = publicDistrictRepository.findAllDistricts();
         // 데이터베이스에 새로 추가할 주변 행정 구역 리스트
         List<NearPublicDistrict> allNearPublicDistricts = new ArrayList<>();
 
@@ -78,8 +73,12 @@ public class NearPublicDistrictService {
         // 10, 7, 5, 2km 순서로 필터를 통해 최적화해서 찾기
         for (RadiusRange range : RadiusRange.values()) {
             // 반경 범위에 대해 주변 행정 구역 찾기
-            List<PublicDistrictResponse.PublicDistrictDTO> filteredLocations = allLocations.stream()
-                    .filter(publicDistrictDTO -> calculateDistance(publicDistrict, publicDistrictDTO) <= range.getRadius())
+            List<PublicDistrictResponse.PublicDistrictInfoDTO> filteredLocations = allLocations.stream()
+                    .filter(publicDistrictInfoDTO -> GeoUtils.calculateDistance(
+                                    publicDistrict.getLatitude(),
+                                    publicDistrict.getLongitude(),
+                                    publicDistrictInfoDTO.getLatitude(),
+                                    publicDistrictInfoDTO.getLongitude()) <= range.getRadius())
                     .collect(Collectors.toList());
 
             // 주변 행정 구역 객체 생성
@@ -96,13 +95,13 @@ public class NearPublicDistrictService {
             allNearPublicDistricts.addAll(nearPublicDistricts);
 
             // 주변 행정 구역 DTO 리스트 생성
-            List<NearPublicDistrictResponse.LocationDTO> locationRequestDTOS = filteredLocations.stream()
+            List<NearPublicDistrictResponse.LocationDTO> locationDTOS = filteredLocations.stream()
                     .map(filteredLocation -> new NearPublicDistrictResponse
                             .LocationDTO(filteredLocation.getSido(), filteredLocation.getSigu(), filteredLocation.getDong()))
                     .collect(Collectors.toList());
 
             // 응답 맵에 추가
-            nearbyLocations.put(range.getRadius(), locationRequestDTOS);
+            nearbyLocations.put(range.getRadius(), locationDTOS);
 
             // 기존에 있던 모든 행정 구역을 필터된 주변 행정 구역으로 값을 대체
             allLocations = filteredLocations;
@@ -116,21 +115,5 @@ public class NearPublicDistrictService {
 
         // 응답 맵 반환
         return nearbyLocations;
-    }
-
-    /**
-     * 하버사인 공식을 활용해서 두 위치 간의 거리를 계산하는 메서드
-     * @param loc1 기준 위치
-     * @param loc2 비교할 위치
-     * @return 두 위치 간의 거리
-     */
-    private double calculateDistance(PublicDistrict loc1, PublicDistrictResponse.PublicDistrictDTO loc2) {
-        double latDistance = Math.toRadians(loc2.getLatitude() - loc1.getLatitude());
-        double lonDistance = Math.toRadians(loc2.getLongitude() - loc1.getLongitude());
-        double a = Math.sin(latDistance / TWO) * Math.sin(latDistance / TWO)
-                + Math.cos(Math.toRadians(loc1.getLatitude())) * Math.cos(Math.toRadians(loc2.getLatitude()))
-                * Math.sin(lonDistance / TWO) * Math.sin(lonDistance / TWO);
-        double c = TWO * Math.atan2(Math.sqrt(a), Math.sqrt(ONE - a));
-        return EARTH_RADIUS * c;
     }
 }

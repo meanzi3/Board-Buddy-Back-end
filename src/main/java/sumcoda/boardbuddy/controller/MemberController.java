@@ -29,8 +29,9 @@ public class MemberController {
      * 아이디 중복 확인 요청
      *
      * @param verifyUsernameDuplicationDTO 사용자가 입력한 아이디
+     * @return 아이디가 중복되지 않았다면 true 반환, 아니라면 false 반환
      **/
-    @PostMapping(value = "/api/auth/check-identifier")
+    @PostMapping(value = "/api/auth/check-username")
     public ResponseEntity<Map<String, Object>> verifyUsernameDuplication(
             @RequestBody MemberRequest.VerifyUsernameDuplicationDTO verifyUsernameDuplicationDTO) {
         log.info("verify username duplication is working");
@@ -50,6 +51,7 @@ public class MemberController {
      * 닉네임 중복 확인 요청
      *
      * @param verifyNicknameDuplicationDTO 사용자가 입력한 닉네임
+     * @return 닉네임이 중복되지 않았다면 true 반환 아니라면 false 반환
      **/
     @PostMapping(value = "/api/auth/check-nickname")
     public ResponseEntity<Map<String, Object>> verifyNicknameDuplication(
@@ -71,6 +73,7 @@ public class MemberController {
      * 회원가입 요청 캐치
      *
      * @param registerDTO 프론트로부터 전달받은 회원가입 정보
+     * @return 회원가입에 성공했다면 해당 memberId 반환, 아니라면 null 반환
      **/
     @PostMapping(value = "/api/auth/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody MemberRequest.RegisterDTO registerDTO) {
@@ -88,9 +91,10 @@ public class MemberController {
     }
 
     /**
-     * 첫 소셜 로그인 사용자의 회원가입 요청 캐치
+     * 신규 소셜 로그인 사용자의 회원강비 요청 캐치
      *
-     * @param oAuth2RegisterDTO 프론트로부터 전달받은 회원가입 정보
+     * @param oAuth2RegisterDTO 프론트로부터 전달받은 소셜 로그인 유저 회원가입 정보
+     * @return 첫 소셜 로그인 사용자가 회원가입에 성공했다면 memberId 반환, 아니라면 null 반환
      **/
     @PostMapping(value = "/api/auth/oauth2/register")
     public ResponseEntity<Map<String, Object>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {
@@ -105,6 +109,27 @@ public class MemberController {
         response.put("message", "회원가입이 완료되었습니다.");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * 회원 탈퇴 요청 캐치
+     *
+     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @return 회원 탈퇴가 완료되었다면 해당 유저의 memberId 반환, 아니라면 null 반환
+     **/
+    @PostMapping(value = "/api/auth/withdrawal")
+    public ResponseEntity<Map<String, Object>> withdrawalMember(Authentication authentication) {
+        log.info("withdrawal member is working");
+
+        Map<String, Object> response = new HashMap<>();
+
+        Long memberId = memberService.withdrawalMember(authentication);
+
+        response.put("data", memberId);
+
+        response.put("message", "회원탈퇴가 완료되었습니다.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**

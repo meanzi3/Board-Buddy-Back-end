@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
@@ -20,11 +19,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import sumcoda.boardbuddy.handler.auth.CustomAccessDeniedHandler;
-import sumcoda.boardbuddy.handler.auth.CustomUnAuthorizedHandler;
-import sumcoda.boardbuddy.handler.auth.CustomAuthenticationFailureHandler;
+import sumcoda.boardbuddy.handler.auth.*;
 import sumcoda.boardbuddy.filter.CustomAuthenticationFilter;
-import sumcoda.boardbuddy.handler.auth.CustomAuthenticationSuccessHandler;
 import sumcoda.boardbuddy.handler.auth.oauth2.OAuth2AuthenticationFailureHandler;
 import sumcoda.boardbuddy.handler.auth.oauth2.OAuth2AuthenticationSuccessHandler;
 import sumcoda.boardbuddy.service.CustomOAuth2UserService;
@@ -51,6 +47,8 @@ public class SecurityConfig {
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
 
     @Bean
@@ -144,6 +142,10 @@ public class SecurityConfig {
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                         .failureHandler(oAuth2AuthenticationFailureHandler));
 
+        http.logout(auth -> auth
+                .logoutUrl("/api/auth/logout")
+                .logoutSuccessHandler(customLogoutSuccessHandler)
+                .deleteCookies("JSESSIONID"));
 
         http    // 하나의 아이디에 대해서 다중 로그인에 대한 처리
                 .sessionManagement(auth -> auth

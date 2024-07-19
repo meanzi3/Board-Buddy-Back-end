@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import sumcoda.boardbuddy.dto.AuthRequest;
 import sumcoda.boardbuddy.dto.MemberResponse;
@@ -76,17 +77,18 @@ public class AuthController {
     /**
      * 사용자의 비밀번호 검증 요청 캐치
      *
-     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @param validatePasswordDTO 검증하려는 비밀번호가 저장되어있는 DTO
+     * @param username 로그인 사용자 아이디
      * @return 사용자가 비밀번호 검증에 성공했다면 true 반환, 아니라면 false 반환
      **/
     @PostMapping("/api/auth/password")
     public ResponseEntity<ApiResponse<Object>> validatePassword(
             @RequestBody AuthRequest.ValidatePasswordDTO validatePasswordDTO,
-            Authentication authentication) {
+            @RequestAttribute String username) {
 
         log.info("validate password is working");
 
-        authService.validatePassword(validatePasswordDTO, authentication);
+        authService.validatePassword(validatePasswordDTO, username);
 
         return buildSuccessResponse(null, "비밀번호 검증이 완료되었습니다.", HttpStatus.OK);
     }

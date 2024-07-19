@@ -4,11 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.MemberRequest;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
@@ -77,28 +73,29 @@ public class MemberController {
      * 신규 소셜 로그인 사용자의 회원강비 요청 캐치
      *
      * @param oAuth2RegisterDTO 프론트로부터 전달받은 소셜 로그인 유저 회원가입 정보
+     * @param username 소셜 로그인 사용자 아이디
      * @return 첫 소셜 로그인 사용자가 회원가입에 성공했다면 memberId 반환, 아니라면 null 반환
      **/
     @PostMapping(value = "/api/auth/oauth2/register")
-    public ResponseEntity<ApiResponse<Object>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {
+    public ResponseEntity<ApiResponse<Object>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, @RequestAttribute String username) {
         log.info("social register is working");
 
-        memberService.registerOAuth2Member(oAuth2RegisterDTO, authentication);
+        memberService.registerOAuth2Member(oAuth2RegisterDTO, username);
 
-        return buildSuccessResponse(null, "회원가입이 완료되었습니다.", HttpStatus.CREATED);
+        return buildSuccessResponse(null, "소셜 회원가입 및 로그인이 완료되었습니다.", HttpStatus.CREATED);
     }
 
     /**
      * 회원 탈퇴 요청 캐치
      *
-     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @param username 로그인 사용자 아이디
      * @return 회원 탈퇴가 완료되었다면 해당 유저의 memberId 반환, 아니라면 null 반환
      **/
     @PostMapping(value = "/api/auth/withdrawal")
-    public ResponseEntity<ApiResponse<Object>> withdrawalMember(Authentication authentication) {
+    public ResponseEntity<ApiResponse<Object>> withdrawalMember(@RequestAttribute String username) {
         log.info("withdrawal member is working");
 
-        memberService.withdrawalMember(authentication);
+        memberService.withdrawalMember(username);
 
         return buildSuccessResponse(null, "회원탈퇴가 완료되었습니다.", HttpStatus.OK);
     }

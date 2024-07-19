@@ -150,10 +150,9 @@ public class AuthService {
     /**
      * 입력된 비밀번호가 현재 로그인된 사용자의 비밀번호와 일치하는지 확인
      * @param validatePasswordDTO 입력된 비밀번호가 저장된 DTO
-     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @param username 로그인 사용자 아이디
      */
-    public void validatePassword(AuthRequest.ValidatePasswordDTO validatePasswordDTO, Authentication authentication) {
-        String username = authUtil.getUserNameByLoginType(authentication);
+    public void validatePassword(AuthRequest.ValidatePasswordDTO validatePasswordDTO, String username) {
         AuthResponse.ProfileDTO profileDTO = memberRepository.findAuthDTOByUsername(username).orElseThrow(() ->
                 new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 

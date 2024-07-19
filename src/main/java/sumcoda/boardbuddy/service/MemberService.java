@@ -111,12 +111,10 @@ public class MemberService {
      * 소셜 로그인 사용자에 대한 추가적인 회원가입
      *
      * @param oAuth2RegisterDTO 소셜로그인 사용자에 대한 추가적인 회원가입 정보
-     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @param username 로그인 정보를 포함하는 사용자 객체
      **/
     @Transactional
-    public void registerOAuth2Member(MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {
-
-        String username = authUtil.getUserNameByLoginType(authentication);
+    public void registerOAuth2Member(MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, String username) {
 
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
@@ -130,12 +128,10 @@ public class MemberService {
     /**
      * 소셜 로그인 사용자에 대한 추가적인 회원가입
      *
-     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @param username 로그인 정보를 포함하는 사용자 객체
      **/
     @Transactional
-    public void withdrawalMember(Authentication authentication) {
-
-        String username = authUtil.getUserNameByLoginType(authentication);
+    public void withdrawalMember(String username) {
 
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));

@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 import sumcoda.boardbuddy.exception.auth.InvalidPasswordException;
-import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
+import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
         if (userDetails == null) {
-            throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요.");
+            throw new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요.");
         }
 
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {

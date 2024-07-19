@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.MemberRequest;
 import sumcoda.boardbuddy.enumerate.MemberRole;
-import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
+import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,7 +85,7 @@ public class MemberTest {
                 .andExpect(jsonPath("$.message").value("위치 정보 설정을 성공하였습니다."));
 
         // 데이터베이스에서 유저를 가져와서 업데이트된 위치 정보 검증
-        Member updatedMember = memberRepository.findByUsername(username).orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자입니다."));
+        Member updatedMember = memberRepository.findByUsername(username).orElseThrow(() -> new MemberRetrievalException("유효하지 않은 사용자입니다."));
         assertThat(updatedMember.getSido()).isEqualTo("서울특별시");
         assertThat(updatedMember.getSigu()).isEqualTo("종로구");
         assertThat(updatedMember.getDong()).isEqualTo("신교동");

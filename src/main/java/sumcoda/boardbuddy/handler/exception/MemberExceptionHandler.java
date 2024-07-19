@@ -4,60 +4,36 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
-import sumcoda.boardbuddy.exception.member.MemberSaveException;
-import sumcoda.boardbuddy.exception.member.NicknameAlreadyExistsException;
-import sumcoda.boardbuddy.exception.member.UsernameAlreadyExistsException;
+import sumcoda.boardbuddy.dto.common.ApiResponse;
+import sumcoda.boardbuddy.exception.member.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import static sumcoda.boardbuddy.util.ResponseHandlerUtil.*;
 
 @RestControllerAdvice
 public class MemberExceptionHandler {
 
     @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> usernameAlreadyExistsExceptionHandler(UsernameAlreadyExistsException ex) {
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("data", false);
-
-        response.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    public ResponseEntity<ApiResponse<Object>> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException e) {
+        return buildFailureResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(NicknameAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> nicknameAlreadyExistsExceptionHandler(NicknameAlreadyExistsException ex) {
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("data", false);
-
-        response.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    public ResponseEntity<ApiResponse<Object>> handleNicknameAlreadyExistsException(NicknameAlreadyExistsException e) {
+        return buildFailureResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MemberSaveException.class)
-    public ResponseEntity<Map<String, Object>> memberSaveExceptionHandler(MemberSaveException ex) {
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("data", null);
-
-        response.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ApiResponse<Object>> handleMemberSaveException(MemberSaveException e) {
+        return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(MemberNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> memberNotFoundExceptionHandler(MemberNotFoundException ex) {
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("data", null);
-
-        response.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(MemberRetrievalException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMemberNotFoundException(MemberRetrievalException e) {
+        return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-
+    @ExceptionHandler(MemberDeletionFailureException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMemberDeletionFailureException(MemberDeletionFailureException e) {
+        return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.auth.CustomUserDetails;
-import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
+import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 
 @Service
@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         AuthResponse.ProfileDTO member = memberRepository.findAuthDTOByUsername(username).orElseThrow(() ->
-                new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         if (member != null) {
             return new CustomUserDetails(member);

@@ -26,7 +26,7 @@ public class MemberController {
      * 아이디 중복 확인 요청
      *
      * @param verifyUsernameDuplicationDTO 사용자가 입력한 아이디
-     * @return 아이디가 중복되지 않았다면 true 반환, 아니라면 false 반환
+     * @return 아이디가 중복되지 않았다면 null 반환
      **/
     @PostMapping(value = "/api/auth/check-username")
     public ResponseEntity<ApiResponse<Object>> verifyUsernameDuplication(
@@ -42,7 +42,7 @@ public class MemberController {
      * 닉네임 중복 확인 요청
      *
      * @param verifyNicknameDuplicationDTO 사용자가 입력한 닉네임
-     * @return 닉네임이 중복되지 않았다면 true 반환 아니라면 false 반환
+     * @return 닉네임이 중복되지 않았다면 null 반환
      **/
     @PostMapping(value = "/api/auth/check-nickname")
     public ResponseEntity<ApiResponse<Object>> verifyNicknameDuplication(
@@ -58,7 +58,7 @@ public class MemberController {
      * 회원가입 요청 캐치
      *
      * @param registerDTO 프론트로부터 전달받은 회원가입 정보
-     * @return 회원가입에 성공했다면 해당 memberId 반환, 아니라면 null 반환
+     * @return 회원가입에 성공했다면 null 반환
      **/
     @PostMapping(value = "/api/auth/register")
     public ResponseEntity<ApiResponse<Object>> register(@RequestBody MemberRequest.RegisterDTO registerDTO) {
@@ -74,7 +74,7 @@ public class MemberController {
      *
      * @param oAuth2RegisterDTO 프론트로부터 전달받은 소셜 로그인 유저 회원가입 정보
      * @param username 소셜 로그인 사용자 아이디
-     * @return 첫 소셜 로그인 사용자가 회원가입에 성공했다면 memberId 반환, 아니라면 null 반환
+     * @return 첫 소셜 로그인 사용자가 회원가입에 성공했다면 null 반환
      **/
     @PostMapping(value = "/api/auth/oauth2/register")
     public ResponseEntity<ApiResponse<Object>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, @RequestAttribute String username) {
@@ -89,7 +89,7 @@ public class MemberController {
      * 회원 탈퇴 요청 캐치
      *
      * @param username 로그인 사용자 아이디
-     * @return 회원 탈퇴가 완료되었다면 해당 유저의 memberId 반환, 아니라면 null 반환
+     * @return 회원 탈퇴가 완료되었다면 null 반환
      **/
     @PostMapping(value = "/api/auth/withdrawal")
     public ResponseEntity<ApiResponse<Object>> withdrawalMember(@RequestAttribute String username) {

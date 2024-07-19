@@ -1,7 +1,6 @@
 package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +13,6 @@ import sumcoda.boardbuddy.exception.member.*;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictNotFoundException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
-import sumcoda.boardbuddy.util.AuthUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -33,8 +31,6 @@ public class MemberService {
 
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    private final AuthUtil authUtil;
 
     /**
      * 아이디 중복검사
@@ -111,7 +107,7 @@ public class MemberService {
      * 소셜 로그인 사용자에 대한 추가적인 회원가입
      *
      * @param oAuth2RegisterDTO 소셜로그인 사용자에 대한 추가적인 회원가입 정보
-     * @param username 로그인 정보를 포함하는 사용자 객체
+     * @param username 로그인 사용자 아이디
      **/
     @Transactional
     public void registerOAuth2Member(MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, String username) {
@@ -128,7 +124,7 @@ public class MemberService {
     /**
      * 소셜 로그인 사용자에 대한 추가적인 회원가입
      *
-     * @param username 로그인 정보를 포함하는 사용자 객체
+     * @param username 로그인 사용자 아이디
      **/
     @Transactional
     public void withdrawalMember(String username) {

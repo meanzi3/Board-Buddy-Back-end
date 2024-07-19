@@ -104,7 +104,7 @@ public class AuthExceptionHandler {
     public ResponseEntity<Map<String, Object>> invalidPasswordExceptionHandler(InvalidPasswordException ex) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("data", null);
+        response.put("data", false);
 
         response.put("message", ex.getMessage());
 
@@ -120,5 +120,27 @@ public class AuthExceptionHandler {
         response.put("message", ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidRequestBodyException.class)
+    public ResponseEntity<Map<String, Object>> invalidRequestBodyExceptionHandler(InvalidRequestBodyException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("data", null);
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AlreadyLoggedOutException.class)
+    public ResponseEntity<Map<String, Object>> alreadyLoggedOutExceptionHandler(AlreadyLoggedOutException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("data", null);
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

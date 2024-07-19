@@ -19,17 +19,21 @@ import java.util.Map;
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         log.info("access denied handler is working");
 
         ObjectMapper objectMapper = new ObjectMapper();
+
         Map<String, Object> responseData = new HashMap<>();
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
+
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
         response.setCharacterEncoding("UTF-8");
 
         responseData.put("data", null);
+
         responseData.put("message", "접근이 거부된 요청입니다.");
 
         objectMapper.writeValue(response.getWriter(), responseData);

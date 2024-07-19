@@ -15,8 +15,8 @@ import org.springframework.util.StringUtils;
 import sumcoda.boardbuddy.dto.AuthRequest;
 import sumcoda.boardbuddy.dto.auth.CustomAuthenticationToken;
 import sumcoda.boardbuddy.exception.auth.AuthenticationNotSupportedException;
+import sumcoda.boardbuddy.exception.auth.InvalidRequestBodyException;
 import sumcoda.boardbuddy.exception.auth.MissingCredentialsException;
-import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 
 import java.io.IOException;
 
@@ -45,7 +45,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         try {
             loginDTO = objectMapper.readValue(request.getReader(), AuthRequest.LoginDTO.class);
         } catch (IOException e) {
-            throw new MemberNotFoundException(e.getMessage());
+            throw new InvalidRequestBodyException("요청 본문이 잘못된 형식이거나 유효하지 않은 데이터를 포함하고 있습니다. 올바른 형식으로 요청을 다시 시도하세요.");
         }
 
         // ID, PASSWORD 가 있는지 확인

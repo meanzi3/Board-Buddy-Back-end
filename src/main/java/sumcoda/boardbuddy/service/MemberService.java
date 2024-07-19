@@ -135,6 +135,27 @@ public class MemberService {
     }
 
     /**
+     * 소셜 로그인 사용자에 대한 추가적인 회원가입
+     *
+     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @return 회원탈퇴가 성공적으로 되었다면 true 아니면 false
+     **/
+    @Transactional
+    public Long withdrawalMember(Authentication authentication) {
+
+        String username = authUtil.getUserNameByLoginType(authentication);
+
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        Long memberId = member.getId();
+
+        memberRepository.delete(member);
+
+        return memberId;
+    }
+
+    /**
      * 멤버 위치 설정 요청 캐치
      *
      * @param locationDTO 사용자가 입력한 위치 정보

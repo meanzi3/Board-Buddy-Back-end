@@ -1,6 +1,8 @@
 package sumcoda.boardbuddy.exception.member;
 
-public class MemberNotFoundException extends RuntimeException {
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+public class MemberNotFoundException extends UsernameNotFoundException {
     public MemberNotFoundException(String message) {
         super(message);
     }

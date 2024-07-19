@@ -29,19 +29,20 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 
         String errorMessage = "";
 
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
 
         if (exception instanceof UsernameNotFoundException) {
-            errorMessage = "아이디가 존재하지 않습니다.";
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            errorMessage = "입력한 아이디가 올바르지 않습니다. 아이디를 확인하세요.";
         } else if(exception instanceof BadCredentialsException) {
-            errorMessage = "비밀번호가 올바르지 않습니다.";
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            errorMessage = "입력한 비밀번호가 올바르지 않습니다. 비밀번호를 확인하세요.";
         }
         else if (exception instanceof InternalAuthenticationServiceException) {
-            errorMessage = "내부 시스템 문제로 로그인 요청을 처리할 수 없습니다. 관리자에게 문의하세요.";
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            errorMessage = "내부 시스템 문제로 로그인 요청을 처리할 수 없습니다. 관리자에게 문의하세요.";
         }
 
 //        else if(exception instanceof DisabledException) {
@@ -55,7 +56,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 //            errorMessage = "인증 요청이 거부되었습니다. 관리자에게 문의하세요.";
 //        }
 
-        responseData.put("data", "error");
+        responseData.put("data", null);
         responseData.put("message", errorMessage);
 
         objectMapper.writeValue(response.getWriter(), responseData);

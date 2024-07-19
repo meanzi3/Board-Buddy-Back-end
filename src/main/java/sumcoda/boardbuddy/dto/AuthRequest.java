@@ -38,13 +38,25 @@ public class AuthRequest {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class LoginDTO {
 
-        String username;
+        private String username;
 
-        String password;
+        private String password;
 
         @Builder
         public LoginDTO(String username, String password) {
             this.username = username;
+            this.password = password;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ValidatePasswordDTO {
+
+        private String password;
+
+        @Builder
+        public ValidatePasswordDTO(String password) {
             this.password = password;
         }
     }

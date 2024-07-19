@@ -19,7 +19,7 @@ public class AuthUtil {
     public String getUserNameByLoginType(Authentication authentication) {
 
         if (authentication == null) {
-            throw new AuthenticationMissingException("인증 객체가 누락되었습니다. 관리자에게 문의하세요.");
+            throw new AuthenticationMissingException("유효하지 않은 사용자의 요청입니다.");
         }
 
         String username;

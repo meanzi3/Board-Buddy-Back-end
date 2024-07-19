@@ -14,9 +14,10 @@ import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.MemberService;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static sumcoda.boardbuddy.util.ResponseHandlerUtil.buildSuccessResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,19 +33,13 @@ public class MemberController {
      * @return 아이디가 중복되지 않았다면 true 반환, 아니라면 false 반환
      **/
     @PostMapping(value = "/api/auth/check-username")
-    public ResponseEntity<Map<String, Object>> verifyUsernameDuplication(
+    public ResponseEntity<ApiResponse<Object>> verifyUsernameDuplication(
             @RequestBody MemberRequest.VerifyUsernameDuplicationDTO verifyUsernameDuplicationDTO) {
         log.info("verify username duplication is working");
 
-        Map<String, Object> response = new HashMap<>();
+        memberService.verifyUsernameDuplication(verifyUsernameDuplicationDTO);
 
-        Boolean isNotDuplicate = memberService.verifyUsernameDuplication(verifyUsernameDuplicationDTO);
-
-        response.put("data", isNotDuplicate);
-
-        response.put("message", "사용가능한 아이디 입니다.");
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return buildSuccessResponse(null, "사용가능한 아이디 입니다.", HttpStatus.OK);
     }
 
     /**
@@ -54,19 +49,13 @@ public class MemberController {
      * @return 닉네임이 중복되지 않았다면 true 반환 아니라면 false 반환
      **/
     @PostMapping(value = "/api/auth/check-nickname")
-    public ResponseEntity<Map<String, Object>> verifyNicknameDuplication(
+    public ResponseEntity<ApiResponse<Object>> verifyNicknameDuplication(
             @RequestBody MemberRequest.VerifyNicknameDuplicationDTO verifyNicknameDuplicationDTO) {
         log.info("verify nickname duplication is working");
 
-        Map<String, Object> response = new HashMap<>();
+        memberService.verifyNicknameDuplication(verifyNicknameDuplicationDTO);
 
-        Boolean isNotDuplicate = memberService.verifyNicknameDuplication(verifyNicknameDuplicationDTO);
-
-        response.put("data", isNotDuplicate);
-
-        response.put("message", "사용가능한 닉네임 입니다.");
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return buildSuccessResponse(null, "사용가능한 닉네임 입니다.", HttpStatus.OK);
     }
 
     /**
@@ -76,18 +65,12 @@ public class MemberController {
      * @return 회원가입에 성공했다면 해당 memberId 반환, 아니라면 null 반환
      **/
     @PostMapping(value = "/api/auth/register")
-    public ResponseEntity<Map<String, Object>> register(@RequestBody MemberRequest.RegisterDTO registerDTO) {
+    public ResponseEntity<ApiResponse<Object>> register(@RequestBody MemberRequest.RegisterDTO registerDTO) {
         log.info("register is working");
 
-        Map<String, Object> response = new HashMap<>();
+        memberService.registerMember(registerDTO);
 
-        Long memberId = memberService.registerMember(registerDTO);
-
-        response.put("data", memberId);
-
-        response.put("message", "회원가입이 완료되었습니다.");
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return buildSuccessResponse(null, "회원가입이 완료되었습니다.", HttpStatus.CREATED);
     }
 
     /**
@@ -97,18 +80,12 @@ public class MemberController {
      * @return 첫 소셜 로그인 사용자가 회원가입에 성공했다면 memberId 반환, 아니라면 null 반환
      **/
     @PostMapping(value = "/api/auth/oauth2/register")
-    public ResponseEntity<Map<String, Object>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {
+    public ResponseEntity<ApiResponse<Object>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {
         log.info("social register is working");
 
-        Map<String, Object> response = new HashMap<>();
+        memberService.registerOAuth2Member(oAuth2RegisterDTO, authentication);
 
-        Long memberId = memberService.registerOAuth2Member(oAuth2RegisterDTO, authentication);
-
-        response.put("data", memberId);
-
-        response.put("message", "회원가입이 완료되었습니다.");
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return buildSuccessResponse(null, "회원가입이 완료되었습니다.", HttpStatus.CREATED);
     }
 
     /**
@@ -118,18 +95,12 @@ public class MemberController {
      * @return 회원 탈퇴가 완료되었다면 해당 유저의 memberId 반환, 아니라면 null 반환
      **/
     @PostMapping(value = "/api/auth/withdrawal")
-    public ResponseEntity<Map<String, Object>> withdrawalMember(Authentication authentication) {
+    public ResponseEntity<ApiResponse<Object>> withdrawalMember(Authentication authentication) {
         log.info("withdrawal member is working");
 
-        Map<String, Object> response = new HashMap<>();
+        memberService.withdrawalMember(authentication);
 
-        Long memberId = memberService.withdrawalMember(authentication);
-
-        response.put("data", memberId);
-
-        response.put("message", "회원탈퇴가 완료되었습니다.");
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return buildSuccessResponse(null, "회원탈퇴가 완료되었습니다.", HttpStatus.OK);
     }
 
     /**

@@ -13,7 +13,7 @@ import sumcoda.boardbuddy.exception.auth.InvalidPasswordException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationAttemptExceededException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException;
-import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
+import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 import sumcoda.boardbuddy.repository.SMSCertificationRepository;
 import sumcoda.boardbuddy.util.AuthUtil;
@@ -134,7 +134,7 @@ public class AuthService {
         String username = authUtil.getUserNameByLoginType(authentication);
 
         MemberResponse.ProfileDTO profileDTO = memberRepository.findMemberDTOByUsername(username).orElseThrow(() ->
-                new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         return MemberResponse.ProfileDTO
                 .builder()
@@ -151,12 +151,11 @@ public class AuthService {
      * 입력된 비밀번호가 현재 로그인된 사용자의 비밀번호와 일치하는지 확인
      * @param validatePasswordDTO 입력된 비밀번호가 저장된 DTO
      * @param authentication 로그인 정보를 포함하는 사용자 객체
-     * @return 비밀번호가 일치하면 true, 그렇지 않으면 false
      */
-    public Boolean validatePassword(AuthRequest.ValidatePasswordDTO validatePasswordDTO, Authentication authentication) {
+    public void validatePassword(AuthRequest.ValidatePasswordDTO validatePasswordDTO, Authentication authentication) {
         String username = authUtil.getUserNameByLoginType(authentication);
         AuthResponse.ProfileDTO profileDTO = memberRepository.findAuthDTOByUsername(username).orElseThrow(() ->
-                new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // DB에 저장된 암호화된 비밀번호와 입력된 비밀번호를 비교
         boolean isValidate = bCryptPasswordEncoder.matches(validatePasswordDTO.getPassword(), profileDTO.getPassword());
@@ -164,7 +163,5 @@ public class AuthService {
         if (!isValidate) {
             throw new InvalidPasswordException("입력하신 비밀번호가 올바르지 않습니다.");
         }
-
-        return true;
     }
 }

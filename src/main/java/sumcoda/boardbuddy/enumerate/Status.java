@@ -3,12 +3,13 @@ package sumcoda.boardbuddy.enumerate;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
 @RequiredArgsConstructor
-public enum ChatRoomRole {
+@Getter
+public enum Status {
 
-    AUTHOR("author"),
-    PARTICIPANT("participant");
+    SUCCESS("success"),
+    FAILURE("failure"),
+    ERROR("error");
 
     private final String value;
-}
+    }

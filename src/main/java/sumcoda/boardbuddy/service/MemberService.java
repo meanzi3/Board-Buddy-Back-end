@@ -10,10 +10,7 @@ import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.MemberRole;
-import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
-import sumcoda.boardbuddy.exception.member.MemberSaveException;
-import sumcoda.boardbuddy.exception.member.NicknameAlreadyExistsException;
-import sumcoda.boardbuddy.exception.member.UsernameAlreadyExistsException;
+import sumcoda.boardbuddy.exception.member.*;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictNotFoundException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
@@ -43,44 +40,45 @@ public class MemberService {
      * 아이디 중복검사
      *
      * @param verifyUsernameDuplicationDTO 사용자가 입력한 아이디
-     * @return 아이디가 존재하지 않으면 true, 이미 존재하면 false 를 프론트로 반환
      **/
-    public Boolean verifyUsernameDuplication(MemberRequest.VerifyUsernameDuplicationDTO verifyUsernameDuplicationDTO) {
+    public void verifyUsernameDuplication(MemberRequest.VerifyUsernameDuplicationDTO verifyUsernameDuplicationDTO) {
 
         Boolean isAlreadyExistsUsername = memberRepository.existsByUsername(verifyUsernameDuplicationDTO.getUsername());
+
+        if (isAlreadyExistsUsername == null) {
+            throw new MemberRetrievalException("유저를 조회하면서 서버 문제가 발생했습니다. 관리자에게 문의하세요.");
+        }
 
         if (Boolean.TRUE.equals(isAlreadyExistsUsername)) {
             throw new UsernameAlreadyExistsException("동일한 아이디가 이미 존재합니다.");
         }
-
-        return true;
     }
 
     /**
      * 닉네임 중복검사
      *
      * @param verifyNicknameDuplicationDTO 사용자가 입력한 닉네임
-     * @return 닉네임이 존재하지 않으면 true, 이미 존재하면 false 를 프론트로 반환
      **/
-    public Boolean verifyNicknameDuplication(MemberRequest.VerifyNicknameDuplicationDTO verifyNicknameDuplicationDTO) {
+    public void verifyNicknameDuplication(MemberRequest.VerifyNicknameDuplicationDTO verifyNicknameDuplicationDTO) {
 
         Boolean isAlreadyExistsNickname = memberRepository.existsByNickname(verifyNicknameDuplicationDTO.getNickname());
+
+        if (isAlreadyExistsNickname == null) {
+            throw new MemberRetrievalException("유저를 조회하면서 서버 문제가 발생했습니다. 관리자에게 문의하세요.");
+        }
 
         if (Boolean.TRUE.equals(isAlreadyExistsNickname)) {
             throw new NicknameAlreadyExistsException("동일한 닉네임이 이미 존재합니다.");
         }
-
-        return true;
     }
 
     /**
      * 회원가입 요청 캐치
      *
      * @param registerDTO 전달받은 회원가입 정보
-     * @return 회원가입에 성공한 유저의 memberId
      **/
     @Transactional
-    public Long registerMember(MemberRequest.RegisterDTO registerDTO) {
+    public void registerMember(MemberRequest.RegisterDTO registerDTO) {
 
         Long memberId = memberRepository.save(Member.createMember(
                 registerDTO.getUsername(),
@@ -107,8 +105,6 @@ public class MemberService {
         if (memberId == null) {
             throw new MemberSaveException("서버 문제로 회원가입에 실패하였습니다. 관리자에게 문의하세요.");
         }
-
-        return memberId;
     }
 
     /**
@@ -116,43 +112,41 @@ public class MemberService {
      *
      * @param oAuth2RegisterDTO 소셜로그인 사용자에 대한 추가적인 회원가입 정보
      * @param authentication 로그인 정보를 포함하는 사용자 객체
-     * @return 신규 소셜 로그인 사용자의 memberId
      **/
     @Transactional
-    public Long registerOAuth2Member(MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {
+    public void registerOAuth2Member(MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, Authentication authentication) {
 
         String username = authUtil.getUserNameByLoginType(authentication);
 
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         member.assignPhoneNumber(oAuth2RegisterDTO.getPhoneNumber());
         member.assignSido(oAuth2RegisterDTO.getSido());
         member.assignSigu(oAuth2RegisterDTO.getSigu());
         member.assignDong(oAuth2RegisterDTO.getDong());
-
-        return member.getId();
     }
 
     /**
      * 소셜 로그인 사용자에 대한 추가적인 회원가입
      *
      * @param authentication 로그인 정보를 포함하는 사용자 객체
-     * @return 회원탈퇴가 성공적으로 되었다면 true 아니면 false
      **/
     @Transactional
-    public Long withdrawalMember(Authentication authentication) {
+    public void withdrawalMember(Authentication authentication) {
 
         String username = authUtil.getUserNameByLoginType(authentication);
 
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
-
-        Long memberId = member.getId();
+                .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         memberRepository.delete(member);
 
-        return memberId;
+        // 삭제 확인
+        boolean isExists = memberRepository.existsById(member.getId());
+        if (isExists) {
+            throw new MemberDeletionFailureException("회원 탈퇴에 실패했습니다. 관리자에게 문의하세요.");
+        }
     }
 
     /**
@@ -170,7 +164,7 @@ public class MemberService {
 
         // 사용자 조회
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new MemberRetrievalException("유효하지 않은 사용자입니다."));
 
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
         PublicDistrictResponse.LocationDTO baseLocationRequestDTO = publicDistrictRepository.findOneBySidoAndSiguAndDong(sido, sigu, dong)

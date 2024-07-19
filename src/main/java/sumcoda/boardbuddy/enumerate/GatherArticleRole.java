@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum GatherArticleRole {
 
-    AUTHOR("AUTHOR"),
-    PARTICIPANT("PARTICIPANT");
+    AUTHOR("author"),
+    PARTICIPANT("participant");
 
     private final String value;
+
+
 }

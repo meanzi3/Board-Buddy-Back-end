@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ChatRoomRole {
 
-    AUTHOR("AUTHOR"),
-    PARTICIPANT("PARTICIPANT");
+    AUTHOR("author"),
+    PARTICIPANT("participant");
 
     private final String value;
 }

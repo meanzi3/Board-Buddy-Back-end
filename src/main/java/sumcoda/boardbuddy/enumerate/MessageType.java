@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum MessageType {
 
-    ENTER("ENTER"),
-    EXIT("EXIT"),
-    TALK("TALK");
+    ENTER("enter"),
+    EXIT("exit"),
+    TALK("talk");
 
     private final String value;
 }

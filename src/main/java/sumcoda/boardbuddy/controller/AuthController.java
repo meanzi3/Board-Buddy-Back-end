@@ -27,7 +27,7 @@ public class AuthController {
      * SMS 인증 메시지를 사용자에게 보내는 요청 캐치
      *
      * @param sendSMSCertificationDTO 로그인 정보를 포함하는 사용자 객체
-     * @return 인증번호가 성공적으로 전달되었다면 null 반환
+     * @return 인증번호가 성공적으로 전달되었다면 약속된 SuccessResponse 반환
      **/
     @PostMapping("/api/auth/sms-certifications/send")
     public ResponseEntity<ApiResponse<Void>> sendSMS(@RequestBody AuthRequest.SendSMSCertificationDTO sendSMSCertificationDTO) {
@@ -42,7 +42,7 @@ public class AuthController {
      *  SMS 인증번호 확인 요청 캐치
      *
      * @param validateSMSCertificationDTO 인증번호 확인을 요청한 사용자의 핸드폰 번호가 저장되어있는 DTO
-     * @return 인증 번호가 올바르게 입력되었다면 null 반환
+     * @return 인증 번호가 올바르게 입력되었다면 약속된 SuccessResponse 반환
      **/
     @PostMapping("/api/auth/sms-certifications/verify")
     public ResponseEntity<ApiResponse<Void>> verifyCertificationNumber(@RequestBody AuthRequest.ValidateSMSCertificationDTO validateSMSCertificationDTO) {
@@ -57,7 +57,7 @@ public class AuthController {
      * 사용자의 로그인 상태를 확인
      *
      * @param username 로그인 사용자 아이디
-     * @return 사용자가 로그인한 상태라면 해당 사용자의 프로필 반환 아니라면 null 반환
+     * @return 사용자가 로그인한 상태라면 해당 사용자의 프로필을 기반으로한 약속된 SuccessResponse 반환
      **/
     @GetMapping("/api/auth/status")
     public ResponseEntity<ApiResponse<MemberResponse.ProfileDTO>> isAuthenticated(@RequestAttribute String username) {
@@ -73,7 +73,7 @@ public class AuthController {
      *
      * @param validatePasswordDTO 검증하려는 비밀번호가 저장되어있는 DTO
      * @param username 로그인 사용자 아이디
-     * @return 사용자가 비밀번호 검증에 성공했다면 null 반환
+     * @return 사용자가 비밀번호 검증에 성공했다면 약속된 SuccessResponse 반환
      **/
     @PostMapping("/api/auth/password")
     public ResponseEntity<ApiResponse<Void>> validatePassword(

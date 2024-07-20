@@ -29,7 +29,7 @@ public class MemberController {
      * @return 아이디가 중복되지 않았다면 null 반환
      **/
     @PostMapping(value = "/api/auth/check-username")
-    public ResponseEntity<ApiResponse<Object>> verifyUsernameDuplication(
+    public ResponseEntity<ApiResponse<Void>> verifyUsernameDuplication(
             @RequestBody MemberRequest.VerifyUsernameDuplicationDTO verifyUsernameDuplicationDTO) {
         log.info("verify username duplication is working");
 
@@ -45,7 +45,7 @@ public class MemberController {
      * @return 닉네임이 중복되지 않았다면 null 반환
      **/
     @PostMapping(value = "/api/auth/check-nickname")
-    public ResponseEntity<ApiResponse<Object>> verifyNicknameDuplication(
+    public ResponseEntity<ApiResponse<Void>> verifyNicknameDuplication(
             @RequestBody MemberRequest.VerifyNicknameDuplicationDTO verifyNicknameDuplicationDTO) {
         log.info("verify nickname duplication is working");
 
@@ -61,7 +61,7 @@ public class MemberController {
      * @return 회원가입에 성공했다면 null 반환
      **/
     @PostMapping(value = "/api/auth/register")
-    public ResponseEntity<ApiResponse<Object>> register(@RequestBody MemberRequest.RegisterDTO registerDTO) {
+    public ResponseEntity<ApiResponse<Void>> register(@RequestBody MemberRequest.RegisterDTO registerDTO) {
         log.info("register is working");
 
         memberService.registerMember(registerDTO);
@@ -70,14 +70,14 @@ public class MemberController {
     }
 
     /**
-     * 신규 소셜 로그인 사용자의 회원강비 요청 캐치
+     * 신규 소셜 로그인 사용자의 회원가입 요청 캐치
      *
      * @param oAuth2RegisterDTO 프론트로부터 전달받은 소셜 로그인 유저 회원가입 정보
      * @param username 소셜 로그인 사용자 아이디
      * @return 첫 소셜 로그인 사용자가 회원가입에 성공했다면 null 반환
      **/
     @PostMapping(value = "/api/auth/oauth2/register")
-    public ResponseEntity<ApiResponse<Object>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, @RequestAttribute String username) {
+    public ResponseEntity<ApiResponse<Void>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, @RequestAttribute String username) {
         log.info("social register is working");
 
         memberService.registerOAuth2Member(oAuth2RegisterDTO, username);
@@ -92,7 +92,7 @@ public class MemberController {
      * @return 회원 탈퇴가 완료되었다면 null 반환
      **/
     @PostMapping(value = "/api/auth/withdrawal")
-    public ResponseEntity<ApiResponse<Object>> withdrawalMember(@RequestAttribute String username) {
+    public ResponseEntity<ApiResponse<Void>> withdrawalMember(@RequestAttribute String username) {
         log.info("withdrawal member is working");
 
         memberService.withdrawalMember(username);

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,9 +13,6 @@ import sumcoda.boardbuddy.dto.AuthRequest;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.AuthService;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static sumcoda.boardbuddy.util.ResponseHandlerUtil.buildSuccessResponse;
 
@@ -34,10 +30,8 @@ public class AuthController {
      * @return 인증번호가 성공적으로 전달되었다면 null 반환
      **/
     @PostMapping("/api/auth/sms-certifications/send")
-    public ResponseEntity<ApiResponse<Object>> sendSMS(@RequestBody AuthRequest.SendSMSCertificationDTO sendSMSCertificationDTO) {
+    public ResponseEntity<ApiResponse<Void>> sendSMS(@RequestBody AuthRequest.SendSMSCertificationDTO sendSMSCertificationDTO) {
         log.info("send sms is working");
-
-        Map<String, Object> response = new HashMap<>();
 
         authService.sendSMS(sendSMSCertificationDTO);
 
@@ -51,7 +45,7 @@ public class AuthController {
      * @return 인증 번호가 올바르게 입력되었다면 null 반환
      **/
     @PostMapping("/api/auth/sms-certifications/verify")
-    public ResponseEntity<ApiResponse<Object>> verifyCertificationNumber(@RequestBody AuthRequest.ValidateSMSCertificationDTO validateSMSCertificationDTO) {
+    public ResponseEntity<ApiResponse<Void>> verifyCertificationNumber(@RequestBody AuthRequest.ValidateSMSCertificationDTO validateSMSCertificationDTO) {
         log.info("validate certification is working");
 
         authService.validateCertificationNumber(validateSMSCertificationDTO);
@@ -62,14 +56,14 @@ public class AuthController {
     /**
      * 사용자의 로그인 상태를 확인
      *
-     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @param username 로그인 사용자 아이디
      * @return 사용자가 로그인한 상태라면 해당 사용자의 프로필 반환 아니라면 null 반환
      **/
     @GetMapping("/api/auth/status")
-    public ResponseEntity<ApiResponse<Object>> isAuthenticated(Authentication authentication) {
+    public ResponseEntity<ApiResponse<MemberResponse.ProfileDTO>> isAuthenticated(@RequestAttribute String username) {
         log.info("check session is working");
 
-        MemberResponse.ProfileDTO profileDTO = authService.isAuthenticated(authentication);
+        MemberResponse.ProfileDTO profileDTO = authService.isAuthenticated(username);
 
         return buildSuccessResponse(profileDTO, "유효한 세션입니다.", HttpStatus.OK);
     }
@@ -82,7 +76,7 @@ public class AuthController {
      * @return 사용자가 비밀번호 검증에 성공했다면 null 반환
      **/
     @PostMapping("/api/auth/password")
-    public ResponseEntity<ApiResponse<Object>> validatePassword(
+    public ResponseEntity<ApiResponse<Void>> validatePassword(
             @RequestBody AuthRequest.ValidatePasswordDTO validatePasswordDTO,
             @RequestAttribute String username) {
 

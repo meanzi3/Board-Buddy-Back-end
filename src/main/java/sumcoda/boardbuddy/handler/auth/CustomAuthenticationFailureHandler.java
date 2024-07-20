@@ -33,12 +33,9 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         response.setCharacterEncoding("UTF-8");
 
 
-        if (exception instanceof UsernameNotFoundException) {
+        if (exception instanceof UsernameNotFoundException || exception instanceof BadCredentialsException) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            errorMessage = "입력한 아이디가 올바르지 않습니다. 아이디를 확인하세요.";
-        } else if(exception instanceof BadCredentialsException) {
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            errorMessage = "입력한 비밀번호가 올바르지 않습니다. 비밀번호를 확인하세요.";
+            errorMessage = "입력한 회원 정보가 올바르지 않습니다. 올바른 회원정보를 입력하세요.";
         }
         else if (exception instanceof InternalAuthenticationServiceException) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());

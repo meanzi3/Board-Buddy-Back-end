@@ -13,10 +13,9 @@ public class ResponseHandlerUtil {
 
     private static final Status STATUS_ERROR = Status.ERROR;
 
-
-    public static ResponseEntity<ApiResponse<Object>> buildSuccessResponse(Object data, String message, HttpStatus httpStatus) {
+    public static ResponseEntity<ApiResponse<Object>> buildResponse(Status status, Object data, String message, HttpStatus httpStatus) {
         ApiResponse<Object> response = ApiResponse.builder()
-                .status(STATUS_SUCCESS.getValue())
+                .status(status.getValue())
                 .data(data)
                 .message(message)
                 .build();
@@ -24,22 +23,16 @@ public class ResponseHandlerUtil {
         return new ResponseEntity<>(response, httpStatus);
     }
 
-    public static ResponseEntity<ApiResponse<Object>> buildFailureOrErrorResponse(Status status, String message, HttpStatus httpStatus) {
-        ApiResponse<Object> response = ApiResponse.builder()
-                .status(status.getValue())
-                .data(null)
-                .message(message)
-                .build();
-
-        return new ResponseEntity<>(response, httpStatus);
+    public static ResponseEntity<ApiResponse<Object>> buildSuccessResponse(Object data, String message, HttpStatus httpStatus) {
+        return buildResponse(STATUS_SUCCESS, data, message, httpStatus);
     }
 
     public static ResponseEntity<ApiResponse<Object>> buildFailureResponse(String message, HttpStatus httpStatus) {
-        return buildFailureOrErrorResponse(STATUS_FAILURE, message, httpStatus);
+        return buildResponse(STATUS_FAILURE, null, message, httpStatus);
     }
 
     public static ResponseEntity<ApiResponse<Object>> buildErrorResponse(String message, HttpStatus httpStatus) {
-        return buildFailureOrErrorResponse(STATUS_ERROR, message, httpStatus);
+        return buildResponse(STATUS_ERROR, null, message, httpStatus);
 
     }
 }

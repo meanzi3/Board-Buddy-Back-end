@@ -2,7 +2,6 @@ package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +14,9 @@ import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
-import sumcoda.boardbuddy.repository.SMSCertificationRepository;
+import sumcoda.boardbuddy.repository.SmsCertificationRepository;
 import sumcoda.boardbuddy.util.AuthUtil;
-import sumcoda.boardbuddy.util.SMSCertificationUtil;
+import sumcoda.boardbuddy.util.SmsCertificationUtil;
 
 import java.security.SecureRandom;
 
@@ -26,13 +25,11 @@ import java.security.SecureRandom;
 @Transactional(readOnly = true)
 public class AuthService {
 
-    private final SMSCertificationUtil smsCertificationUtil;
+    private final SmsCertificationUtil smsCertificationUtil;
 
-    private final SMSCertificationRepository smsCertificationRepository;
+    private final SmsCertificationRepository smsCertificationRepository;
 
     private final MemberRepository memberRepository;
-
-    private final AuthUtil authUtil;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -124,14 +121,10 @@ public class AuthService {
     /**
      * 사용자의 로그인 상태를 확인
      *
-     * @param authentication 로그인 정보를 포함하는 사용자 객체
+     * @param username 로그인 사용자 아이디
      * @return 사용자가 로그인한 상태라면 해당 사용자의 프로필 반환 아니라면 null 반환
      **/
-    public MemberResponse.ProfileDTO isAuthenticated(Authentication authentication) {
-        if (!authUtil.isAuthenticated(authentication)) {
-            return null;
-        }
-        String username = authUtil.getUserNameByLoginType(authentication);
+    public MemberResponse.ProfileDTO isAuthenticated(String username) {
 
         MemberResponse.ProfileDTO profileDTO = memberRepository.findMemberDTOByUsername(username).orElseThrow(() ->
                 new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));

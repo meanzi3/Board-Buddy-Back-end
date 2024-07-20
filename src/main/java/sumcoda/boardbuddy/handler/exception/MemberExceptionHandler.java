@@ -28,12 +28,17 @@ public class MemberExceptionHandler {
     }
 
     @ExceptionHandler(MemberRetrievalException.class)
-    public ResponseEntity<ApiResponse<Object>> handleMemberNotFoundException(MemberRetrievalException e) {
+    public ResponseEntity<ApiResponse<Object>> handleMemberRetrievalException(MemberRetrievalException e) {
         return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MemberDeletionFailureException.class)
     public ResponseEntity<ApiResponse<Object>> handleMemberDeletionFailureException(MemberDeletionFailureException e) {
         return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MemberNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMemberNotFoundException(MemberNotFoundException e) {
+        return buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

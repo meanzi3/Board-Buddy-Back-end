@@ -31,9 +31,9 @@ public class GatherArticleController {
     @PostMapping(value = "/api/gatherArticles")
     public ResponseEntity<ApiResponse<GatherArticleResponse.CreateDTO>> createGatherArticle(
             @RequestBody GatherArticleRequest.CreateDTO createRequest,
-            @ModelAttribute("username") String username){
+            @RequestAttribute String username){
         GatherArticleResponse.CreateDTO createResponse = gatherArticleService.createGatherArticle(createRequest, username);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(createResponse, "모집글이 업로드 되었습니다"));
+        return buildSuccessResponse(createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
     }
 
     /**
@@ -46,9 +46,9 @@ public class GatherArticleController {
     @GetMapping(value = "/api/gatherArticles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<GatherArticleResponse.ReadDTO>> getGatherArticle(
             @PathVariable Long gatherArticleId,
-            @ModelAttribute("username") String username) {
-        GatherArticleResponse.ReadDTO response = gatherArticleService.getGatherArticle(gatherArticleId, username);
-        return ResponseEntity.ok(new ApiResponse<>(response, "성공적으로 조회되었습니다."));
+            @RequestAttribute String username) {
+        GatherArticleResponse.ReadDTO readResponse = gatherArticleService.getGatherArticle(gatherArticleId, username);
+        return buildSuccessResponse(readResponse, "성공적으로 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -63,9 +63,9 @@ public class GatherArticleController {
     public ResponseEntity<ApiResponse<GatherArticleResponse.UpdateDTO>> updateGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestBody GatherArticleRequest.UpdateDTO updateRequest,
-            @ModelAttribute("username") String username) {
+            @RequestAttribute String username) {
         GatherArticleResponse.UpdateDTO updateResponse = gatherArticleService.updateGatherArticle(gatherArticleId, updateRequest, username);
-        return ResponseEntity.ok(new ApiResponse<>(updateResponse, "모집글이 수정되었습니다."));
+        return buildSuccessResponse(updateResponse, "모집글이 수정되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -78,9 +78,9 @@ public class GatherArticleController {
     @DeleteMapping(value = "/api/gatherArticles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<GatherArticleResponse.DeleteDTO>> deleteGatherArticle(
             @PathVariable Long gatherArticleId,
-            @ModelAttribute("username") String username){
+            @RequestAttribute String username){
         GatherArticleResponse.DeleteDTO deleteResponse = gatherArticleService.deleteGatherArticle(gatherArticleId, username);
-        return ResponseEntity.ok(new ApiResponse<>(deleteResponse, "모집글이 삭제되었습니다."));
+        return buildSuccessResponse(deleteResponse, "모집글이 삭제되었습니다.", HttpStatus.OK);
     }
 
     /**

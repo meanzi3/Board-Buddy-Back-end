@@ -11,6 +11,7 @@ import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleUpdateException;
 import sumcoda.boardbuddy.exception.gatherArticle.UnauthorizedActionException;
 
 import static sumcoda.boardbuddy.util.ResponseHandlerUtil.buildErrorResponse;
+import static sumcoda.boardbuddy.util.ResponseHandlerUtil.buildFailureResponse;
 
 @RestControllerAdvice
 public class GatherArticleExceptionHandler {
@@ -24,7 +25,7 @@ public class GatherArticleExceptionHandler {
   // 모집글 조회 예외 처리 핸들러
   @ExceptionHandler(GatherArticleNotFoundException.class)
   public ResponseEntity<ApiResponse<Object>> handleGatherArticleNotFoundException(GatherArticleNotFoundException e) {
-    return buildErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    return buildFailureResponse(e.getMessage(), HttpStatus.NOT_FOUND);
   }
 
   // 모집글 수정 예외 처리 핸들러
@@ -36,7 +37,7 @@ public class GatherArticleExceptionHandler {
   // 작성자 확인 예외 처리 핸들러
   @ExceptionHandler(UnauthorizedActionException.class)
   public ResponseEntity<ApiResponse<Object>> handleUnauthorizedActionException(UnauthorizedActionException e) {
-    return buildErrorResponse(e.getMessage(), HttpStatus.FORBIDDEN);
+    return buildFailureResponse(e.getMessage(), HttpStatus.FORBIDDEN);
   }
 
 

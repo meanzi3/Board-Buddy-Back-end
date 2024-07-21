@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.MemberRequest;
+import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.MemberService;
@@ -114,5 +115,23 @@ public class MemberController {
         Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> response = memberService.updateMemberLocation(locationDTO, username);
 
         return ResponseEntity.ok(new ApiResponse<>(response, "위치 정보 설정을 성공하였습니다."));
+    }
+
+    /**
+     * 멤버 반경 설정 요청 캐치
+     *
+     * @param radiusDTO 사용자가 입력한 반경 정보
+     * @param username 로그인 사용자 아이디
+     * @return 반경 설정이 성공했다면 약속된 SuccessResponse 반환
+     **/
+    @PostMapping("/api/radius")
+    public ResponseEntity<ApiResponse<Void>> updateMemberRadius(
+            @RequestBody MemberRequest.RadiusDTO radiusDTO,
+            @RequestAttribute String username) {
+        log.info("updateMemberRadius is working");
+
+        memberService.updateMemberRadius(radiusDTO, username);
+
+        return buildSuccessResponse(null, "반경 설정을 성공하였습니다.", HttpStatus.OK);
     }
 }

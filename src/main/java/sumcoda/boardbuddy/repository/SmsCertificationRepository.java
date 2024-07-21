@@ -8,7 +8,7 @@ import java.time.Duration;
 
 @RequiredArgsConstructor
 @Repository
-public class SMSCertificationRepository {
+public class SmsCertificationRepository {
 
     // Redis에 저장되는 Key값이 중복되지 않도록 상수 선언
     private final String RECEIVED_PHONE_NUMBER_PREFIX = "sms:received:phone:number ";

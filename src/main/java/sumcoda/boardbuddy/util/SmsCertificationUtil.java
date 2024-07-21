@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class SMSCertificationUtil {
+public class SmsCertificationUtil {
 
     @Value("${spring.cool-sms.api-key}")
     private String apiKey;

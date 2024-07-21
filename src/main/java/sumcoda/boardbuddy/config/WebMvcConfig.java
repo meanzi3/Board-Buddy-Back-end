@@ -23,14 +23,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/auth/register",
                         "/api/auth/check-username",
                         "/api/auth/check-nickname",
-                        "/api/auth/sms-certifications/send",
-                        "/api/auth/sms-certifications/verify",
+                        "/api/auth/sms-certifications/**",
                         "/api/auth/login",
-                        // Authentication 로직을 실행하지만 해당 핸들러에서는 필요 없다.
-                        "/api/auth/status",
-                        "/api/oauth2/authorization/google",
-                        "/api/oauth2/authorization/kakao",
-                        "/api/oauth2/authorization/naver"));
+                        "/api/oauth2/**"));
         WebMvcConfigurer.super.addInterceptors(registry);
     }
 

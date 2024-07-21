@@ -13,25 +13,21 @@ public class ResponseHandlerUtil {
 
     private static final Status STATUS_ERROR = Status.ERROR;
 
-    public static ResponseEntity<ApiResponse<Object>> buildResponse(Status status, Object data, String message, HttpStatus httpStatus) {
-        ApiResponse<Object> response = ApiResponse.builder()
-                .status(status.getValue())
-                .data(data)
-                .message(message)
-                .build();
+    private static <T> ResponseEntity<ApiResponse<T>> buildResponse(Status status, T data, String message, HttpStatus httpStatus) {
+        ApiResponse<T> response = ApiResponse.createApiResponse(status, data, message);
 
         return new ResponseEntity<>(response, httpStatus);
     }
 
-    public static ResponseEntity<ApiResponse<Object>> buildSuccessResponse(Object data, String message, HttpStatus httpStatus) {
+    public static <T> ResponseEntity<ApiResponse<T>> buildSuccessResponse(T data, String message, HttpStatus httpStatus) {
         return buildResponse(STATUS_SUCCESS, data, message, httpStatus);
     }
 
-    public static ResponseEntity<ApiResponse<Object>> buildFailureResponse(String message, HttpStatus httpStatus) {
+    public static <T> ResponseEntity<ApiResponse<T>> buildFailureResponse(String message, HttpStatus httpStatus) {
         return buildResponse(STATUS_FAILURE, null, message, httpStatus);
     }
 
-    public static ResponseEntity<ApiResponse<Object>> buildErrorResponse(String message, HttpStatus httpStatus) {
+    public static <T> ResponseEntity<ApiResponse<T>> buildErrorResponse(String message, HttpStatus httpStatus) {
         return buildResponse(STATUS_ERROR, null, message, httpStatus);
 
     }

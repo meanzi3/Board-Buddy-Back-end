@@ -108,11 +108,11 @@ public class MemberController {
     @PostMapping("/api/locations")
     public ResponseEntity<ApiResponse<Map<Integer, List<NearPublicDistrictResponse.LocationDTO>>>> updateMemberLocation(
             @RequestBody MemberRequest.LocationDTO locationDTO,
-            @ModelAttribute("username") String username) {
+            @RequestAttribute String username) {
         log.info("updateMemberLocation is working");
 
         Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> response = memberService.updateMemberLocation(locationDTO, username);
 
-        return ResponseEntity.ok(new ApiResponse<>(response, "위치 정보 설정을 성공하였습니다."));
+        return buildSuccessResponse(response, "위치 정보 설정을 성공하였습니다.", HttpStatus.OK);
     }
 }

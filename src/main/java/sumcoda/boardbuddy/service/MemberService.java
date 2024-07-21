@@ -156,11 +156,11 @@ public class MemberService {
 
         // 사용자 조회
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberRetrievalException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
         PublicDistrictResponse.LocationDTO baseLocationRequestDTO = publicDistrictRepository.findOneBySidoAndSiguAndDong(sido, sigu, dong)
-                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보가 올바르지 않습니다."));
+                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 멤버의 위치 업데이트
         member.assignLocation(sido, sigu, dong);

@@ -258,6 +258,11 @@ public class GatherArticleService {
      **/
     @Transactional
     public List<GatherArticleResponse.GatherArticleInfosDTO> getMyGatherArticles(String username) {
+
+        if (username == null) {
+            throw new MemberRetrievalException("작성한 모집글 조회 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
+        }
+
         return gatherArticleRepository.findGatherArticleInfosByUsername(username);
     }
 
@@ -269,6 +274,11 @@ public class GatherArticleService {
      **/
     @Transactional
     public List<GatherArticleResponse.GatherArticleInfosDTO> getMyParticipations(String username) {
+
+        if (username == null) {
+            throw new MemberRetrievalException("참가한 모집글 조회 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
+        }
+
         return gatherArticleRepository.findParticipationsByUsername(username);
     }
 }

@@ -8,7 +8,7 @@ public class PublicDistrictResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class PublicDistrictInfoDTO {
+    public static class InfoDTO {
 
         private String sido;
         private String sigu;
@@ -17,7 +17,7 @@ public class PublicDistrictResponse {
         private Double longitude;
 
         @Builder
-        public PublicDistrictInfoDTO(String sido, String sigu, String dong, Double latitude, Double longitude) {
+        public InfoDTO(String sido, String sigu, String dong, Double latitude, Double longitude) {
             this.sido = sido;
             this.sigu = sigu;
             this.dong = dong;

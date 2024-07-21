@@ -8,7 +8,7 @@ public class NearPublicDistrictResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class NearPublicDistrictInfoDTO {
+    public static class InfoDTO {
 
         private String sido;
         private String sigu;
@@ -16,7 +16,7 @@ public class NearPublicDistrictResponse {
         private Integer radius;
 
         @Builder
-        public NearPublicDistrictInfoDTO(String sido, String sigu, String dong, Integer radius) {
+        public InfoDTO(String sido, String sigu, String dong, Integer radius) {
             this.sido = sido;
             this.sigu = sigu;
             this.dong = dong;

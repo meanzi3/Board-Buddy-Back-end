@@ -30,10 +30,10 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
     }
 
     @Override
-    public List<PublicDistrictResponse.PublicDistrictInfoDTO> findAllDistricts() {
+    public List<PublicDistrictResponse.InfoDTO> findAllDistricts() {
 
         return jpaQueryFactory
-                .select(Projections.fields(PublicDistrictResponse.PublicDistrictInfoDTO.class,
+                .select(Projections.fields(PublicDistrictResponse.InfoDTO.class,
                         publicDistrict.sido,
                         publicDistrict.sigu,
                         publicDistrict.dong,

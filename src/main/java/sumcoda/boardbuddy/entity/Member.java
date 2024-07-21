@@ -263,4 +263,9 @@ public class Member {
         this.sigu = sigu;
         this.dong = dong;
     }
+
+    // Member 반경 수정 메서드
+    public void assignRadius(Integer radius) {
+        this.radius = radius;
+    }
 }

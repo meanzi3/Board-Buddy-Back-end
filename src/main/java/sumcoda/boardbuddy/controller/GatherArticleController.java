@@ -12,6 +12,8 @@ import sumcoda.boardbuddy.service.GatherArticleService;
 
 import java.util.List;
 
+import static sumcoda.boardbuddy.util.ResponseHandlerUtil.*;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -89,12 +91,12 @@ public class GatherArticleController {
      **/
     @GetMapping(value = "/api/my/gatherArticles")
     public ResponseEntity<ApiResponse<List<GatherArticleResponse.GatherArticleInfosDTO>>> getMyGatherArticles (
-            @ModelAttribute("username") String username) {
+            @RequestAttribute String username) {
         log.info("get gather articles is working");
 
         List<GatherArticleResponse.GatherArticleInfosDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
 
-        return ResponseEntity.ok(new ApiResponse<>(gatherArticles, "내 모집글이 성공적으로 조회되었습니다."));
+        return buildSuccessResponse(gatherArticles, "내 모집글이 성공적으로 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -105,12 +107,12 @@ public class GatherArticleController {
      **/
     @GetMapping(value = "/api/my/participations")
     public ResponseEntity<ApiResponse<List<GatherArticleResponse.GatherArticleInfosDTO>>> getMyParticipations (
-            @ModelAttribute("username") String username) {
+            @RequestAttribute String username) {
         log.info("get my participations is working");
 
         List<GatherArticleResponse.GatherArticleInfosDTO> participations = gatherArticleService.getMyParticipations(username);
 
-        return ResponseEntity.ok(new ApiResponse<>(participations, "참가한 모집글이 성공적으로 조회되었습니다."));
+        return buildSuccessResponse(participations, "참가한 모집글이 성공적으로 조회되었습니다.", HttpStatus.OK);
     }
 }
 

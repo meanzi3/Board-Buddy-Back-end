@@ -55,7 +55,7 @@ public class GatherArticleService {
         gatherArticleRepository.save(gatherArticle);
 
         // memberGatherArticle 생성
-        MemberGatherArticle memberGatherArticle = MemberGatherArticle.createMemberGatherArticle(
+        MemberGatherArticle memberGatherArticle = MemberGatherArticle.buildMemberGatherArticle(
                 LocalDateTime.now(),
                 true,
                 GatherArticleRole.AUTHOR,

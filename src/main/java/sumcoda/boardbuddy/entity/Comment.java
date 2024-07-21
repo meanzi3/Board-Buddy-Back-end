@@ -51,7 +51,7 @@ public class Comment extends BaseTimeEntity {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Comment createComment(String content, Member member, GatherArticle gatherArticle, Comment parent) {
+    public static Comment buildComment(String content, Member member, GatherArticle gatherArticle, Comment parent) {
         return Comment.builder()
                 .content(content)
                 .member(member)

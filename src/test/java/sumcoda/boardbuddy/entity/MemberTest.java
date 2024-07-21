@@ -42,7 +42,7 @@ public class MemberTest {
     @BeforeEach
     void setUp() {
         // 테스트를 위한 사용자 생성 및 저장
-        Member member = Member.createMember(
+        Member member = Member.buildMember(
                 username,
                 "password",
                 "nickname",

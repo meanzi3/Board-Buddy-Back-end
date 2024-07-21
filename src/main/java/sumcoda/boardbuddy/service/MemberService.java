@@ -5,7 +5,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.MemberRequest;
-import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.entity.Member;
@@ -17,7 +16,6 @@ import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 
 @Service
@@ -78,7 +76,7 @@ public class MemberService {
     @Transactional
     public void registerMember(MemberRequest.RegisterDTO registerDTO) {
 
-        Long memberId = memberRepository.save(Member.createMember(
+        Long memberId = memberRepository.save(Member.buildMember(
                 registerDTO.getUsername(),
                 bCryptPasswordEncoder.encode(registerDTO.getPassword()),
                 registerDTO.getNickname(),

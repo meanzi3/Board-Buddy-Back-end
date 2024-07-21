@@ -48,7 +48,7 @@ public class MemberChatRoom {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static MemberChatRoom createMemberChatRoom(LocalDateTime joinedAt, ChatRoomRole chatRoomRole, Member member, ChatRoom chatRoom) {
+    public static MemberChatRoom buildMemberChatRoom(LocalDateTime joinedAt, ChatRoomRole chatRoomRole, Member member, ChatRoom chatRoom) {
         return MemberChatRoom.builder()
                 .joinedAt(joinedAt)
                 .chatRoomRole(chatRoomRole)

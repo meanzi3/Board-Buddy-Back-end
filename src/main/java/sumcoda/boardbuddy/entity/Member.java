@@ -165,7 +165,7 @@ public class Member {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Member createMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Integer buddyScore, Integer monthlyJoinCount, Integer totalJoinCount, Integer excellentCount, Integer goodCount, Integer badCount, Integer noShowCount, String description, Integer rank, MemberRole memberRole, ProfileImage profileImage) {
+    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Integer buddyScore, Integer monthlyJoinCount, Integer totalJoinCount, Integer excellentCount, Integer goodCount, Integer badCount, Integer noShowCount, String description, Integer rank, MemberRole memberRole, ProfileImage profileImage) {
         return Member.builder()
                 .username(username)
                 .password(password)

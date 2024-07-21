@@ -44,7 +44,7 @@ public class ChatMessage extends BaseTimeEntity {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static ChatMessage createChatMessage(String content, MessageType messageType, Member member, ChatRoom chatRoom) {
+    public static ChatMessage buildChatMessage(String content, MessageType messageType, Member member, ChatRoom chatRoom) {
         return ChatMessage.builder()
                 .content(content)
                 .messageType(messageType)

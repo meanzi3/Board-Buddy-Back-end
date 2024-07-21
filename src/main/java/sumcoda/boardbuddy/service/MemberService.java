@@ -5,6 +5,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.MemberRequest;
+import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.entity.Member;
@@ -16,6 +17,7 @@ import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 @Service
@@ -167,5 +169,21 @@ public class MemberService {
 
         // 사용자가 입력한 주변 시도, 시구, 동에 대한 주변 시도, 시구, 동을 반환하기 위해 findNearbyLocations() 메서드 실행 후 응답 반환
         return nearPublicDistrictService.findNearbyLocations(baseLocationRequestDTO);
+    }
+
+    /**
+     * 멤버 반경 설정
+     *
+     * @param radiusDTO 사용자가 입력한 반경 정보
+     * @param username 로그인 사용자 아이디
+     **/
+    @Transactional
+    public void updateMemberRadius(MemberRequest.RadiusDTO radiusDTO, String username) {
+        // 사용자 조회
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        // 멤버의 반경 업데이트
+        member.assignRadius(radiusDTO.getRadius());
     }
 }

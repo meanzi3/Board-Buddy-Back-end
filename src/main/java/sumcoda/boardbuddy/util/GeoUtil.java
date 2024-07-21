@@ -1,12 +1,15 @@
 package sumcoda.boardbuddy.util;
 
-public class GeoUtils {
+public class GeoUtil {
 
     // 지구의 반경 (단위: km)
     private static final int EARTH_RADIUS = 6371;
     // 계산에 사용되는 숫자
     private static final int ONE = 1;
     private static final int TWO = 2;
+
+    // 인스턴스화를 방지하기 위해 private 생성자 선언
+    private GeoUtil() {}
 
     /**
      * 하버사인 공식을 사용하여 두 위치 간의 거리를 계산하는 메서드

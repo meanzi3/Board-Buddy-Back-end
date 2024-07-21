@@ -98,5 +98,17 @@ public class MemberRequest {
             this.dong = dong;
         }
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class RadiusDTO {
+
+        private Integer radius;
+
+        @Builder
+        public RadiusDTO(Integer radius) {
+            this.radius = radius;
+        }
+    }
 }
 

@@ -11,8 +11,9 @@ import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.GatherArticleService;
 
 import java.util.List;
+import java.util.Map;
 
-import static sumcoda.boardbuddy.util.ResponseHandlerUtil.*;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,11 +30,11 @@ public class GatherArticleController {
      * @return
      */
     @PostMapping(value = "/api/gatherArticles")
-    public ResponseEntity<ApiResponse<GatherArticleResponse.CreateDTO>> createGatherArticle(
+    public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.CreateDTO>>> createGatherArticle(
             @RequestBody GatherArticleRequest.CreateDTO createRequest,
             @RequestAttribute String username){
         GatherArticleResponse.CreateDTO createResponse = gatherArticleService.createGatherArticle(createRequest, username);
-        return buildSuccessResponse(createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
+        return buildSuccessResponseWithData("createResponse", createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
     }
 
     /**
@@ -44,11 +45,11 @@ public class GatherArticleController {
      * @return
      */
     @GetMapping(value = "/api/gatherArticles/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<GatherArticleResponse.ReadDTO>> getGatherArticle(
+    public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.ReadDTO>>> getGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username) {
         GatherArticleResponse.ReadDTO readResponse = gatherArticleService.getGatherArticle(gatherArticleId, username);
-        return buildSuccessResponse(readResponse, "성공적으로 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("readResponse", readResponse, "성공적으로 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -60,12 +61,12 @@ public class GatherArticleController {
      * @return
      */
     @PutMapping(value = "/api/gatherArticles/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<GatherArticleResponse.UpdateDTO>> updateGatherArticle(
+    public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.UpdateDTO>>> updateGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestBody GatherArticleRequest.UpdateDTO updateRequest,
             @RequestAttribute String username) {
         GatherArticleResponse.UpdateDTO updateResponse = gatherArticleService.updateGatherArticle(gatherArticleId, updateRequest, username);
-        return buildSuccessResponse(updateResponse, "모집글이 수정되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("updateResponse", updateResponse, "모집글이 수정되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -76,11 +77,11 @@ public class GatherArticleController {
      * @return
      */
     @DeleteMapping(value = "/api/gatherArticles/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<GatherArticleResponse.DeleteDTO>> deleteGatherArticle(
+    public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.DeleteDTO>>> deleteGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username){
         GatherArticleResponse.DeleteDTO deleteResponse = gatherArticleService.deleteGatherArticle(gatherArticleId, username);
-        return buildSuccessResponse(deleteResponse, "모집글이 삭제되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("deleteResponse", deleteResponse, "모집글이 삭제되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -90,13 +91,13 @@ public class GatherArticleController {
      * @return 내가 작성한 모집글 리스트
      **/
     @GetMapping(value = "/api/my/gatherArticles")
-    public ResponseEntity<ApiResponse<List<GatherArticleResponse.GatherArticleInfosDTO>>> getMyGatherArticles (
+    public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.GatherArticleInfosDTO>>>> getMyGatherArticles (
             @RequestAttribute String username) {
         log.info("get gather articles is working");
 
         List<GatherArticleResponse.GatherArticleInfosDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
 
-        return buildSuccessResponse(gatherArticles, "내 모집글이 성공적으로 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("gatherArticles", gatherArticles, "내 모집글이 성공적으로 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -106,13 +107,13 @@ public class GatherArticleController {
      * @return 참가한 모집글 리스트
      **/
     @GetMapping(value = "/api/my/participations")
-    public ResponseEntity<ApiResponse<List<GatherArticleResponse.GatherArticleInfosDTO>>> getMyParticipations (
+    public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.GatherArticleInfosDTO>>>> getMyParticipations (
             @RequestAttribute String username) {
         log.info("get my participations is working");
 
         List<GatherArticleResponse.GatherArticleInfosDTO> participations = gatherArticleService.getMyParticipations(username);
 
-        return buildSuccessResponse(participations, "참가한 모집글이 성공적으로 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("participations", participations, "참가한 모집글이 성공적으로 조회되었습니다.", HttpStatus.OK);
     }
 }
 

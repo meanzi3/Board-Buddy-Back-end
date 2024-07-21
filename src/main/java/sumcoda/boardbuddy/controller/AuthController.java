@@ -14,7 +14,9 @@ import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.AuthService;
 
-import static sumcoda.boardbuddy.util.ResponseHandlerUtil.buildSuccessResponse;
+import java.util.Map;
+
+import static sumcoda.boardbuddy.builder.ResponseBuilder.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -35,7 +37,7 @@ public class AuthController {
 
         authService.sendSMS(sendSMSCertificationDTO);
 
-        return buildSuccessResponse(null, "입력하신 SMS 인증 번호가 일치합니다.", HttpStatus.OK);
+        return buildSuccessResponseWithoutData("입력하신 SMS 인증 번호가 일치합니다.", HttpStatus.OK);
     }
 
     /**
@@ -50,7 +52,7 @@ public class AuthController {
 
         authService.validateCertificationNumber(validateSMSCertificationDTO);
 
-        return buildSuccessResponse(null, "입력하신 SMS 인증 번호가 일치합니다.", HttpStatus.OK);
+        return buildSuccessResponseWithoutData("입력하신 SMS 인증 번호가 일치합니다.", HttpStatus.OK);
     }
 
     /**
@@ -60,12 +62,12 @@ public class AuthController {
      * @return 사용자가 로그인한 상태라면 해당 사용자의 프로필을 기반으로한 약속된 SuccessResponse 반환
      **/
     @GetMapping("/api/auth/status")
-    public ResponseEntity<ApiResponse<MemberResponse.ProfileDTO>> isAuthenticated(@RequestAttribute String username) {
+    public ResponseEntity<ApiResponse<Map<String, MemberResponse.ProfileDTO>>> isAuthenticated(@RequestAttribute String username) {
         log.info("check session is working");
 
         MemberResponse.ProfileDTO profileDTO = authService.isAuthenticated(username);
 
-        return buildSuccessResponse(profileDTO, "유효한 세션입니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("profileDTO", profileDTO, "유효한 세션입니다.", HttpStatus.OK);
     }
 
     /**
@@ -84,6 +86,6 @@ public class AuthController {
 
         authService.validatePassword(validatePasswordDTO, username);
 
-        return buildSuccessResponse(null, "비밀번호 검증이 완료되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithoutData("비밀번호 검증이 완료되었습니다.", HttpStatus.OK);
     }
 }

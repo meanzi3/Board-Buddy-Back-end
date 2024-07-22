@@ -12,9 +12,9 @@ jobs:
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-      PROD_REDIS_PASSWORD: ${{ secrets.PROD_REDIS_PASSWORD }}
       PROD_REDIS_HOST: ${{ secrets.PROD_REDIS_HOST }}
       PROD_REDIS_PORT: ${{ secrets.PROD_REDIS_PORT }}
+      PROD_REDIS_PASSWORD: ${{ secrets.PROD_REDIS_PASSWORD }}
       PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
       PROD_DB_USERNAME: ${{ secrets.PROD_DB_USERNAME }}
       PROD_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
@@ -116,7 +116,7 @@ jobs:
           sudo docker run -d --name redis \
             -v /home/ubuntu/redis.conf:/usr/local/etc/redis/redis.conf \
             --network app-network \
-            -e REDIS_PASSWORD=${PROD_REDIS_PASSWORD} \
+            -e PROD_REDIS_PASSWORD=${PROD_REDIS_PASSWORD} \
             -p 6379:6379 redis:latest redis-server /usr/local/etc/redis/redis.conf
 
           # Spring Boot 애플리케이션 컨테이너를 실행

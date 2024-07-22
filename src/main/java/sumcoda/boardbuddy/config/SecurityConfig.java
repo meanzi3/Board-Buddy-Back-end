@@ -135,7 +135,7 @@ public class SecurityConfig {
                         .authorizationEndpoint(oAuth2 -> oAuth2
                                 .baseUri("/api/oauth2/authorization"))
                         .redirectionEndpoint(oAuth2 -> oAuth2
-                                .baseUri("https://boardbuddyapp.com/login/oauth2/code/**"))
+                                .baseUri("https://boardbuddyapp.com/api/login/oauth2/code/**"))
                         .userInfoEndpoint(userInfoEndpointConfig ->
                                 userInfoEndpointConfig
                                         .userService(customOAuth2UserService))

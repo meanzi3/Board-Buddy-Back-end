@@ -34,7 +34,7 @@ public class GatherArticleController {
             @RequestBody GatherArticleRequest.CreateDTO createRequest,
             @RequestAttribute String username){
         GatherArticleResponse.CreateDTO createResponse = gatherArticleService.createGatherArticle(createRequest, username);
-        return buildSuccessResponseWithData("createResponse", createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
+        return buildSuccessResponseWithData("post", createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
     }
 
     /**
@@ -49,7 +49,7 @@ public class GatherArticleController {
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username) {
         GatherArticleResponse.ReadDTO readResponse = gatherArticleService.getGatherArticle(gatherArticleId, username);
-        return buildSuccessResponseWithData("readResponse", readResponse, "성공적으로 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("post", readResponse, "성공적으로 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -66,7 +66,7 @@ public class GatherArticleController {
             @RequestBody GatherArticleRequest.UpdateDTO updateRequest,
             @RequestAttribute String username) {
         GatherArticleResponse.UpdateDTO updateResponse = gatherArticleService.updateGatherArticle(gatherArticleId, updateRequest, username);
-        return buildSuccessResponseWithData("updateResponse", updateResponse, "모집글이 수정되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("post", updateResponse, "모집글이 수정되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -81,7 +81,7 @@ public class GatherArticleController {
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username){
         GatherArticleResponse.DeleteDTO deleteResponse = gatherArticleService.deleteGatherArticle(gatherArticleId, username);
-        return buildSuccessResponseWithData("deleteResponse", deleteResponse, "모집글이 삭제되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("post", deleteResponse, "모집글이 삭제되었습니다.", HttpStatus.OK);
     }
 
     /**

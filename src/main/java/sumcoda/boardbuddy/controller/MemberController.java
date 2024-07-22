@@ -112,9 +112,9 @@ public class MemberController {
             @RequestAttribute String username) {
         log.info("updateMemberLocation is working");
 
-        Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> response = memberService.updateMemberLocation(locationDTO, username);
+        Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> locations = memberService.updateMemberLocation(locationDTO, username);
 
-        return buildSuccessResponseWithData("response", response, "위치 정보 설정을 성공하였습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("locations", locations, "위치 정보 설정을 성공하였습니다.", HttpStatus.OK);
     }
 
     /**

@@ -32,9 +32,11 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         response.setCharacterEncoding("UTF-8");
 
+        responseData.put("status", "failure");
+
         responseData.put("data", null);
 
-        responseData.put("message", "접근이 거부된 요청입니다.");
+        responseData.put("message", "해당 요청에 대한 접근이 거부되었습니다.");
 
         objectMapper.writeValue(response.getWriter(), responseData);
     }

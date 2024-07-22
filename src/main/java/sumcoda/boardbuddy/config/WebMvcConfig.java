@@ -23,7 +23,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/auth/register",
                         "/api/auth/check-username",
                         "/api/auth/check-nickname",
-                        "/api/auth/sms-certifications/**",
+                        "/api/auth/sms-certifications/send",
+                        "/api/auth/sms-certifications/verify",
                         "/api/auth/login",
                         "/api/oauth2/**"));
         WebMvcConfigurer.super.addInterceptors(registry);

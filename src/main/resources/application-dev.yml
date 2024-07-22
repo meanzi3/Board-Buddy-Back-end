@@ -23,10 +23,6 @@ spring:
       repositories:
         enabled: false
 
-app:
-  base-url: http://localhost:8080
-  enviroment: local
-
 #  security:
 #    oauth2:
 #      client:

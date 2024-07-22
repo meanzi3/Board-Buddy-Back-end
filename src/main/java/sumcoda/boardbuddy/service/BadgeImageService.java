@@ -3,7 +3,6 @@ package sumcoda.boardbuddy.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.boardbuddy.config.AppConfig;
 import sumcoda.boardbuddy.dto.BadgeImageResponse;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
@@ -22,7 +21,6 @@ public class BadgeImageService {
     private final BadgeImageRepository badgeImageRepository;
 
     private final MemberRepository memberRepository;
-    private final AppConfig appConfig;
 
     /**
      * 뱃지 조회 요청 캐치
@@ -58,12 +56,9 @@ public class BadgeImageService {
      * @return 뱃지 이미지 URL
      **/
     private String buildBadgeUrl(String awsS3SavedFileURL) {
-        String baseUrl = appConfig.getBaseUrl();
-
-        String enviroment = appConfig.getEnviroment();
 
         String filename = awsS3SavedFileURL.substring(awsS3SavedFileURL.lastIndexOf("/") + 1);
 
-        return "local".equalsIgnoreCase(enviroment) ? baseUrl + FileStorageUtil.getLocalStoreDir(filename) : awsS3SavedFileURL;
+        return "http://localhost:8080" + FileStorageUtil.getLocalStoreDir(filename);
     }
 }

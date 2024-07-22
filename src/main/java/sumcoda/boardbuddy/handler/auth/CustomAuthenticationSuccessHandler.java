@@ -59,9 +59,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        responseData.put("data", profileDTO);
+        responseData.put("status", "success");
+        responseData.put("data", Map.of("profileDTO", profileDTO));
         responseData.put("message", "로그인에 성공하였습니다.");
 
         objectMapper.writeValue(response.getWriter(), responseData);
     }
 }
+

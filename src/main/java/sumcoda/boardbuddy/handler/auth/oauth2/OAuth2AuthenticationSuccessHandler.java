@@ -8,13 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.dto.auth.oauth2.CustomOAuth2User;
 import sumcoda.boardbuddy.entity.Member;
+import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.io.IOException;
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final MemberRepository memberRepository;
-    
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException{
         log.info("OAuth2 success handler is working");
@@ -42,7 +42,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         if (Boolean.TRUE.equals(isPhoneNumberVerifiedMember)) {
             response.setStatus(HttpStatus.OK.value());
             redirectStrategy.sendRedirect(request, response, "https://boardbuddyapp.vercel.app/login/oauth/callback?isLoginSucceed=true&isVerifiedMember=true&message=로그인에 성공하였습니다.");
-        // 신규 소셜 로그인 사용자인 경우
+            // 신규 소셜 로그인 사용자인 경우
         } else {
             response.setStatus(HttpStatus.CREATED.value());
             redirectStrategy.sendRedirect(request, response , "https://boardbuddyapp.vercel.app/login/oauth/callback?isLoginSucceed=true&isVerifiedMember=false&message=로그인에 성공하였습니다.");
@@ -54,9 +54,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         log.info("login user name : " + username);
 
-        Member member = memberRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(""));
+        Member member = memberRepository.findByUsername(username).orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         return member.getPhoneNumber() != null;
     }
 
 }
+

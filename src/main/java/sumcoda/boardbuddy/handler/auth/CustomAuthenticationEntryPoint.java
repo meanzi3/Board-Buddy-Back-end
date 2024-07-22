@@ -31,6 +31,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         response.setCharacterEncoding("UTF-8");
 
+        responseData.put("status", "failure");
+
         responseData.put("data", null);
 
         responseData.put("message", "인증되지 않은 사용자의 요청입니다.");

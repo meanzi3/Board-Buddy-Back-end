@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.MemberRequest;
+import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.MemberService;
@@ -133,5 +134,16 @@ public class MemberController {
         memberService.updateMemberRadius(radiusDTO, username);
 
         return buildSuccessResponseWithoutData("반경 설정을 성공하였습니다.", HttpStatus.OK);
+    }
+
+    /**
+     * 랭킹 조회 요청 캐치
+     *
+     * @return TOP3 리스트를 조회하여 약속된 SuccessResponse 반환
+     */
+    @GetMapping("/api/rankings")
+    public ResponseEntity<ApiResponse<Map<String, List<MemberResponse.RankingsDTO>>>> getTop3Rankings() {
+        List<MemberResponse.RankingsDTO> rankingsDTO = memberService.getTop3Rankings();
+        return buildSuccessResponseWithData("rankings", rankingsDTO,"랭킹 조회에 성공했습니다.", HttpStatus.OK);
     }
 }

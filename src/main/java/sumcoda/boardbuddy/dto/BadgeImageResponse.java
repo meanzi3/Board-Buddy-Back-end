@@ -23,22 +23,13 @@ public class BadgeImageResponse {
     @Getter
     @NoArgsConstructor
     public static class BadgeImageUrlDTO {
-        //로컬 경로
-        private String localSavedFileURL;
 
-        //AWS 경로
-//        private String awsS3SavedFileURL;
+        private String awsS3SavedFileURL;
 
 
         @Builder
-        public BadgeImageUrlDTO (String localSavedFileURL) {
-            this.localSavedFileURL = localSavedFileURL;
+        public BadgeImageUrlDTO (String awsS3SavedFileURL) {
+            this.awsS3SavedFileURL = awsS3SavedFileURL;
         }
-
-        // AWS 사용 시 활용
-//        @Builder
-//        public BadgeImageUrlDTO (String awsS3SavedFileURL) {
-//            this.awsS3SavedFileURL = awsS3SavedFileURL;
-//        }
     }
 }

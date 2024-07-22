@@ -10,29 +10,17 @@ import java.util.List;
 import static sumcoda.boardbuddy.entity.QBadgeImage.badgeImage;
 
 @RequiredArgsConstructor
-public class BadgeImageRepositoryCustomImpl implements sumcoda.boardbuddy.repository.badgeImage.BadgeImageRepositoryCustom {
+public class BadgeImageRepositoryCustomImpl implements BadgeImageRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    // 로컬 테스트 시 사용
     @Override
     public List<BadgeImageResponse.BadgeImageUrlDTO> findBadgeImagesByNickname(String nickname) {
         return jpaQueryFactory.select(Projections.fields(BadgeImageResponse.BadgeImageUrlDTO.class,
-                        badgeImage.localSavedFileURL))
+                        badgeImage.awsS3SavedFileURL))
                 .from(badgeImage)
                 .where(badgeImage.member.nickname.eq(nickname))
                 .orderBy(badgeImage.id.desc())
                 .fetch();
     }
-
-    //AWS 테스트 시 사용
-//    @Override
-//    public List<BadgeImageResponse.BadgeImageUrlDTO> findBadgeImagesByNickname(String nickname) {
-//        return jpaQueryFactory.select(Projections.fields(BadgeImageResponse.BadgeImageUrlDTO.class,
-//                        badgeImage.awsS3SavedFileURL))
-//                .from(badgeImage)
-//                .where(badgeImage.member.nickname.eq(nickname))
-//                .orderBy(badgeImage.id.desc())
-//                .fetch();
-//    }
 }

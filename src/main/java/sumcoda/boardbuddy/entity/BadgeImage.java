@@ -24,12 +24,8 @@ public class BadgeImage {
     private String savedFilename;
 
     // 이미지에 대한 URL 정보를 DB에서 찾을때 활용
-//    @Column(nullable = false)
-//    private String awsS3SavedFileURL;
-
-    //로컬 저장소에서 이미지를 찾을 때 사용할 경로
     @Column(nullable = false)
-    private String localSavedFileURL;
+    private String awsS3SavedFileURL;
 
     // 연관관계 주인
     // 양방향 연관관계
@@ -37,45 +33,23 @@ public class BadgeImage {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    //로컬 테스트용
     @Builder
-    public BadgeImage(String originalFilename, String savedFilename, String localSavedFileURL, Member member) {
+    public BadgeImage(String originalFilename, String savedFilename, String awsS3SavedFileURL, Member member) {
         this.originalFilename = originalFilename;
         this.savedFilename = savedFilename;
-        this.localSavedFileURL = localSavedFileURL;
+        this.awsS3SavedFileURL = awsS3SavedFileURL;
         this.assignMember(member);
     }
 
-    //로컬 테스트용
     // 직접 빌더 패턴의 생성자를 활용하지 않고 해당 메서드를 활용하여 엔티티 생성
-    public static BadgeImage buildBadgeImage(String originalFilename, String savedFilename, String localSavedFileURL, Member member) {
+    public static BadgeImage buildBadgeImage(String originalFilename, String savedFilename, String awsS3SavedFileURL, Member member) {
         return BadgeImage.builder()
                 .originalFilename(originalFilename)
                 .savedFilename(savedFilename)
-                .localSavedFileURL(localSavedFileURL)
+                .awsS3SavedFileURL(awsS3SavedFileURL)
                 .member(member)
                 .build();
     }
-
-    //AWS 테스트용
-//    @Builder
-//    public BadgeImage(String originalFilename, String savedFilename, String awsS3SavedFileURL, Member member) {
-//        this.originalFilename = originalFilename;
-//        this.savedFilename = savedFilename;
-//        this.awsS3SavedFileURL = awsS3SavedFileURL;
-//        this.assignMember(member);
-//    }
-
-    //AWS 테스트용
-    // 직접 빌더 패턴의 생성자를 활용하지 않고 해당 메서드를 활용하여 엔티티 생성
-//    public static BadgeImage createBadgeImage(String originalFilename, String savedFilename, String awsS3SavedFileURL, Member member) {
-//        return BadgeImage.builder()
-//                .originalFilename(originalFilename)
-//                .savedFilename(savedFilename)
-//                .awsS3SavedFileURL(awsS3SavedFileURL)
-//                .member(member)
-//                .build();
-//    }
 
     // BadgeImage N <-> 1 Member
     // 양방향 연관관계 편의 메서드

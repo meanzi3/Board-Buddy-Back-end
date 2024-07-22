@@ -30,7 +30,7 @@ public class KakaoApiService {
     // 중요 카테고리만 그룹핑한 카테고리 그룹명
     private static final String BOARD_CAFE_CATEGORY = "가정,생활 > 여가시설 > 보드카페";
     // 환경 변수로 등록한 API 키
-    @Value("${kakao.rest.api.key}")
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoRestApiKey;
 
     // kakao API 를 호출하기 위한 클라이언트 모듈

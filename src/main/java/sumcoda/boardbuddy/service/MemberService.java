@@ -5,6 +5,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.MemberRequest;
+import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.entity.Member;
@@ -213,4 +214,16 @@ public class MemberService {
         // 멤버의 반경 업데이트
         member.assignRadius(radiusDTO.getRadius());
     }
+
+    /**
+     * 랭킹 조회
+     *
+     * @return TOP3 RankingsDTO list
+     */
+    @Transactional
+    public List<MemberResponse.RankingsDTO> getTop3Rankings(){
+
+        return memberRepository.findTop3RankingMembers();
+    }
+
 }

@@ -38,4 +38,17 @@ public class MemberResponse {
             this.awsS3SavedFileURL = awsS3SavedFileURL;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class RankingsDTO {
+        private String nickname;
+        private String profileURL;
+
+        @Builder
+        public RankingsDTO(String nickname, String profileURL) {
+            this.nickname = nickname;
+            this.profileURL = profileURL;
+        }
+    }
 }

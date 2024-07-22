@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
 
+import java.util.List;
 import java.util.Optional;
 
 import static sumcoda.boardbuddy.entity.QMember.*;
@@ -45,4 +46,20 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .where(member.username.eq(username))
                 .fetchOne());
     }
+
+    @Override
+    public List<MemberResponse.RankingsDTO> findTop3RankingMembers() {
+        return jpaQueryFactory
+                .select(Projections.fields(MemberResponse.RankingsDTO.class,
+                        member.nickname,
+                        profileImage.awsS3SavedFileURL.as("profileURL")
+                ))
+                .from(member)
+                .leftJoin(member.profileImage, profileImage)
+                .where(member.rank.isNotNull())
+                .orderBy(member.rank.asc())
+                .limit(3)
+                .fetch();
+    }
+
 }

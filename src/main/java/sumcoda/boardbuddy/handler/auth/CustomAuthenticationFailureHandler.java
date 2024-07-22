@@ -22,7 +22,7 @@ import java.util.Map;
 @Component
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException{
         ObjectMapper objectMapper = new ObjectMapper();
         log.info("authentication failure handler is working");
         Map<String, Object> responseData = new HashMap<>();
@@ -36,10 +36,13 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         if (exception instanceof UsernameNotFoundException || exception instanceof BadCredentialsException) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             errorMessage = "입력한 회원 정보가 올바르지 않습니다. 올바른 회원정보를 입력하세요.";
+            responseData.put("status", "failure");
         }
         else if (exception instanceof InternalAuthenticationServiceException) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             errorMessage = "내부 시스템 문제로 로그인 요청을 처리할 수 없습니다. 관리자에게 문의하세요.";
+            responseData.put("status", "error");
+
         }
 
 //        else if(exception instanceof DisabledException) {
@@ -60,3 +63,4 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 
     }
 }
+

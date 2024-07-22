@@ -41,8 +41,8 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
             errorMessage = "인증 요청이 거부되었습니다. 관리자에게 문의하세요.";
         }
         else if (exception instanceof InternalAuthenticationServiceException) {
-            errorMessage = "내부 시스템 문제로 로그인 요청을 처리할 수 없습니다. 관리자에게 문의하세요.";
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            errorMessage = "내부 시스템 문제로 로그인 요청을 처리할 수 없습니다. 관리자에게 문의하세요.";
         }
 
         redirectStrategy.sendRedirect(request, response, "https://boardbuddyapp.vercel.app/login/oauth/callback?isLoginSucceed=false&isVerifiedMember=false&message=" + errorMessage);
@@ -78,4 +78,5 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
         return oAuth2ErrorMessage;
     }
 }
+
 

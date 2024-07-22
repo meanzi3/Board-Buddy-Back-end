@@ -104,6 +104,35 @@ public class MemberService {
     }
 
     /**
+     * 애플리케이션 시작시 관리자 계정 생성
+     *
+     **/
+    public void createAdminAccount() {
+        memberRepository.save(Member.buildMember(
+                "admin",
+                bCryptPasswordEncoder.encode("a12345#"),
+                "admin",
+                "admin@naver.com",
+                "01012345678",
+                "서울 특별시",
+                "강남구",
+                "삼성동",
+                2,
+                50,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                null,
+                null,
+                MemberRole.USER,
+                null)
+        );
+    }
+
+    /**
      * 소셜 로그인 사용자에 대한 추가적인 회원가입
      *
      * @param oAuth2RegisterDTO 소셜로그인 사용자에 대한 추가적인 회원가입 정보

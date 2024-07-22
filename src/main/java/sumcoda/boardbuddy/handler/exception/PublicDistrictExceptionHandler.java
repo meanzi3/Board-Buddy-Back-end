@@ -8,6 +8,7 @@ import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictNotFoundException;
 
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildErrorResponse;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.buildFailureResponse;
 
 @RestControllerAdvice
 public class PublicDistrictExceptionHandler {
@@ -15,6 +16,6 @@ public class PublicDistrictExceptionHandler {
   // 행정 구역 찾기 예외 처리 핸들러
   @ExceptionHandler(PublicDistrictNotFoundException.class)
   public ResponseEntity<ApiResponse<Void>> handlePublicDistrictNotFoundException(PublicDistrictNotFoundException e) {
-    return buildErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    return buildFailureResponse(e.getMessage(), HttpStatus.NOT_FOUND);
   }
 }

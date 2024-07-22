@@ -34,6 +34,6 @@ public class BadgeImageController {
 
         BadgeImageResponse.BadgeImageListDTO badgeImageListDTO = badgeImageService.getBadges(nickname);
 
-        return buildSuccessResponseWithData("badgeImageListDTO", badgeImageListDTO,"뱃지가 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("badges", badgeImageListDTO,"뱃지가 조회되었습니다.", HttpStatus.OK);
     }
 }

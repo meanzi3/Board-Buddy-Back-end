@@ -23,9 +23,9 @@ services:
     depends_on:
       - redis
     environment:
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-      SPRING_REDIS_PASSWORD: ${PROD_REDIS_PASSWORD}
+      PROD_REDIS_HOST: ${PROD_REDIS_HOST}
+      PROD_REDIS_PORT: ${PROD_REDIS_PORT}
+      PROD_REDIS_PASSWORD: ${PROD_REDIS_PASSWORD}
 
 networks:
   app-network:

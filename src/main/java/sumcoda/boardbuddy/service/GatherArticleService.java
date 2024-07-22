@@ -12,7 +12,7 @@ import sumcoda.boardbuddy.enumerate.GatherArticleRole;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleSaveException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleUpdateException;
-import sumcoda.boardbuddy.exception.gatherArticle.UnauthorizedActionException;
+import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleAccessDeniedException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.MemberRepository;
@@ -113,7 +113,7 @@ public class GatherArticleService {
 
         // 작성자 검증
         if (!memberGatherArticleRepository.isAuthor(id, member.getId())) {
-            throw new UnauthorizedActionException("작성자만 수정할 수 있습니다.");
+            throw new GatherArticleAccessDeniedException("작성자만 수정할 수 있습니다.");
         }
 
         // 예외 검증, 처리
@@ -144,7 +144,7 @@ public class GatherArticleService {
 
         // 작성자인지 검증
         if (!memberGatherArticleRepository.isAuthor(id, member.getId())) {
-            throw new UnauthorizedActionException("작성자만 삭제할 수 있습니다.");
+            throw new GatherArticleAccessDeniedException("작성자만 삭제할 수 있습니다.");
         }
 
         // 삭제

@@ -93,7 +93,7 @@ public class GatherArticle extends BaseTimeEntity {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static GatherArticle createGatherArticle(String title, Integer currentParticipants, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
+    public static GatherArticle buildGatherArticle(String title, Integer currentParticipants, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
         return GatherArticle.builder()
                 .title(title)
                 .currentParticipants(currentParticipants)

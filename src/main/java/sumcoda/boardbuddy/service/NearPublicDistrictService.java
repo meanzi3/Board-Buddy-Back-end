@@ -83,7 +83,7 @@ public class NearPublicDistrictService {
 
             // 주변 행정 구역 객체 생성
             List<NearPublicDistrict> nearPublicDistricts = filteredLocations.stream()
-                    .map(filteredLocation -> NearPublicDistrict.createNearPublicDistrict(
+                    .map(filteredLocation -> NearPublicDistrict.buildNearPublicDistrict(
                             filteredLocation.getSido(),
                             filteredLocation.getSigu(),
                             filteredLocation.getDong(),

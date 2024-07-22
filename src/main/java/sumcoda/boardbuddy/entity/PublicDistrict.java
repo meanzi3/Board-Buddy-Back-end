@@ -52,7 +52,7 @@ public class PublicDistrict {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static PublicDistrict createPublicDistrict(String sido, String sigu, String dong, Double latitude, Double longitude) {
+    public static PublicDistrict buildPublicDistrict(String sido, String sigu, String dong, Double latitude, Double longitude) {
         return PublicDistrict.builder()
                 .sido(sido)
                 .sigu(sigu)

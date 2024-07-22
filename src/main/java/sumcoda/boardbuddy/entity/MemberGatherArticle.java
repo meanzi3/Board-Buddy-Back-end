@@ -53,7 +53,7 @@ public class MemberGatherArticle {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static MemberGatherArticle createMemberGatherArticle(LocalDateTime joinedAt, Boolean isPermit, GatherArticleRole gatherArticleRole, Member member, GatherArticle gatherArticle) {
+    public static MemberGatherArticle buildMemberGatherArticle(LocalDateTime joinedAt, Boolean isPermit, GatherArticleRole gatherArticleRole, Member member, GatherArticle gatherArticle) {
         return MemberGatherArticle.builder()
                 .joinedAt(joinedAt)
                 .isPermit(isPermit)

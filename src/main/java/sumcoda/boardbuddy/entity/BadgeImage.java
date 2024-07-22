@@ -48,7 +48,7 @@ public class BadgeImage {
 
     //로컬 테스트용
     // 직접 빌더 패턴의 생성자를 활용하지 않고 해당 메서드를 활용하여 엔티티 생성
-    public static BadgeImage createBadgeImage(String originalFilename, String savedFilename, String localSavedFileURL, Member member) {
+    public static BadgeImage buildBadgeImage(String originalFilename, String savedFilename, String localSavedFileURL, Member member) {
         return BadgeImage.builder()
                 .originalFilename(originalFilename)
                 .savedFilename(savedFilename)

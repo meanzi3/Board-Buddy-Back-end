@@ -35,7 +35,7 @@ public class ProfileImage {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static ProfileImage createProfileImage(String originalFilename, String savedFilename, String awsS3SavedFileURL) {
+    public static ProfileImage buildProfileImage(String originalFilename, String savedFilename, String awsS3SavedFileURL) {
         return ProfileImage.builder()
                 .originalFilename(originalFilename)
                 .savedFilename(savedFilename)

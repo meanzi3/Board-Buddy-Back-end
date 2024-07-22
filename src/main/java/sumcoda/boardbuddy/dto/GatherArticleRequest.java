@@ -50,7 +50,7 @@ public class GatherArticleRequest {
 
     // 엔티티로 변환
     public GatherArticle toEntity() {
-      return GatherArticle.createGatherArticle(this.title, 1, this.maxParticipants, GatherArticleStatus.OPEN, this.description, this.startDateTime, this.endDateTime,
+      return GatherArticle.buildGatherArticle(this.title, 1, this.maxParticipants, GatherArticleStatus.OPEN, this.description, this.startDateTime, this.endDateTime,
               this.sido, this. sigu, this.dong,  this.meetingLocation);
     }
   }

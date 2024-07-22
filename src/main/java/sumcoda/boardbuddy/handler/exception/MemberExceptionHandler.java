@@ -7,38 +7,38 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.exception.member.*;
 
-import static sumcoda.boardbuddy.util.ResponseHandlerUtil.*;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.*;
 
 @RestControllerAdvice
 public class MemberExceptionHandler {
 
     @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity<ApiResponse<Object>> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException e) {
+    public ResponseEntity<ApiResponse<Void>> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException e) {
         return buildFailureResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(NicknameAlreadyExistsException.class)
-    public ResponseEntity<ApiResponse<Object>> handleNicknameAlreadyExistsException(NicknameAlreadyExistsException e) {
+    public ResponseEntity<ApiResponse<Void>> handleNicknameAlreadyExistsException(NicknameAlreadyExistsException e) {
         return buildFailureResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MemberSaveException.class)
-    public ResponseEntity<ApiResponse<Object>> handleMemberSaveException(MemberSaveException e) {
+    public ResponseEntity<ApiResponse<Void>> handleMemberSaveException(MemberSaveException e) {
         return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MemberRetrievalException.class)
-    public ResponseEntity<ApiResponse<Object>> handleMemberRetrievalException(MemberRetrievalException e) {
+    public ResponseEntity<ApiResponse<Void>> handleMemberRetrievalException(MemberRetrievalException e) {
         return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MemberDeletionFailureException.class)
-    public ResponseEntity<ApiResponse<Object>> handleMemberDeletionFailureException(MemberDeletionFailureException e) {
+    public ResponseEntity<ApiResponse<Void>> handleMemberDeletionFailureException(MemberDeletionFailureException e) {
         return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MemberNotFoundException.class)
-    public ResponseEntity<ApiResponse<Object>> handleMemberNotFoundException(MemberNotFoundException e) {
+    public ResponseEntity<ApiResponse<Void>> handleMemberNotFoundException(MemberNotFoundException e) {
         return buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

@@ -46,7 +46,7 @@ public class NearPublicDistrict {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static NearPublicDistrict createNearPublicDistrict(String sido, String sigu, String dong, Integer radius, PublicDistrict publicDistrict) {
+    public static NearPublicDistrict buildNearPublicDistrict(String sido, String sigu, String dong, Integer radius, PublicDistrict publicDistrict) {
         return NearPublicDistrict.builder()
                 .sido(sido)
                 .sigu(sigu)

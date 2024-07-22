@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.MemberRequest;
-import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.MemberService;
@@ -14,7 +13,8 @@ import sumcoda.boardbuddy.service.MemberService;
 import java.util.List;
 import java.util.Map;
 
-import static sumcoda.boardbuddy.util.ResponseHandlerUtil.buildSuccessResponse;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithData;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithoutData;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class MemberController {
 
         memberService.verifyUsernameDuplication(verifyUsernameDuplicationDTO);
 
-        return buildSuccessResponse(null, "사용가능한 아이디 입니다.", HttpStatus.OK);
+        return buildSuccessResponseWithoutData("사용가능한 아이디 입니다.", HttpStatus.OK);
     }
 
     /**
@@ -52,7 +52,7 @@ public class MemberController {
 
         memberService.verifyNicknameDuplication(verifyNicknameDuplicationDTO);
 
-        return buildSuccessResponse(null, "사용가능한 닉네임 입니다.", HttpStatus.OK);
+        return buildSuccessResponseWithoutData("사용가능한 닉네임 입니다.", HttpStatus.OK);
     }
 
     /**
@@ -67,7 +67,7 @@ public class MemberController {
 
         memberService.registerMember(registerDTO);
 
-        return buildSuccessResponse(null, "회원가입이 완료되었습니다.", HttpStatus.CREATED);
+        return buildSuccessResponseWithoutData("회원가입이 완료되었습니다.", HttpStatus.CREATED);
     }
 
     /**
@@ -83,7 +83,7 @@ public class MemberController {
 
         memberService.registerOAuth2Member(oAuth2RegisterDTO, username);
 
-        return buildSuccessResponse(null, "소셜 회원가입 및 로그인이 완료되었습니다.", HttpStatus.CREATED);
+        return buildSuccessResponseWithoutData("소셜 회원가입 및 로그인이 완료되었습니다.", HttpStatus.CREATED);
     }
 
     /**
@@ -98,7 +98,7 @@ public class MemberController {
 
         memberService.withdrawalMember(username);
 
-        return buildSuccessResponse(null, "회원탈퇴가 완료되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithoutData("회원탈퇴가 완료되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -107,14 +107,14 @@ public class MemberController {
      * @param locationDTO 사용자가 입력한 위치 정보
      **/
     @PostMapping("/api/locations")
-    public ResponseEntity<ApiResponse<Map<Integer, List<NearPublicDistrictResponse.LocationDTO>>>> updateMemberLocation(
+    public ResponseEntity<ApiResponse<Map<String, Map<Integer, List<NearPublicDistrictResponse.LocationDTO>>>>> updateMemberLocation(
             @RequestBody MemberRequest.LocationDTO locationDTO,
             @RequestAttribute String username) {
         log.info("updateMemberLocation is working");
 
         Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> response = memberService.updateMemberLocation(locationDTO, username);
 
-        return buildSuccessResponse(response, "위치 정보 설정을 성공하였습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("response", response, "위치 정보 설정을 성공하였습니다.", HttpStatus.OK);
     }
 
     /**
@@ -132,6 +132,6 @@ public class MemberController {
 
         memberService.updateMemberRadius(radiusDTO, username);
 
-        return buildSuccessResponse(null, "반경 설정을 성공하였습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithoutData("반경 설정을 성공하였습니다.", HttpStatus.OK);
     }
 }

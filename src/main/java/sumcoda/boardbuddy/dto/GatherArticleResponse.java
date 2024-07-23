@@ -129,14 +129,14 @@ public class GatherArticleResponse {
     public static class AuthorDTO {
         private String nickname;
         private Integer rank;
-        private String profileURL;
+        private String profileImageS3SavedURL;
         private String description;
 
         @Builder
-        public AuthorDTO(String nickname, Integer rank, String profileURL, String description) {
+        public AuthorDTO(String nickname, Integer rank, String profileImageS3SavedURL, String description) {
             this.nickname = nickname;
             this.rank = rank;
-            this.profileURL = profileURL;
+            this.profileImageS3SavedURL = profileImageS3SavedURL;
             this.description = description;
         }
 
@@ -145,7 +145,7 @@ public class GatherArticleResponse {
             return GatherArticleResponse.AuthorDTO.builder()
                     .nickname(member.getNickname())
                     .rank(member.getRank())
-                    .profileURL(member.getProfileImage() != null ? member.getProfileImage().getAwsS3SavedFileURL() : null)
+                    .profileImageS3SavedURL(member.getProfileImage() != null ? member.getProfileImage().getAwsS3SavedFileURL() : null)
                     .description(member.getDescription())
                     .build();
         }

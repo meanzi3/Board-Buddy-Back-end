@@ -41,4 +41,9 @@ public class MemberExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleMemberNotFoundException(MemberNotFoundException e) {
         return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(MemberNotJoinedGatherArticleException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMemberNotJoinedGatherArticleException(MemberNotJoinedGatherArticleException e) {
+        return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

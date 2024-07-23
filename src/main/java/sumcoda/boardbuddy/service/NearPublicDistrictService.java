@@ -33,12 +33,13 @@ public class NearPublicDistrictService {
     private final NearPublicDistrictJdbcRepository nearPublicDistrictJdbcRepository;
 
     /**
-     * 주어진 위치를 기준으로 주변 행정 구역을 찾는 메서드
+     * 위치 설정 시 주어진 위치를 기준으로 주변 행정 구역을 저장하는 메서드
      * @param baseLocation 기준 위치
      * @return 주변 행정 구역의 정보
      */
     @Transactional
-    public Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> findNearbyLocations(PublicDistrictResponse.LocationDTO baseLocation) {
+    public Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> saveNearDistrictByUpdateLocation(PublicDistrictResponse.LocationDTO baseLocation) {
+
         // 반환할 주변 위치 정보를 담을 맵
         Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> nearbyLocations = new HashMap<>();
 
@@ -75,10 +76,10 @@ public class NearPublicDistrictService {
             // 반경 범위에 대해 주변 행정 구역 찾기
             List<PublicDistrictResponse.InfoDTO> filteredLocations = allLocations.stream()
                     .filter(infoDTO -> GeoUtil.calculateDistance(
-                                    publicDistrict.getLatitude(),
-                                    publicDistrict.getLongitude(),
-                                    infoDTO.getLatitude(),
-                                    infoDTO.getLongitude()) <= range.getRadius())
+                            publicDistrict.getLatitude(),
+                            publicDistrict.getLongitude(),
+                            infoDTO.getLatitude(),
+                            infoDTO.getLongitude()) <= range.getRadius())
                     .collect(Collectors.toList());
 
             // 주변 행정 구역 객체 생성
@@ -115,5 +116,67 @@ public class NearPublicDistrictService {
 
         // 응답 맵 반환
         return nearbyLocations;
+    }
+
+    /**
+     * 회원가입 시 주어진 위치를 기준으로 주변 행정 구역을 저장하는 메서드
+     * @param baseLocation 기준 위치
+     */
+    @Transactional
+    public void saveNearDistrictByRegisterLocation(PublicDistrictResponse.LocationDTO baseLocation) {
+
+        // 기준 위치에 해당하는 행정 구역을 조회
+        PublicDistrict publicDistrict = publicDistrictRepository.findBySidoAndSiguAndDong(baseLocation.getSido(), baseLocation.getSigu(), baseLocation.getDong())
+                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        // 기존에 저장된 주변 행정 구역 정보 조회
+        List<NearPublicDistrictResponse.InfoDTO> existingNearbyDistricts = nearPublicDistrictRepository.findByPublicDistrictId(publicDistrict.getId());
+
+        // 기존에 저장된 주변 행정 구역이 있다면 바로 리턴
+        if (!existingNearbyDistricts.isEmpty()) {
+            return;
+        }
+
+        // redis 를 사용해서 모든 행정 구역 정보를 조회
+        // 추후 로직 적용
+
+        // mariadb 를 사용해서 모든 행정 구역 정보를 조회
+        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllDistricts();
+        // 데이터베이스에 새로 추가할 주변 행정 구역 리스트
+        List<NearPublicDistrict> allNearPublicDistricts = new ArrayList<>();
+
+        // 각 반경 범위에 대해 주변 행정 구역을 찾고 리스트에 추가
+        for (RadiusRange range : RadiusRange.values()) {
+            // 반경 범위에 대해 주변 행정 구역 찾기
+            List<PublicDistrictResponse.InfoDTO> filteredLocations = allLocations.stream()
+                    .filter(infoDTO -> GeoUtil.calculateDistance(
+                            publicDistrict.getLatitude(),
+                            publicDistrict.getLongitude(),
+                            infoDTO.getLatitude(),
+                            infoDTO.getLongitude()) <= range.getRadius())
+                    .collect(Collectors.toList());
+
+            // 주변 행정 구역 객체 생성
+            List<NearPublicDistrict> nearPublicDistricts = filteredLocations.stream()
+                    .map(filteredLocation -> NearPublicDistrict.buildNearPublicDistrict(
+                            filteredLocation.getSido(),
+                            filteredLocation.getSigu(),
+                            filteredLocation.getDong(),
+                            range.getRadius(),
+                            publicDistrict))
+                    .toList();
+
+            // 모든 주변 행정 구역 리스트에 추가
+            allNearPublicDistricts.addAll(nearPublicDistricts);
+
+            // 기존에 있던 모든 행정 구역을 필터된 주변 행정 구역으로 값을 대체
+            allLocations = filteredLocations;
+        }
+
+        // 일반 쿼리(general insert query)로 주변 행정 구역을 저장 - 쿼리 약 1000 개
+//        nearPublicDistrictRepository.saveAll(allNearPublicDistricts);
+
+        // 벌크 쿼리(bulk insert query)로 주변 행정 구역을 저장 - 쿼리 1 개
+        nearPublicDistrictJdbcRepository.saveAll(allNearPublicDistricts);
     }
 }

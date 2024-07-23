@@ -4,7 +4,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
-public class KakaoUriBuilderUtil {
+public class KakaoApiUtil {
 
     // 키워드로 장소 검색 api 기본 uri
     private static final String KAKAO_LOCAL_KEYWORD_SEARCH_URL = "https://dapi.kakao.com/v2/local/search/keyword.json";
@@ -16,7 +16,7 @@ public class KakaoUriBuilderUtil {
     private static final String SORT_BY_DISTANCE = "distance";
 
     // 인스턴스화를 방지하기 위해 private 생성자 선언
-    private KakaoUriBuilderUtil() {}
+    private KakaoApiUtil() {}
 
     // 키워드로 장소 검색 api 를 호출하기 위한 전체 uri 를 만드는 메서드
     public static URI buildUriByKeywordSearch(Double x, Double y, Integer radius, Integer page) {

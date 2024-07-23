@@ -147,3 +147,4 @@ jobs:
           # Spring Boot 애플리케이션 로그 확인
           sudo docker logs spring-boot-app
           EOF
+          

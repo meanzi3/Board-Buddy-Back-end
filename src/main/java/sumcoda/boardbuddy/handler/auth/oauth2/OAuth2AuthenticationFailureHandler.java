@@ -28,54 +28,54 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
 
         RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-        String errorMessage = "";
+        String messageCode = null;
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         if (exception instanceof OAuth2AuthenticationException) {
-            errorMessage = getOAuth2ErrorMessage(exception.getMessage());
+            messageCode = getOAuth2MessageCode(exception.getMessage());
         }
         else if (exception instanceof AuthenticationCredentialsNotFoundException) {
-            errorMessage = "인증 요청이 거부되었습니다. 관리자에게 문의하세요.";
+            messageCode = "8";
         }
         else if (exception instanceof InternalAuthenticationServiceException) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            errorMessage = "내부 시스템 문제로 로그인 요청을 처리할 수 없습니다. 관리자에게 문의하세요.";
+            messageCode = "9";
         }
 
-        redirectStrategy.sendRedirect(request, response, "https://boardbuddyapp.vercel.app/login/oauth/callback?isLoginSucceed=false&isVerifiedMember=false&message=" + errorMessage);
+        redirectStrategy.sendRedirect(request, response, "https://boardbuddyapp.vercel.app/login/oauth/callback?isLoginSucceed=false&isVerifiedMember=false&messageCode=" + messageCode);
     }
 
-    private String getOAuth2ErrorMessage(String errorMessage) {
+    private String getOAuth2MessageCode(String errorMessage) {
 
-        String oAuth2ErrorMessage;
+        String oAuth2MessageCode;
 
         switch (errorMessage) {
             case "The authorization request or token request is missing a required parameter":
-                oAuth2ErrorMessage = "인증 요청 또는 토큰 요청에 필요한 매개 변수가 누락되었습니다.";
+                oAuth2MessageCode = "1";
                 break;
             case "Missing or invalid client identifier":
-                oAuth2ErrorMessage = "누락되었거나 유효하지 않은 클라이언트 식별자";
+                oAuth2MessageCode = "2";
                 break;
             case "Invalid or mismatching redirection URI":
-                oAuth2ErrorMessage = "유효하지 않거나 일치하지 않는 리디렉션 URI";
+                oAuth2MessageCode = "3";
                 break;
             case "The requested scope is invalid, unknown, or malformed":
-                oAuth2ErrorMessage = "요청된 범위가 유효하지 않거나, 알 수 없거나, 형식이 잘못되었습니다.";
+                oAuth2MessageCode = "4";
                 break;
             case "The resource owner or authorization server denied the access request":
-                oAuth2ErrorMessage = "자원 소유자 또는 인증 서버가 액세스 요청을 거부했습니다.";
+                oAuth2MessageCode = "5";
                 break;
             case "Client authentication failed":
-                oAuth2ErrorMessage = "클라이언트 인증 실패";
+                oAuth2MessageCode = "6";
                 break;
             default:
-                oAuth2ErrorMessage = "제공된 권한 부여(승인 코드, 리소스 소유자 자격 증명)는 유효하지 않거나, 만료되거나, 취소되었습니다.";
+                oAuth2MessageCode = "7";
                 break;
         }
-        return oAuth2ErrorMessage;
+        return oAuth2MessageCode;
     }
 }
 

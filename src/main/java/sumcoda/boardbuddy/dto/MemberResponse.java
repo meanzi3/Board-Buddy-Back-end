@@ -43,12 +43,12 @@ public class MemberResponse {
     @NoArgsConstructor
     public static class RankingsDTO {
         private String nickname;
-        private String profileURL;
+        private String profileImageS3SavedURL;
 
         @Builder
-        public RankingsDTO(String nickname, String profileURL) {
+        public RankingsDTO(String nickname, String profileImageS3SavedURL) {
             this.nickname = nickname;
-            this.profileURL = profileURL;
+            this.profileImageS3SavedURL = profileImageS3SavedURL;
         }
     }
 }

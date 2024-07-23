@@ -78,6 +78,8 @@ public class GatherArticleResponse {
         private String description;
         private GatherArticleResponse.AuthorDTO author;
         private String meetingLocation;
+        private Double x;
+        private Double y;
         private Integer maxParticipants;
         private Integer currentParticipants;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
@@ -90,13 +92,15 @@ public class GatherArticleResponse {
         private String participationStatus;
 
         @Builder
-        public ReadDTO(String title, String description, AuthorDTO author, String meetingLocation,
+        public ReadDTO(String title, String description, AuthorDTO author, String meetingLocation, Double x, Double y,
                        Integer maxParticipants, Integer currentParticipants, LocalDateTime startDateTime,
                        LocalDateTime endDateTime, LocalDateTime createdAt, GatherArticleStatus status, String participationStatus) {
             this.title = title;
             this.description = description;
             this.author = author;
             this.meetingLocation = meetingLocation;
+            this.x = x;
+            this.y = y;
             this.maxParticipants = maxParticipants;
             this.currentParticipants = currentParticipants;
             this.startDateTime = startDateTime;
@@ -113,6 +117,8 @@ public class GatherArticleResponse {
                     .description(gatherArticle.getDescription())
                     .author(AuthorDTO.from(member))
                     .meetingLocation(gatherArticle.getMeetingLocation())
+                    .x(gatherArticle.getX())
+                    .y(gatherArticle.getY())
                     .maxParticipants(gatherArticle.getMaxParticipants())
                     .currentParticipants(gatherArticle.getCurrentParticipants())
                     .startDateTime(gatherArticle.getStartDateTime())

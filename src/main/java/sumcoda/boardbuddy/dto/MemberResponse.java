@@ -25,17 +25,17 @@ public class MemberResponse {
 
         private Boolean isPhoneNumberVerified;
 
-        private String awsS3SavedFileURL;
+        private String profileImageS3SavedURL;
 
         @Builder
-        public ProfileDTO(String nickname, String sido, String sigu, String dong, String phoneNumber, Boolean isPhoneNumberVerified, String awsS3SavedFileURL) {
+        public ProfileDTO(String nickname, String sido, String sigu, String dong, String phoneNumber, Boolean isPhoneNumberVerified, String profileImageS3SavedURL) {
             this.nickname = nickname;
             this.sido = sido;
             this.sigu = sigu;
             this.dong = dong;
             this.phoneNumber = phoneNumber;
             this.isPhoneNumberVerified = isPhoneNumberVerified;
-            this.awsS3SavedFileURL = awsS3SavedFileURL;
+            this.profileImageS3SavedURL = profileImageS3SavedURL;
         }
     }
 

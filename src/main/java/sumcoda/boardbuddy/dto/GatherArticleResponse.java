@@ -151,7 +151,7 @@ public class GatherArticleResponse {
             return GatherArticleResponse.AuthorDTO.builder()
                     .nickname(member.getNickname())
                     .rank(member.getRank())
-                    .profileImageS3SavedURL(member.getProfileImage() != null ? member.getProfileImage().getAwsS3SavedFileURL() : null)
+                    .profileImageS3SavedURL(member.getProfileImage() != null ? member.getProfileImage().getProfileImageS3SavedURL() : null)
                     .description(member.getDescription())
                     .build();
         }

@@ -39,7 +39,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                         member.sigu,
                         member.dong,
                         member.phoneNumber,
-                        profileImage.awsS3SavedFileURL
+                        profileImage.profileImageS3SavedURL
                 ))
                 .from(member)
                 .leftJoin(member.profileImage, profileImage)
@@ -52,7 +52,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         return jpaQueryFactory
                 .select(Projections.fields(MemberResponse.RankingsDTO.class,
                         member.nickname,
-                        profileImage.awsS3SavedFileURL.as("profileImageS3SavedURL")
+                        profileImage.profileImageS3SavedURL
                 ))
                 .from(member)
                 .leftJoin(member.profileImage, profileImage)

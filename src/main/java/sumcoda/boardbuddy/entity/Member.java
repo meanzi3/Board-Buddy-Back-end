@@ -154,7 +154,7 @@ public class Member {
 
     // 양방향 연관관계
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<sumcoda.boardbuddy.entity.BadgeImage> badgeImages = new ArrayList<>();
+    private List<BadgeImage> badgeImages = new ArrayList<>();
 
     @Builder
     public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Integer buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, MemberRole memberRole, ProfileImage profileImage) {

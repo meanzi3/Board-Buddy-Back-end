@@ -15,7 +15,6 @@ import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 import sumcoda.boardbuddy.repository.SmsCertificationRepository;
-import sumcoda.boardbuddy.util.AuthUtil;
 import sumcoda.boardbuddy.util.SmsCertificationUtil;
 
 import java.security.SecureRandom;
@@ -136,7 +135,7 @@ public class AuthService {
                 .sigu(profileDTO.getSigu())
                 .dong(profileDTO.getDong())
                 .isPhoneNumberVerified(profileDTO.getPhoneNumber() != null)
-                .awsS3SavedFileURL(profileDTO.getAwsS3SavedFileURL())
+                .profileImageS3SavedURL(profileDTO.getProfileImageS3SavedURL())
                 .build();
     }
 

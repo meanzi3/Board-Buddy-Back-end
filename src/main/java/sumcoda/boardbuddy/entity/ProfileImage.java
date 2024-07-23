@@ -25,21 +25,21 @@ public class ProfileImage {
 
     // 이미지에 대한 URL 정보를 DB에서 찾을때 활용
     @Column(nullable = false)
-    private String awsS3SavedFileURL;
+    private String profileImageS3SavedURL;
 
     @Builder
-    public ProfileImage(String originalFilename, String savedFilename, String awsS3SavedFileURL) {
+    public ProfileImage(String originalFilename, String savedFilename, String profileImageS3SavedURL) {
         this.originalFilename = originalFilename;
         this.savedFilename = savedFilename;
-        this.awsS3SavedFileURL = awsS3SavedFileURL;
+        this.profileImageS3SavedURL = profileImageS3SavedURL;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static ProfileImage buildProfileImage(String originalFilename, String savedFilename, String awsS3SavedFileURL) {
+    public static ProfileImage buildProfileImage(String originalFilename, String savedFilename, String profileImageS3SavedURL) {
         return ProfileImage.builder()
                 .originalFilename(originalFilename)
                 .savedFilename(savedFilename)
-                .awsS3SavedFileURL(awsS3SavedFileURL)
+                .profileImageS3SavedURL(profileImageS3SavedURL)
                 .build();
     }
 }

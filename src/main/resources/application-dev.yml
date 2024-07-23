@@ -4,6 +4,9 @@ spring:
 #  config:
 #    activate:
 #      on-profile: "dev"
+  jpa:
+    hibernate:
+      ddl-auto: create
 
   datasource:
     url: ${DEV_DB_URL}

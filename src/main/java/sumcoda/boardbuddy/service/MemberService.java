@@ -116,6 +116,10 @@ public class MemberService {
      *
      **/
     public void createAdminAccount() {
+        Boolean existsByUsername = memberRepository.existsByUsername("admin");
+        if (existsByUsername) {
+            return;
+        }
         memberRepository.save(Member.buildMember(
                 "admin",
                 bCryptPasswordEncoder.encode("a12345#"),

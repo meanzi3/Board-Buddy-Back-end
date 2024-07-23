@@ -13,6 +13,9 @@ spring:
     hikari:
       connection-timeout: 3000
       maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: update
   data:
     redis:
       host: ${PROD_REDIS_HOST}

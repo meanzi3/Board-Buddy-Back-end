@@ -15,8 +15,6 @@ spring:
       data-locations: classpath:data.sql
 
   jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: true
     properties:
       hibernate:

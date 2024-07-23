@@ -88,6 +88,14 @@ jobs:
           echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} >> env.list
           echo SPRING_PROFILES_ACTIVE=common,prod >> env.list
 
+      # Redis 설정 파일 생성
+      - name: Create redis configuration file
+        run: |
+          echo "bind 0.0.0.0" > redis.conf
+          echo "protected-mode no" >> redis.conf
+          echo "port 6379" >> redis.conf
+          echo "requirepass ${{ secrets.PROD_REDIS_PASSWORD }}" >> redis.conf
+
       # 파일을 EC2로 전송
       - name: Transfer files to EC2
         run: |

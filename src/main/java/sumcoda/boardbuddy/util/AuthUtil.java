@@ -19,7 +19,7 @@ public class AuthUtil {
     public String getUserNameByLoginType(Authentication authentication) {
 
         if (authentication == null) {
-            throw new AuthenticationMissingException("유효하지 않은 사용자의 요청입니다.");
+            throw new AuthenticationMissingException("유효하지 않은 사용자의 요청입니다.(인터셉터 동작)");
         }
 
         String username;

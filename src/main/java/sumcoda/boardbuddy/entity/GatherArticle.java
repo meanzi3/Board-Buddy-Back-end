@@ -65,6 +65,14 @@ public class GatherArticle extends BaseTimeEntity {
     @Column(nullable = false)
     private String meetingLocation;
 
+    // 경도
+    @Column(nullable = false)
+    private Double x;
+
+    // 위도
+    @Column(nullable = false)
+    private Double y;
+
     // 양방향 연관관계
     @OneToOne(mappedBy = "gatherArticle")
     private ChatRoom chatRoom;
@@ -78,7 +86,7 @@ public class GatherArticle extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public GatherArticle(String title, Integer currentParticipants, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
+    public GatherArticle(String title, Integer currentParticipants, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation, Double x, Double y) {
         this.title = title;
         this.currentParticipants = currentParticipants;
         this.maxParticipants = maxParticipants;
@@ -90,10 +98,12 @@ public class GatherArticle extends BaseTimeEntity {
         this.dong = dong;
         this.sigu = sigu;
         this.meetingLocation = meetingLocation;
+        this.x = x;
+        this.y = y;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static GatherArticle buildGatherArticle(String title, Integer currentParticipants, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation) {
+    public static GatherArticle buildGatherArticle(String title, Integer currentParticipants, Integer maxParticipants, GatherArticleStatus status, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sigu, String dong, String meetingLocation, Double x, Double y) {
         return GatherArticle.builder()
                 .title(title)
                 .currentParticipants(currentParticipants)
@@ -106,17 +116,21 @@ public class GatherArticle extends BaseTimeEntity {
                 .sigu(sigu)
                 .dong(dong)
                 .meetingLocation(meetingLocation)
+                .x(x)
+                .y(y)
                 .build();
     }
 
     // 수정 메서드
-    public void update(String title, String description, String location, String sido, String sigu, String dong, Integer maxParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public void update(String title, String description, String location, String sido, String sigu, String dong, Double x, Double y, Integer maxParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         if (title != null) this.title = title;
         if (description != null) this.description = description;
         if (location != null) this.meetingLocation = location;
         if (sido != null) this.sido = sido;
         if (sigu != null) this.sigu = sigu;
         if (dong != null) this.dong = dong;
+        if (x != null) this.x = x;
+        if (y != null) this.y = y;
         if (maxParticipants != null) this.maxParticipants = maxParticipants;
         if (startDateTime != null) this.startDateTime = startDateTime;
         if (endDateTime != null) this.endDateTime = endDateTime;

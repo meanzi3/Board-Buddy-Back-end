@@ -134,7 +134,7 @@ public class MemberService {
                 "admin",
                 "admin@naver.com",
                 "01012345678",
-                "서울 특별시",
+                "서울특별시",
                 "강남구",
                 "삼성동",
                 2,

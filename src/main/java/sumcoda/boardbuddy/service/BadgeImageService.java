@@ -29,7 +29,7 @@ public class BadgeImageService {
      * @return 뱃지 이미지 URL 리스트
      **/
     @Transactional
-    public BadgeImageResponse.BadgeImageListDTO getBadges (String nickname) {
+    public List<BadgeImageResponse.BadgeImageUrlDTO> getBadges (String nickname) {
         if (nickname == null) {
             throw new MemberRetrievalException("뱃지 조회 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
         }
@@ -38,26 +38,21 @@ public class BadgeImageService {
             throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
         }
 
-        List<BadgeImageResponse.BadgeImageUrlDTO> badgeImageUrlDTOs = badgeImageRepository.findBadgeImagesByNickname(nickname);
-
-        List<String> badgeUrl = badgeImageUrlDTOs.stream()
-                .map(dto -> buildBadgeUrl(dto.getAwsS3SavedFileURL()))
+        return badgeImageRepository.findBadgeImagesByNickname(nickname)
+                .stream()
+                .map(dto -> new BadgeImageResponse.BadgeImageUrlDTO(buildBadgeUrl(dto.getBadgeImageS3SavedURL())))
                 .collect(Collectors.toList());
-
-        return BadgeImageResponse.BadgeImageListDTO.builder()
-                .badges(badgeUrl)
-                .build();
     }
 
     /**
      * 뱃지 URL 빌드 메서드
      *
-     * @param awsS3SavedFileURL
+     * @param badgeImageS3SavedURL DB에 저장 되어있는 뱃지 이미지 URL
      * @return 뱃지 이미지 URL
      **/
-    private String buildBadgeUrl(String awsS3SavedFileURL) {
+    private String buildBadgeUrl(String badgeImageS3SavedURL) {
 
-        String filename = awsS3SavedFileURL.substring(awsS3SavedFileURL.lastIndexOf("/") + 1);
+        String filename = badgeImageS3SavedURL.substring(badgeImageS3SavedURL.lastIndexOf("/") + 1);
 
         return "http://localhost:8080" + FileStorageUtil.getLocalStoreDir(filename);
     }

@@ -11,6 +11,7 @@ import sumcoda.boardbuddy.dto.BadgeImageResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.BadgeImageService;
 
+import java.util.List;
 import java.util.Map;
 
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithData;
@@ -29,11 +30,11 @@ public class BadgeImageController {
      * @return 뱃지 리스트
      **/
     @GetMapping(value = "/api/badges/{nickname}")
-    public ResponseEntity<ApiResponse<Map<String, BadgeImageResponse.BadgeImageListDTO>>> getBadges (@PathVariable String nickname) {
+    public ResponseEntity<ApiResponse<Map<String, List<BadgeImageResponse.BadgeImageUrlDTO>>>> getBadges (@PathVariable String nickname) {
         log.info("get badges is working");
 
-        BadgeImageResponse.BadgeImageListDTO badgeImageListDTO = badgeImageService.getBadges(nickname);
+        List<BadgeImageResponse.BadgeImageUrlDTO> badgeImageListDTOs = badgeImageService.getBadges(nickname);
 
-        return buildSuccessResponseWithData("badges", badgeImageListDTO,"뱃지가 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithData("badges", badgeImageListDTOs,"뱃지가 조회되었습니다.", HttpStatus.OK);
     }
 }

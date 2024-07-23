@@ -176,6 +176,12 @@ public class GatherArticleService {
         if (createRequest.getDong() == null || createRequest.getDong().isEmpty()) {
             throw new GatherArticleSaveException("동이 입력되지 않았습니다.");
         }
+        if (createRequest.getX() == null) {
+            throw new GatherArticleSaveException("경도가 입력되지 않았습니다.");
+        }
+        if (createRequest.getY() == null) {
+            throw new GatherArticleSaveException("위도가 입력되지 않았습니다.");
+        }
         if (createRequest.getStartDateTime() == null) {
             throw new GatherArticleSaveException("시작 시간이 입력되지 않았습니다.");
         }
@@ -209,6 +215,12 @@ public class GatherArticleService {
         }
         if (updateRequest.getDong() == null || updateRequest.getDong().isEmpty()) {
             throw new GatherArticleUpdateException("동이 입력되지 않았습니다.");
+        }
+        if (updateRequest.getX() == null) {
+            throw new GatherArticleUpdateException("경도가 입력되지 않았습니다.");
+        }
+        if (updateRequest.getY() == null) {
+            throw new GatherArticleUpdateException("위도가 입력되지 않았습니다.");
         }
         if (updateRequest.getStartDateTime() == null) {
             throw new GatherArticleUpdateException("시작 시간이 입력되지 않았습니다.");

@@ -10,9 +10,11 @@ import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.MemberRole;
+import sumcoda.boardbuddy.enumerate.ReviewType;
 import sumcoda.boardbuddy.exception.member.*;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictNotFoundException;
 import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 
 import java.util.List;
@@ -29,6 +31,8 @@ public class MemberService {
     private final PublicDistrictRepository publicDistrictRepository;
 
     private final NearPublicDistrictService nearPublicDistrictService;
+
+    private final MemberGatherArticleRepository memberGatherArticleRepository;
 
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -94,6 +98,9 @@ public class MemberService {
                 0,
                 0,
                 0,
+                0,
+                0,
+                0,
                 null,
                 null,
                 MemberRole.USER,
@@ -120,6 +127,9 @@ public class MemberService {
                 "삼성동",
                 2,
                 50,
+                0,
+                0,
+                0,
                 0,
                 0,
                 0,
@@ -226,4 +236,33 @@ public class MemberService {
         return memberRepository.findTop3RankingMembers();
     }
 
+    /**
+     * 리뷰 보내기 요청 캐치
+     *
+     * @param gatherArticleId 모집글 Id
+     * @param reviewDTO 리뷰를 받는 유저 닉네임과 리뷰 타입을 담은 dto
+     * @param username 로그인 사용자 아이디
+     **/
+    @Transactional
+    public void sendReview(Long gatherArticleId, MemberRequest.ReviewDTO reviewDTO, String username) {
+        //리뷰 보내는 유저 조회
+        Member reviewer = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberRetrievalException("리뷰를 보내는 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        // 리뷰를 보내는 유저가 해당 모집글에 참가했는지 확인
+        boolean isRelated = memberGatherArticleRepository.existsByGatherArticleIdAndMemberUsername(gatherArticleId, username);
+
+        if (!isRelated) {
+            throw new MemberNotJoinedGatherArticleException("잘못된 접근입니다.");
+        }
+
+        // 리뷰 받는 유저 조회
+        Member reviewee = memberRepository.findByNickname(reviewDTO.getNickname())
+                .orElseThrow(() -> new MemberRetrievalException("리뷰를 받는 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        ReviewType reviewType = ReviewType.valueOf(String.valueOf(reviewDTO.getReview()));
+
+        reviewee.assignReviewCount(reviewType);
+        reviewer.assignSendReviewCount();
+    }
 }

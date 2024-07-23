@@ -52,7 +52,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         return jpaQueryFactory
                 .select(Projections.fields(MemberResponse.RankingsDTO.class,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL.as("profileURL")
+                        profileImage.profileImageS3SavedURL
                 ))
                 .from(member)
                 .leftJoin(member.profileImage, profileImage)

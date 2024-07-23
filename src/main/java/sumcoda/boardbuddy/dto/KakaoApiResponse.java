@@ -13,10 +13,10 @@ public class KakaoApiResponse {
     @NoArgsConstructor
     public static class KeywordSearchDTO {
 
-        @JsonProperty("documents") // json array mapping
+        @JsonProperty("documents")
         private List<DocumentDTO> documentDTOList;
 
-        @JsonProperty("meta") // json object mapping
+        @JsonProperty("meta")
         private MetaDTO metaDTO;
 
         @Builder
@@ -29,36 +29,36 @@ public class KakaoApiResponse {
     @Getter
     @NoArgsConstructor
     public static class DocumentDTO {
-
-        @JsonProperty("address_name") // 스테이크를 카멜로 매핑
-        private String addressName; // 전체 지번 주소
-
+        // 전체 지번 주소, 스네이크 표기법을 카멜 표기법으로 매핑
+        @JsonProperty("address_name")
+        private String addressName;
+        // 카테고리 이름
         @JsonProperty("category_name")
-        private String categoryName; // 카테고리 이름
-
+        private String categoryName;
+        // 중심좌표까지의 거리
         @JsonProperty("distance")
-        private Integer distance; // 중심좌표까지의 거리
-
+        private Integer distance;
+        // 장소 ID
         @JsonProperty("id")
-        private Integer id; // 장소 ID
-
+        private Integer id;
+        // 전화번호
         @JsonProperty("phone")
-        private String phone; // 전화번호
-
+        private String phone;
+        // 장소명
         @JsonProperty("place_name")
-        private String placeName; // 장소명
-
+        private String placeName;
+        // 장소 상세페이지 URL
         @JsonProperty("place_url")
-        private String placeUrl; // 장소 상세페이지 URL
-
+        private String placeUrl;
+        // 전체 도로명 주소
         @JsonProperty("road_address_name")
-        private String roadAddressName; // 전체 도로명 주소
-
+        private String roadAddressName;
+        // 경도
         @JsonProperty("x")
-        private Double x; // 경도
-
+        private Double x;
+        // 위도
         @JsonProperty("y")
-        private Double y; // 위도
+        private Double y;
 
         @Builder
         public DocumentDTO(String addressName, String categoryName, Integer distance, Integer id, String phone, String placeName, String placeUrl, String roadAddressName, Double x, Double y) {
@@ -78,9 +78,9 @@ public class KakaoApiResponse {
     @Getter
     @NoArgsConstructor
     public static class MetaDTO {
-
-        @JsonProperty("is_end") // 스테이크를 카멜로 매핑
-        private Boolean isEnd; // 페이지 끝 여부
+        // 페이지 끝 여부
+        @JsonProperty("is_end")
+        private Boolean isEnd;
 
         @Builder
         public MetaDTO(Boolean isEnd) {

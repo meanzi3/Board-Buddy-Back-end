@@ -81,6 +81,11 @@ public class MemberService {
     @Transactional
     public void registerMember(MemberRequest.RegisterDTO registerDTO) {
 
+        // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
+        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(
+                registerDTO.getSido(), registerDTO.getSigu(), registerDTO.getDong())
+                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
         Long memberId = memberRepository.save(Member.buildMember(
                 registerDTO.getUsername(),
                 bCryptPasswordEncoder.encode(registerDTO.getPassword()),
@@ -109,6 +114,9 @@ public class MemberService {
         if (memberId == null) {
             throw new MemberSaveException("서버 문제로 회원가입에 실패하였습니다. 관리자에게 문의하세요.");
         }
+
+        // 회원가입 시 주변 행정 구역 저장
+        nearPublicDistrictService.saveNearDistrictByRegisterLocation(baseLocation);
     }
 
     /**
@@ -159,10 +167,18 @@ public class MemberService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
+        // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
+        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(
+                oAuth2RegisterDTO.getSido(), oAuth2RegisterDTO.getSigu(), oAuth2RegisterDTO.getDong())
+                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
         member.assignPhoneNumber(oAuth2RegisterDTO.getPhoneNumber());
         member.assignSido(oAuth2RegisterDTO.getSido());
         member.assignSigu(oAuth2RegisterDTO.getSigu());
         member.assignDong(oAuth2RegisterDTO.getDong());
+
+        // 회원가입 시 주변 행정 구역 저장
+        nearPublicDistrictService.saveNearDistrictByRegisterLocation(baseLocation);
     }
 
     /**
@@ -189,6 +205,7 @@ public class MemberService {
      * 멤버 위치 설정 요청 캐치
      *
      * @param locationDTO 사용자가 입력한 위치 정보
+     * @param username 로그인 사용자 아이디
      **/
     @Transactional
     public Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> updateMemberLocation(MemberRequest.LocationDTO locationDTO, String username) {
@@ -203,14 +220,14 @@ public class MemberService {
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
-        PublicDistrictResponse.LocationDTO baseLocationRequestDTO = publicDistrictRepository.findOneBySidoAndSiguAndDong(sido, sigu, dong)
+        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(sido, sigu, dong)
                 .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 멤버의 위치 업데이트
         member.assignLocation(sido, sigu, dong);
 
-        // 사용자가 입력한 주변 시도, 시구, 동에 대한 주변 시도, 시구, 동을 반환하기 위해 findNearbyLocations() 메서드 실행 후 응답 반환
-        return nearPublicDistrictService.findNearbyLocations(baseLocationRequestDTO);
+        // 위치 설정 시 주변 행정 구역 저장 후 DTO 로 응답
+        return nearPublicDistrictService.saveNearDistrictByUpdateLocation(baseLocation);
     }
 
     /**

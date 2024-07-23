@@ -110,7 +110,7 @@ public class SecurityConfig {
                         .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/**", "/login/oauth2/code/**").permitAll()
                         .anyRequest().authenticated())
 
                 // 추가 코드
@@ -135,7 +135,7 @@ public class SecurityConfig {
                         .authorizationEndpoint(oAuth2 -> oAuth2
                                 .baseUri("/api/oauth2/authorization"))
                         .redirectionEndpoint(oAuth2 -> oAuth2
-                                .baseUri("https://boardbuddyapp.com/api/login/oauth2/code/**"))
+                                .baseUri("/login/oauth2/code/**"))
                         .userInfoEndpoint(userInfoEndpointConfig ->
                                 userInfoEndpointConfig
                                         .userService(customOAuth2UserService))

@@ -6,7 +6,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - app-network
+      - spring-boot-app-network
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
     environment:
@@ -19,7 +19,7 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - app-network
+      - spring-boot-app-network
     depends_on:
       - redis
     environment:
@@ -28,5 +28,5 @@ services:
       - PROD_REDIS_PASSWORD: ${PROD_REDIS_PASSWORD}
 
 networks:
-  app-network:
+  spring-boot-app-network:
     driver: bridge

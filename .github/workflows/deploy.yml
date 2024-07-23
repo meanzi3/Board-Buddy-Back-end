@@ -114,7 +114,7 @@ jobs:
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
 
           # Docker 네트워크를 생성
-          sudo docker network create app-network || true
+          sudo docker network create spring-boot-app-network || true
 
           # Redis 컨테이너를 실행
           if [ $(sudo docker ps -a -q -f name=redis) ]; then
@@ -123,7 +123,7 @@ jobs:
           fi
           sudo docker run -d --name redis \
             -v /home/ubuntu/redis.conf:/usr/local/etc/redis/redis.conf \
-            --network app-network \
+            --network spring-boot-app-network \
             -e PROD_REDIS_PASSWORD=${PROD_REDIS_PASSWORD} \
             -p 6379:6379 redis:latest redis-server /usr/local/etc/redis/redis.conf
 
@@ -136,7 +136,7 @@ jobs:
             --env-file /home/ubuntu/env.list \
             -v /home/ubuntu/application-common.yml:/config/application-common.yml \
             -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
-            --network app-network \
+            --network spring-boot-app-network \
             -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
             --spring.config.location=/config/application-common.yml,/config/application-prod.yml
 

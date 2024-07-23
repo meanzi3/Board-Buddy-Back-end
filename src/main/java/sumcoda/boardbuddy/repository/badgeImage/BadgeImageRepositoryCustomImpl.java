@@ -17,7 +17,7 @@ public class BadgeImageRepositoryCustomImpl implements BadgeImageRepositoryCusto
     @Override
     public List<BadgeImageResponse.BadgeImageUrlDTO> findBadgeImagesByNickname(String nickname) {
         return jpaQueryFactory.select(Projections.fields(BadgeImageResponse.BadgeImageUrlDTO.class,
-                        badgeImage.awsS3SavedFileURL))
+                        badgeImage.badgeImageS3SavedURL))
                 .from(badgeImage)
                 .where(badgeImage.member.nickname.eq(nickname))
                 .orderBy(badgeImage.id.desc())

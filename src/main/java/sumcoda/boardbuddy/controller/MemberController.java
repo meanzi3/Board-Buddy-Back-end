@@ -137,17 +137,6 @@ public class MemberController {
     }
 
     /**
-     * 랭킹 조회 요청 캐치
-     *
-     * @return TOP3 리스트를 조회하여 약속된 SuccessResponse 반환
-     */
-    @GetMapping("/api/rankings")
-    public ResponseEntity<ApiResponse<Map<String, List<MemberResponse.RankingsDTO>>>> getTop3Rankings() {
-        List<MemberResponse.RankingsDTO> rankingsDTO = memberService.getTop3Rankings();
-        return buildSuccessResponseWithData("rankings", rankingsDTO,"랭킹 조회에 성공했습니다.", HttpStatus.OK);
-    }
-
-    /**
      * 리뷰 보내기 요청 캐치
      *
      * @param gatherArticleId 모집글 Id
@@ -165,5 +154,20 @@ public class MemberController {
         memberService.sendReview(gatherArticleId, reviewDTO, username);
 
         return buildSuccessResponseWithoutData("후기가 전송되었습니다.", HttpStatus.OK);
+    }
+
+    /**
+     * 프로필 조회 요청 캐치
+     *
+     * @param nickname 유저 닉네임
+     * @return 프로필 조회가 성공했다면 약속된 SuccessResponse 반환
+     **/
+    @GetMapping("/api/profiles/{nickname}")
+    public ResponseEntity<ApiResponse<Map<String, MemberResponse.ProfileInfosDTO>>> getMemberProfileByNickname (@PathVariable String nickname) {
+        log.info("get member profile is working");
+
+        MemberResponse.ProfileInfosDTO profileInfosDTO = memberService.getMemberProfileByNickname(nickname);
+
+        return buildSuccessResponseWithData("profile", profileInfosDTO, "프로필이 조회되었습니다.", HttpStatus.OK);
     }
 }

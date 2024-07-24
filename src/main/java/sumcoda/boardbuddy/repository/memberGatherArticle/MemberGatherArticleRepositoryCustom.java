@@ -6,6 +6,10 @@ import sumcoda.boardbuddy.entity.MemberGatherArticle;
 
 public interface MemberGatherArticleRepositoryCustom {
   Member findAuthorByGatherArticleId(Long gatherArticleId);
+
   boolean isAuthor(Long gatherArticleId, Long memberId);
+
   MemberGatherArticle findByGatherArticleAndMember(GatherArticle gatherArticle, Member member);
+
+  boolean isPermit(Long gatherArticleId, String username);
 }

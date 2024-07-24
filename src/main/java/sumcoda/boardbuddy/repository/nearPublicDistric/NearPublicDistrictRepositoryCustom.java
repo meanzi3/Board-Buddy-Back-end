@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface NearPublicDistrictRepositoryCustom {
     List<NearPublicDistrictResponse.InfoDTO> findByPublicDistrictId(Long publicDistrictId);
+
+    List<NearPublicDistrictResponse.LocationDTO> findByPublicDistrictIdAndRadius(Long publicDistrictId, Integer radius);
 }

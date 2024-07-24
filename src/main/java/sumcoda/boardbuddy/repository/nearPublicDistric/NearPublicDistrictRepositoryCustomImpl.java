@@ -26,4 +26,17 @@ public class NearPublicDistrictRepositoryCustomImpl implements NearPublicDistric
                 .where(nearPublicDistrict.publicDistrict.id.eq(publicDistrictId))
                 .fetch();
     }
+
+    @Override
+    public List<NearPublicDistrictResponse.LocationDTO> findByPublicDistrictIdAndRadius(Long publicDistrictId, Integer radius) {
+        return jpaQueryFactory
+                .select(Projections.fields(NearPublicDistrictResponse.LocationDTO.class,
+                        nearPublicDistrict.sido,
+                        nearPublicDistrict.sigu,
+                        nearPublicDistrict.dong))
+                .from(nearPublicDistrict)
+                .where(nearPublicDistrict.publicDistrict.id.eq(publicDistrictId)
+                        .and(nearPublicDistrict.radius.eq(radius)))
+                .fetch();
+    }
 }

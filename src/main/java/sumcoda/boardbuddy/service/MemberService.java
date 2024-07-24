@@ -246,7 +246,7 @@ public class MemberService {
         // 멤버의 반경 업데이트
         member.assignRadius(radiusDTO.getRadius());
     }
-
+    
     /**
      * 리뷰 보내기 요청 캐치
      *
@@ -261,10 +261,8 @@ public class MemberService {
                 .orElseThrow(() -> new MemberRetrievalException("리뷰를 보내는 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 리뷰를 보내는 유저가 해당 모집글에 참가했는지 확인
-        boolean isRelated = memberGatherArticleRepository.existsByGatherArticleIdAndMemberUsername(gatherArticleId, username);
-
-        if (!isRelated) {
-            throw new MemberNotJoinedGatherArticleException("잘못된 접근입니다.");
+        if (!memberGatherArticleRepository.isPermit(gatherArticleId, username)) {
+            throw new MemberNotJoinedGatherArticleException("리뷰를 보낼 권한이 없습니다.");
         }
 
         // 리뷰 받는 유저 조회
@@ -273,12 +271,59 @@ public class MemberService {
 
         ReviewType reviewType = ReviewType.valueOf(String.valueOf(reviewDTO.getReview()));
 
-        reviewee.assignReviewCount(reviewType);
-        reviewer.assignSendReviewCount();
+        incrementReviewCounts(reviewee, reviewType);
+        incrementSendReviewCount(reviewer);
     }
 
     /**
-     * 리뷰 보내기 요청 캐치
+     * 각 리뷰 카운트 증가 메서드
+     *
+     * @param reviewee 리뷰를 받는 유저
+     * @param reviewType 리뷰 타입
+     **/
+    private void incrementReviewCounts(Member reviewee, ReviewType reviewType) {
+        Integer newMonthlyExcellentCount = reviewee.getMonthlyExcellentCount();
+        Integer newTotalExcellentCount = reviewee.getTotalExcellentCount();
+        Integer newMonthlyGoodCount = reviewee.getMonthlyGoodCount();
+        Integer newTotalGoodCount = reviewee.getTotalGoodCount();
+        Integer newMonthlyBadCount = reviewee.getMonthlyBadCount();
+        Integer newTotalBadCount = reviewee.getTotalBadCount();
+        Integer newMonthlyNoShowCount = reviewee.getMonthlyNoShowCount();
+
+        switch (reviewType) {
+            case EXCELLENT:
+                newMonthlyExcellentCount++;
+                newTotalExcellentCount++;
+                break;
+            case GOOD:
+                newMonthlyGoodCount++;
+                newTotalGoodCount++;
+                break;
+            case BAD:
+                newMonthlyBadCount++;
+                newTotalBadCount++;
+                break;
+            case NOSHOW:
+                newMonthlyNoShowCount++;
+                break;
+        }
+
+        reviewee.assignReviewCount(newMonthlyExcellentCount, newTotalExcellentCount, newMonthlyGoodCount, newTotalGoodCount, newMonthlyBadCount, newTotalBadCount, newMonthlyNoShowCount);
+    }
+
+    /**
+     * 리뷰 보낸 횟수 증가 메서드
+     *
+     * @param reviewer 리뷰를 보낸 유저
+     **/
+    private void incrementSendReviewCount(Member reviewer) {
+        Integer newSendReviewCount = reviewer.getMonthlySendReviewCount() + 1;
+
+        reviewer.assignSendReviewCount(newSendReviewCount);
+    }
+
+    /**
+     * 프로필 조회 요청 캐치
      *
      * @param nickname 유저 닉네임
      * @return 해당 닉네임의 유저 프로필

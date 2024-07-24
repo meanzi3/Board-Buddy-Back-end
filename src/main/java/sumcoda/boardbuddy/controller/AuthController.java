@@ -67,7 +67,7 @@ public class AuthController {
 
         MemberResponse.ProfileDTO profileDTO = authService.isAuthenticated(username);
 
-        return buildSuccessResponseWithData("profileDTO", profileDTO, "유효한 세션입니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("profileDTO", profileDTO, "유효한 세션입니다.", HttpStatus.OK);
     }
 
     /**

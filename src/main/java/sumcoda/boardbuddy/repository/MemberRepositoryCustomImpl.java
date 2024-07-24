@@ -99,4 +99,18 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                         .fetchOne())
                 .map(profileInfosDTO -> profileInfosDTO.toBuilder().badges(badges).build());
     }
+
+    @Override
+    public Optional<MemberResponse.LocationWithRadiusDTO> findLocationWithRadiusDTOByUsername(String username) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(MemberResponse.LocationWithRadiusDTO.class,
+                        member.sido,
+                        member.sigu,
+                        member.dong,
+                        member.radius
+                ))
+                .from(member)
+                .where(member.username.eq(username))
+                .fetchOne());
+    }
 }

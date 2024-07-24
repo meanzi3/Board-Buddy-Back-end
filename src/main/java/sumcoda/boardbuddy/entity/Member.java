@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.boardbuddy.enumerate.MemberRole;
-import sumcoda.boardbuddy.enumerate.ReviewType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -255,7 +254,7 @@ public class Member {
 
     // Member 1 <-> N BadgeImage
     // 양방향 연관관계 편의 메서드
-    public void addBadgeImage(sumcoda.boardbuddy.entity.BadgeImage badgeImage) {
+    public void addBadgeImage(BadgeImage badgeImage) {
         this.badgeImages.add(badgeImage);
 
         if (badgeImage.getMember() != this) {
@@ -296,29 +295,19 @@ public class Member {
         this.radius = radius;
     }
 
-    // 리뷰 카운트 증가 메서드
-    public void assignReviewCount(ReviewType reviewType) {
-        switch (reviewType) {
-            case EXCELLENT:
-                this.monthlyExcellentCount++;
-                this.totalExcellentCount++;
-                break;
-            case GOOD:
-                this.monthlyGoodCount++;
-                this.totalGoodCount++;
-                break;
-            case BAD:
-                this.monthlyBadCount++;
-                this.totalBadCount++;
-                break;
-            case NOSHOW:
-                this.monthlyNoShowCount++;
-                break;
-        }
+    // 각 리뷰 카운트 수정 메서드
+    public void assignReviewCount(Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount) {
+        this.monthlyExcellentCount = monthlyExcellentCount;
+        this.totalExcellentCount = totalExcellentCount;
+        this.monthlyGoodCount = monthlyGoodCount;
+        this.totalGoodCount = totalGoodCount;
+        this.monthlyBadCount = monthlyBadCount;
+        this.totalBadCount = totalBadCount;
+        this.monthlyNoShowCount = monthlyNoShowCount;
     }
 
-    // 리뷰 보낸 횟수 증가 메서드
-    public void assignSendReviewCount() {
-        this.monthlySendReviewCount++;
+    // 리뷰 보낸 횟수 수정 메서드
+    public void assignSendReviewCount(Integer monthlySendReviewCount) {
+        this.monthlySendReviewCount = monthlySendReviewCount;
     }
 }

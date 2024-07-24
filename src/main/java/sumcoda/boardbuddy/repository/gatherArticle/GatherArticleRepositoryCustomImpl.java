@@ -1,12 +1,18 @@
 package sumcoda.boardbuddy.repository.gatherArticle;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.GatherArticleRole;
+import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -73,5 +79,64 @@ public class GatherArticleRepositoryCustomImpl implements sumcoda.boardbuddy.rep
                         .and(memberGatherArticle.gatherArticleRole.eq(GatherArticleRole.AUTHOR))
                         .and(memberGatherArticle.gatherArticle.createdAt.between(startOfLastMonth, endOfLastMonth)))
                 .fetchOne();
+    }
+
+    @Override
+    public Slice<GatherArticleResponse.ReadSliceDTO> findGatherArticlesByLocationAndStatusAndSort(
+            List<String> sidoList, List<String> siguList, List<String> dongList, String status, String sort, Pageable pageable) {
+
+        List<GatherArticleResponse.ReadSliceDTO> results = jpaQueryFactory.select(Projections.fields(
+                        GatherArticleResponse.ReadSliceDTO.class,
+                        gatherArticle.id,
+                        gatherArticle.title,
+                        gatherArticle.description,
+                        Projections.fields(GatherArticleResponse.AuthorSimpleDTO.class,
+                                member.nickname.as("nickname"),
+                                member.rank.as("rank")).as("author"),
+                        gatherArticle.meetingLocation,
+                        gatherArticle.maxParticipants,
+                        gatherArticle.currentParticipants,
+                        gatherArticle.startDateTime,
+                        gatherArticle.endDateTime,
+                        gatherArticle.createdAt,
+                        gatherArticle.status))
+                .from(gatherArticle)
+                .join(gatherArticle.memberGatherArticles, memberGatherArticle)
+                .join(memberGatherArticle.member, member)
+                .where(
+                        inLocation(sidoList, siguList, dongList),
+                        eqStatus(status)
+                )
+                .orderBy(getOrderSpecifier(sort))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        boolean hasNext = false;
+
+        if (results.size() > pageable.getPageSize()) {
+            results.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(results, pageable, hasNext);
+    }
+
+    private BooleanExpression eqStatus(String status) {
+        return status != null ? gatherArticle.status.eq(GatherArticleStatus.valueOf(status.toUpperCase())) : null;
+    }
+
+    private BooleanExpression inLocation(List<String> sidoList, List<String> siguList, List<String> dongList) {
+        return gatherArticle.sido.in(sidoList)
+                .and(gatherArticle.sigu.in(siguList))
+                .and(gatherArticle.dong.in(dongList));
+    }
+
+    private OrderSpecifier<?> getOrderSpecifier(String sort) {
+        if (GatherArticleStatus.SOON.getValue().equals(sort)) {
+            return gatherArticle.startDateTime.asc();
+        } else {
+            return gatherArticle.id.desc();
+        }
     }
 }

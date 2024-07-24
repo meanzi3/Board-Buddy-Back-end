@@ -8,8 +8,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum GatherArticleStatus {
 
-  OPEN("모집중"),
-  CLOSED("모집마감");
+  OPEN("open"),
+  CLOSED("closed"),
+  SOON("soon");
 
   @JsonValue
   private final String value;

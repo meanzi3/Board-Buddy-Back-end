@@ -12,7 +12,7 @@ import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.MemberRole;
 import sumcoda.boardbuddy.enumerate.ReviewType;
 import sumcoda.boardbuddy.exception.member.*;
-import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictNotFoundException;
+import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
@@ -84,7 +84,7 @@ public class MemberService {
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
         PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(
                 registerDTO.getSido(), registerDTO.getSigu(), registerDTO.getDong())
-                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         Long memberId = memberRepository.save(Member.buildMember(
                 registerDTO.getUsername(),
@@ -172,7 +172,7 @@ public class MemberService {
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
         PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(
                 oAuth2RegisterDTO.getSido(), oAuth2RegisterDTO.getSigu(), oAuth2RegisterDTO.getDong())
-                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         member.assignPhoneNumber(oAuth2RegisterDTO.getPhoneNumber());
         member.assignSido(oAuth2RegisterDTO.getSido());
@@ -223,7 +223,7 @@ public class MemberService {
 
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
         PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(sido, sigu, dong)
-                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 멤버의 위치 업데이트
         member.assignLocation(sido, sigu, dong);

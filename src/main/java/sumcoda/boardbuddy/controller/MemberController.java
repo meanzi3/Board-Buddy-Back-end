@@ -137,17 +137,6 @@ public class MemberController {
     }
 
     /**
-     * 랭킹 조회 요청 캐치
-     *
-     * @return TOP3 리스트를 조회하여 약속된 SuccessResponse 반환
-     */
-    @GetMapping("/api/rankings")
-    public ResponseEntity<ApiResponse<Map<String, List<MemberResponse.RankingsDTO>>>> getTop3Rankings() {
-        List<MemberResponse.RankingsDTO> rankingsDTO = memberService.getTop3Rankings();
-        return buildSuccessResponseWithData("rankings", rankingsDTO,"랭킹 조회에 성공했습니다.", HttpStatus.OK);
-    }
-
-    /**
      * 리뷰 보내기 요청 캐치
      *
      * @param gatherArticleId 모집글 Id

@@ -5,10 +5,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.entity.Member;
 
 import java.util.List;
 import java.util.Optional;
 
+import static sumcoda.boardbuddy.entity.QBadgeImage.badgeImage;
 import static sumcoda.boardbuddy.entity.QMember.*;
 import static sumcoda.boardbuddy.entity.QProfileImage.*;
 
@@ -62,4 +64,35 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .fetch();
     }
 
+    // 점수로 정렬
+    @Override
+    public List<Member> findAllOrderedByRankScore() {
+        return jpaQueryFactory.selectFrom(member)
+                .orderBy(member.rankScore.desc())
+                .fetch();
+    }
+
+    @Override
+    public Optional<MemberResponse.ProfileInfosDTO> findMemberProfileByNickname(String nickname) {
+        List<String> badges = jpaQueryFactory.select(badgeImage.badgeImageS3SavedURL)
+                .from(badgeImage)
+                .where(badgeImage.member.nickname.eq(nickname))
+                .orderBy(badgeImage.id.desc())
+                .limit(3)
+                .fetch();
+
+        return Optional.ofNullable(jpaQueryFactory
+                        .select(Projections.fields(MemberResponse.ProfileInfosDTO.class,
+                                member.description,
+                                member.rank,
+                                member.buddyScore,
+                                member.joinCount,
+                                member.totalExcellentCount,
+                                member.totalGoodCount,
+                                member.totalBadCount))
+                        .from(member)
+                        .where(member.nickname.eq(nickname))
+                        .fetchOne())
+                .map(profileInfosDTO -> profileInfosDTO.toBuilder().badges(badges).build());
+    }
 }

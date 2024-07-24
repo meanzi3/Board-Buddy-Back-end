@@ -155,4 +155,19 @@ public class MemberController {
 
         return buildSuccessResponseWithoutData("후기가 전송되었습니다.", HttpStatus.OK);
     }
+
+    /**
+     * 프로필 조회 요청 캐치
+     *
+     * @param nickname 유저 닉네임
+     * @return 프로필 조회가 성공했다면 약속된 SuccessResponse 반환
+     **/
+    @GetMapping("/api/profiles/{nickname}")
+    public ResponseEntity<ApiResponse<Map<String, MemberResponse.ProfileInfosDTO>>> getMemberProfileByNickname (@PathVariable String nickname) {
+        log.info("get member profile is working");
+
+        MemberResponse.ProfileInfosDTO profileInfosDTO = memberService.getMemberProfileByNickname(nickname);
+
+        return buildSuccessResponseWithData("profile", profileInfosDTO, "프로필이 조회되었습니다.", HttpStatus.OK);
+    }
 }

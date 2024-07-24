@@ -16,4 +16,6 @@ public interface MemberRepositoryCustom {
     List<MemberResponse.RankingsDTO> findTop3RankingMembers();
 
     List<Member> findAllOrderedByRankScore();
+
+    Optional<MemberResponse.ProfileInfosDTO> findMemberProfileByNickname(String nickname);
 }

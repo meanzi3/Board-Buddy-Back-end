@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static sumcoda.boardbuddy.entity.QBadgeImage.badgeImage;
 import static sumcoda.boardbuddy.entity.QComment.*;
 import static sumcoda.boardbuddy.entity.QMember.*;
 import static sumcoda.boardbuddy.entity.QMemberGatherArticle.*;
@@ -75,4 +76,27 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public Optional<MemberResponse.ProfileInfosDTO> findMemberProfileByNickname(String nickname) {
+        List<String> badges = jpaQueryFactory.select(badgeImage.badgeImageS3SavedURL)
+                .from(badgeImage)
+                .where(badgeImage.member.nickname.eq(nickname))
+                .orderBy(badgeImage.id.desc())
+                .limit(3)
+                .fetch();
+
+        return Optional.ofNullable(jpaQueryFactory
+                        .select(Projections.fields(MemberResponse.ProfileInfosDTO.class,
+                                member.description,
+                                member.rank,
+                                member.buddyScore,
+                                member.joinCount,
+                                member.totalExcellentCount,
+                                member.totalGoodCount,
+                                member.totalBadCount))
+                        .from(member)
+                        .where(member.nickname.eq(nickname))
+                        .fetchOne())
+                .map(profileInfosDTO -> profileInfosDTO.toBuilder().badges(badges).build());
+    }
 }

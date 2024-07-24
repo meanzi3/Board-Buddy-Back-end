@@ -276,4 +276,16 @@ public class MemberService {
         reviewee.assignReviewCount(reviewType);
         reviewer.assignSendReviewCount();
     }
+
+    /**
+     * 리뷰 보내기 요청 캐치
+     *
+     * @param nickname 유저 닉네임
+     * @return 해당 닉네임의 유저 프로필
+     **/
+    @Transactional
+    public MemberResponse.ProfileInfosDTO getMemberProfileByNickname(String nickname) {
+        return memberRepository.findMemberProfileByNickname(nickname)
+                .orElseThrow(() -> new MemberRetrievalException("유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+    }
 }

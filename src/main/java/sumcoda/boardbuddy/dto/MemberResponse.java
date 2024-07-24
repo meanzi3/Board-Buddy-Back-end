@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class MemberResponse {
 
     @Getter
@@ -49,6 +51,38 @@ public class MemberResponse {
         public RankingsDTO(String nickname, String profileImageS3SavedURL) {
             this.nickname = nickname;
             this.profileImageS3SavedURL = profileImageS3SavedURL;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ProfileInfosDTO {
+        private String description;
+
+        private Integer rank;
+
+        private Integer buddyScore;
+
+        private List<String> badges;
+
+        private Integer joinCount;
+
+        private Integer totalExcellentCount;
+
+        private Integer totalGoodCount;
+
+        private Integer totalBadCount;
+
+        @Builder(toBuilder = true)
+        public ProfileInfosDTO(String description, Integer rank, Integer buddyScore, List<String> badges, Integer joinCount, Integer totalExcellentCount, Integer totalGoodCount, Integer totalBadCount) {
+            this.description = description;
+            this.rank = rank;
+            this.buddyScore = buddyScore;
+            this.badges = badges;
+            this.joinCount = joinCount;
+            this.totalExcellentCount = totalExcellentCount;
+            this.totalGoodCount = totalGoodCount;
+            this.totalBadCount = totalBadCount;
         }
     }
 }

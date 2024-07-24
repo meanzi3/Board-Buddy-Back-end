@@ -88,6 +88,14 @@ jobs:
           echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} >> env.list
           echo SPRING_PROFILES_ACTIVE=common,prod >> env.list
 
+      # Redis 설정 파일 생성
+      - name: Create redis configuration file
+        run: |
+          echo "bind 0.0.0.0" > redis.conf
+          echo "protected-mode no" >> redis.conf
+          echo "port 6379" >> redis.conf
+          echo "requirepass ${{ secrets.PROD_REDIS_PASSWORD }}" >> redis.conf
+
       # 파일을 EC2로 전송
       - name: Transfer files to EC2
         run: |
@@ -106,7 +114,7 @@ jobs:
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
 
           # Docker 네트워크를 생성
-          sudo docker network create app-network || true
+          sudo docker network create spring-boot-app-network || true
 
           # Redis 컨테이너를 실행
           if [ $(sudo docker ps -a -q -f name=redis) ]; then
@@ -115,7 +123,7 @@ jobs:
           fi
           sudo docker run -d --name redis \
             -v /home/ubuntu/redis.conf:/usr/local/etc/redis/redis.conf \
-            --network app-network \
+            --network spring-boot-app-network \
             -e PROD_REDIS_PASSWORD=${PROD_REDIS_PASSWORD} \
             -p 6379:6379 redis:latest redis-server /usr/local/etc/redis/redis.conf
 
@@ -128,7 +136,7 @@ jobs:
             --env-file /home/ubuntu/env.list \
             -v /home/ubuntu/application-common.yml:/config/application-common.yml \
             -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
-            --network app-network \
+            --network spring-boot-app-network \
             -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
             --spring.config.location=/config/application-common.yml,/config/application-prod.yml
 
@@ -147,3 +155,4 @@ jobs:
           # Spring Boot 애플리케이션 로그 확인
           sudo docker logs spring-boot-app
           EOF
+          

@@ -35,7 +35,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         responseData.put("data", null);
 
-        responseData.put("message", "인증되지 않은 사용자의 요청입니다.");
+        responseData.put("message", "인증되지 않은 사용자의 요청입니다.(핸들러 동작)");
 
         objectMapper.writeValue(response.getWriter(), responseData);
     }

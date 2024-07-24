@@ -12,7 +12,7 @@ import sumcoda.boardbuddy.dto.BoardCafeRequest;
 import sumcoda.boardbuddy.dto.BoardCafeResponse;
 import sumcoda.boardbuddy.dto.KakaoApiResponse;
 import sumcoda.boardbuddy.exception.kakaoApi.KakaoApiServerException;
-import sumcoda.boardbuddy.util.KakaoUriBuilderUtil;
+import sumcoda.boardbuddy.util.KakaoApiUtil;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class KakaoApiService {
             // 마지막 페이지가 아닐 때까지 반복
             while (!isEnd) {
                 // URI 빌드
-                URI uri = KakaoUriBuilderUtil.buildUriByKeywordSearch(locationDTO.getX(), locationDTO.getY(), locationDTO.getRadius(), page);
+                URI uri = KakaoApiUtil.buildUriByKeywordSearch(locationDTO.getX(), locationDTO.getY(), locationDTO.getRadius(), page);
 
                 // HTTP 헤더 설정
                 HttpHeaders headers = new HttpHeaders();

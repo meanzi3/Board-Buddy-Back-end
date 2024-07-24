@@ -85,4 +85,22 @@ public class MemberResponse {
             this.totalBadCount = totalBadCount;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class LocationWithRadiusDTO {
+
+        private String sido;
+        private String sigu;
+        private String dong;
+        private Integer radius;
+
+        @Builder
+        public LocationWithRadiusDTO(String sido, String sigu, String dong, Integer radius) {
+            this.sido = sido;
+            this.sigu = sigu;
+            this.dong = dong;
+            this.radius = radius;
+        }
+    }
 }

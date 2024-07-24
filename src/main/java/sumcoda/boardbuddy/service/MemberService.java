@@ -5,7 +5,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.MemberRequest;
-import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.entity.Member;
@@ -108,6 +107,7 @@ public class MemberService {
                 0,
                 null,
                 null,
+                0.0,
                 MemberRole.USER,
                 null)).getId();
 
@@ -134,7 +134,7 @@ public class MemberService {
                 "admin",
                 "admin@naver.com",
                 "01012345678",
-                "서울 특별시",
+                "서울특별시",
                 "강남구",
                 "삼성동",
                 2,
@@ -150,6 +150,7 @@ public class MemberService {
                 0,
                 null,
                 null,
+                0.0,
                 MemberRole.USER,
                 null)
         );
@@ -245,7 +246,7 @@ public class MemberService {
         // 멤버의 반경 업데이트
         member.assignRadius(radiusDTO.getRadius());
     }
-
+    
     /**
      * 리뷰 보내기 요청 캐치
      *

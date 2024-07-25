@@ -96,7 +96,7 @@ public class MemberService {
                 registerDTO.getSigu(),
                 registerDTO.getDong(),
                 2,
-                50,
+                50.0,
                 0,
                 0,
                 0,
@@ -139,7 +139,7 @@ public class MemberService {
                 "강남구",
                 "삼성동",
                 2,
-                50,
+                50.0,
                 0,
                 0,
                 0,
@@ -274,6 +274,7 @@ public class MemberService {
 
         incrementReviewCounts(reviewee, reviewType);
         incrementSendReviewCount(reviewer);
+        updateBuddyScore(reviewee, reviewType);
     }
 
     /**
@@ -321,6 +322,23 @@ public class MemberService {
         Integer newSendReviewCount = reviewer.getMonthlySendReviewCount() + 1;
 
         reviewer.assignSendReviewCount(newSendReviewCount);
+    }
+
+    /**
+     * 버디지수 업데이트 메서드
+     *
+     * @param reviewee 리뷰를 받는 유저
+     * @param reviewType 리뷰 타입
+     **/
+    private void updateBuddyScore(Member reviewee, ReviewType reviewType) {
+        // 리뷰 타입에 따라 얻는 버디 지수
+        double gettingBuddyScore = reviewType.getScore();
+
+        // 새로 계산된 버디 지수
+        double newBuddyScore = reviewee.getBuddyScore() + gettingBuddyScore;
+
+        // 버디 지수 업데이트
+        reviewee.assignBuddyScore(newBuddyScore);
     }
 
     /**

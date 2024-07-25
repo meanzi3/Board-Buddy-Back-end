@@ -211,7 +211,7 @@ public class Member {
                 .description(description)
                 .rank(rank)
                 .rankScore(rankScore)
-                .memberRole(role)
+                .role(role)
                 .profileImage(profileImage)
                 .build();
     }

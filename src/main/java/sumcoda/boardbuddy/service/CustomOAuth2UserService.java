@@ -100,7 +100,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .description(null)
                     .rank(null)
                     .rankScore(0.0)
-                    .memberRole(Role.USER)
+                    .role(Role.USER)
                     .profileImage(null)
                     .build();
 

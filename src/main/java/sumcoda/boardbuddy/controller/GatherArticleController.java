@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.GatherArticleRequest;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.GatherArticleService;
+import sumcoda.boardbuddy.util.AuthUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,8 @@ import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWit
 public class GatherArticleController {
 
     private final GatherArticleService gatherArticleService;
+
+    private final AuthUtil authUtil;
 
     /**
      * 모집글 작성 컨트롤러
@@ -131,9 +135,10 @@ public class GatherArticleController {
             @RequestParam Integer page,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String sort,
-            @RequestAttribute String username
+            Authentication authentication
     ) {
         log.info("getGatherArticles is working");
+        String username = authUtil.getUserNameByLoginType(authentication);
 
         GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(
                 GatherArticleRequest.ReadListDTO.builder()

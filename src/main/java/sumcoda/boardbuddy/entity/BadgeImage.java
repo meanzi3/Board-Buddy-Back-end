@@ -19,10 +19,6 @@ public class BadgeImage {
     @Column(nullable = false)
     private String originalFilename;
 
-    // UUID 를 활용하여 구성된 파일 이름
-    @Column(nullable = false)
-    private String savedFilename;
-
     // 이미지에 대한 URL 정보를 DB에서 찾을때 활용
     @Column(nullable = false)
     private String badgeImageS3SavedURL;
@@ -34,18 +30,16 @@ public class BadgeImage {
     private Member member;
 
     @Builder
-    public BadgeImage(String originalFilename, String savedFilename, String badgeImageS3SavedURL, Member member) {
+    public BadgeImage(String originalFilename, String badgeImageS3SavedURL, Member member) {
         this.originalFilename = originalFilename;
-        this.savedFilename = savedFilename;
         this.badgeImageS3SavedURL = badgeImageS3SavedURL;
         this.assignMember(member);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 않고 해당 메서드를 활용하여 엔티티 생성
-    public static BadgeImage buildBadgeImage(String originalFilename, String savedFilename, String badgeImageS3SavedURL, Member member) {
+    public static BadgeImage buildBadgeImage(String originalFilename, String badgeImageS3SavedURL, Member member) {
         return BadgeImage.builder()
                 .originalFilename(originalFilename)
-                .savedFilename(savedFilename)
                 .badgeImageS3SavedURL(badgeImageS3SavedURL)
                 .member(member)
                 .build();

@@ -18,4 +18,6 @@ public interface MemberRepositoryCustom {
     List<Member> findAllOrderedByRankScore();
 
     Optional<MemberResponse.ProfileInfosDTO> findMemberProfileByNickname(String nickname);
+
+    Optional<MemberResponse.LocationWithRadiusDTO> findLocationWithRadiusDTOByUsername(String username);
 }

@@ -14,7 +14,7 @@ import sumcoda.boardbuddy.service.RankingService;
 import java.util.List;
 import java.util.Map;
 
-import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithData;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithPairKeyData;
 
 @Service
 @Slf4j
@@ -32,6 +32,6 @@ public class RankingController {
     @GetMapping("/api/rankings")
     public ResponseEntity<ApiResponse<Map<String, List<MemberResponse.RankingsDTO>>>> getTop3Rankings() {
         List<MemberResponse.RankingsDTO> rankingsDTO = rankingService.getTop3Rankings();
-        return buildSuccessResponseWithData("rankings", rankingsDTO,"랭킹 조회에 성공했습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("rankings", rankingsDTO,"랭킹 조회에 성공했습니다.", HttpStatus.OK);
     }
 }

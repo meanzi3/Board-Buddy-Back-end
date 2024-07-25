@@ -5,10 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
-import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
-import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleSaveException;
-import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleUpdateException;
-import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleAccessDeniedException;
+import sumcoda.boardbuddy.exception.gatherArticle.*;
 
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildFailureResponse;
 
@@ -39,5 +36,15 @@ public class GatherArticleExceptionHandler {
     return buildFailureResponse(e.getMessage(), HttpStatus.FORBIDDEN);
   }
 
+  // 유효하지 않은 정렬 기준 예외 처리 핸들러
+  @ExceptionHandler(GatherArticleSortException.class)
+  public ResponseEntity<ApiResponse<Void>> handleGatherArticleSortException(GatherArticleSortException e) {
+    return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+  }
 
+  // 유효하지 않은 모집글 상태 예외 처리 핸들러
+  @ExceptionHandler(GatherArticleStatusException.class)
+  public ResponseEntity<ApiResponse<Void>> handleGatherArticleStatusException(GatherArticleStatusException e) {
+    return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+  }
 }

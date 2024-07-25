@@ -14,7 +14,7 @@ import sumcoda.boardbuddy.service.MemberService;
 import java.util.List;
 import java.util.Map;
 
-import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithData;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithPairKeyData;
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithoutData;
 
 @RestController
@@ -115,7 +115,7 @@ public class MemberController {
 
         Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> locations = memberService.updateMemberLocation(locationDTO, username);
 
-        return buildSuccessResponseWithData("locations", locations, "위치 정보 설정을 성공하였습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("locations", locations, "위치 정보 설정을 성공하였습니다.", HttpStatus.OK);
     }
 
     /**
@@ -168,6 +168,6 @@ public class MemberController {
 
         MemberResponse.ProfileInfosDTO profileInfosDTO = memberService.getMemberProfileByNickname(nickname);
 
-        return buildSuccessResponseWithData("profile", profileInfosDTO, "프로필이 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("profile", profileInfosDTO, "프로필이 조회되었습니다.", HttpStatus.OK);
     }
 }

@@ -8,7 +8,7 @@ import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.entity.NearPublicDistrict;
 import sumcoda.boardbuddy.entity.PublicDistrict;
 import sumcoda.boardbuddy.enumerate.RadiusRange;
-import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictNotFoundException;
+import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
 import sumcoda.boardbuddy.repository.nearPublicDistric.NearPublicDistrictJdbcRepository;
 import sumcoda.boardbuddy.repository.nearPublicDistric.NearPublicDistrictRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
@@ -45,7 +45,7 @@ public class NearPublicDistrictService {
 
         // 기준 위치에 해당하는 행정 구역을 조회
         PublicDistrict publicDistrict = publicDistrictRepository.findBySidoAndSiguAndDong(baseLocation.getSido(), baseLocation.getSigu(), baseLocation.getDong())
-                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 기존에 저장된 주변 행정 구역 정보 조회
         List<NearPublicDistrictResponse.InfoDTO> existingNearbyDistricts = nearPublicDistrictRepository.findByPublicDistrictId(publicDistrict.getId());
@@ -127,7 +127,7 @@ public class NearPublicDistrictService {
 
         // 기준 위치에 해당하는 행정 구역을 조회
         PublicDistrict publicDistrict = publicDistrictRepository.findBySidoAndSiguAndDong(baseLocation.getSido(), baseLocation.getSigu(), baseLocation.getDong())
-                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 기존에 저장된 주변 행정 구역 정보 조회
         List<NearPublicDistrictResponse.InfoDTO> existingNearbyDistricts = nearPublicDistrictRepository.findByPublicDistrictId(publicDistrict.getId());

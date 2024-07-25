@@ -42,4 +42,19 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
                 .from(publicDistrict)
                 .fetch();
     }
+
+    public Optional<PublicDistrictResponse.LocationWithIdDTO> findOneWithIdBySidoAndSiguAndDong(String sido, String sigu, String dong) {
+
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(PublicDistrictResponse.LocationWithIdDTO.class,
+                        publicDistrict.sido,
+                        publicDistrict.sigu,
+                        publicDistrict.dong,
+                        publicDistrict.id))
+                .from(publicDistrict)
+                .where(publicDistrict.sido.eq(sido)
+                        .and(publicDistrict.sigu.eq(sigu))
+                        .and(publicDistrict.dong.eq(dong)))
+                .fetchOne());
+    }
 }

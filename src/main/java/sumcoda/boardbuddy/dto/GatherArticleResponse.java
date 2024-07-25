@@ -9,6 +9,7 @@ import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class GatherArticleResponse {
 
@@ -190,6 +191,69 @@ public class GatherArticleResponse {
             return GatherArticleResponse.DeleteDTO.builder()
                     .id(gatherArticle.getId())
                     .build();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ReadSliceDTO {
+        private Long id;
+        private String title;
+        private String description;
+        private AuthorSimpleDTO author;
+        private String meetingLocation;
+        private Integer maxParticipants;
+        private Integer currentParticipants;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime startDateTime;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime endDateTime;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime createdAt;
+        private GatherArticleStatus status;
+
+        @Builder
+        public ReadSliceDTO(Long id, String title, String description, AuthorSimpleDTO author, String meetingLocation,
+                            Integer maxParticipants, Integer currentParticipants, LocalDateTime startDateTime,
+                            LocalDateTime endDateTime, LocalDateTime createdAt, GatherArticleStatus status) {
+            this.id = id;
+            this.title = title;
+            this.description = description;
+            this.author = author;
+            this.meetingLocation = meetingLocation;
+            this.maxParticipants = maxParticipants;
+            this.currentParticipants = currentParticipants;
+            this.startDateTime = startDateTime;
+            this.endDateTime = endDateTime;
+            this.createdAt = createdAt;
+            this.status = status;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class AuthorSimpleDTO {
+        private String nickname;
+        private Integer rank;
+
+        @Builder
+        public AuthorSimpleDTO(String nickname, Integer rank) {
+            this.nickname = nickname;
+            this.rank = rank;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ReadListDTO {
+
+        private List<ReadSliceDTO> posts;
+        private Boolean last;
+
+        @Builder
+        public ReadListDTO(List<ReadSliceDTO> posts, Boolean last) {
+            this.posts = posts;
+            this.last = last;
         }
     }
 }

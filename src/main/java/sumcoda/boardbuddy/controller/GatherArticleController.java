@@ -5,10 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.GatherArticleRequest;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.dto.auth.oauth2.CustomOAuth2User;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
+import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 import sumcoda.boardbuddy.service.GatherArticleService;
 import sumcoda.boardbuddy.util.AuthUtil;
 
@@ -138,7 +142,23 @@ public class GatherArticleController {
             Authentication authentication
     ) {
         log.info("getGatherArticles is working");
-        String username = AuthUtil.getUserNameByLoginType(authentication);
+
+        if (authentication == null) {
+            throw new AuthenticationMissingException("유효하지 않은 사용자의 요청입니다.(인터셉터 동작)");
+        }
+
+        String username;
+
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            // OAuth2.0 사용자
+            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+            username = oauthUser.getUsername();
+
+            // 그외 사용자
+        } else {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = userDetails.getUsername();
+        }
 
         GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(
                 GatherArticleRequest.ReadListDTO.builder()

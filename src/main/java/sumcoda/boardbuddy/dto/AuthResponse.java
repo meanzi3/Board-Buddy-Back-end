@@ -3,7 +3,7 @@ package sumcoda.boardbuddy.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sumcoda.boardbuddy.enumerate.MemberRole;
+import sumcoda.boardbuddy.enumerate.Role;
 
 public class AuthResponse {
 
@@ -15,13 +15,13 @@ public class AuthResponse {
 
         private String password;
 
-        private MemberRole memberRole;
+        private Role role;
 
         @Builder
-        public ProfileDTO(String username, String password, MemberRole memberRole) {
+        public ProfileDTO(String username, String password, Role role) {
             this.username = username;
             this.password = password;
-            this.memberRole = memberRole;
+            this.role = role;
         }
     }
 }

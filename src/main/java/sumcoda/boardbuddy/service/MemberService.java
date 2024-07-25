@@ -9,7 +9,7 @@ import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.entity.Member;
-import sumcoda.boardbuddy.enumerate.MemberRole;
+import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.enumerate.ReviewType;
 import sumcoda.boardbuddy.exception.member.*;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
@@ -109,7 +109,7 @@ public class MemberService {
                 null,
                 null,
                 0.0,
-                MemberRole.USER,
+                Role.USER,
                 null)).getId();
 
         if (memberId == null) {
@@ -152,7 +152,7 @@ public class MemberService {
                 null,
                 null,
                 0.0,
-                MemberRole.USER,
+                Role.USER,
                 null)
         );
     }

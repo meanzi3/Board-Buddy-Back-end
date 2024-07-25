@@ -45,7 +45,6 @@ public class RankingService {
      * 랭킹 조회
      * @return TOP3 RankingsDTO list
      */
-    @Transactional(readOnly = true)
     public List<MemberResponse.RankingsDTO> getTop3Rankings(){
 
         return memberRepository.findTop3RankingMembers();

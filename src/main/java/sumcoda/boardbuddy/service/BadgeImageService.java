@@ -33,7 +33,6 @@ public class BadgeImageService {
      * @param nickname 사용자가 입력한 닉네임
      * @return 뱃지 이미지 URL 리스트
      **/
-    @Transactional
     public List<BadgeImageResponse.BadgeImageUrlDTO> getBadges (String nickname) {
         if (nickname == null) {
             throw new MemberRetrievalException("뱃지 조회 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
@@ -68,6 +67,7 @@ public class BadgeImageService {
      * @param top3MemberIds
      * @param lastMonth
      */
+    @Transactional
     public void assignBadgesToTopMembersByIds(List<Long> top3MemberIds, YearMonth lastMonth) {
         // 받을 뱃지의 년, 월 문자열 구하기 예: "202407"
         String lastMonthStr = lastMonth.format(DateTimeFormatter.ofPattern("yyyyMM"));

@@ -72,7 +72,7 @@ public class Member {
     // 사용자의 버디지수
     // 일반 로그인, 소셜 로그인 별도 설정 필요 없음
     @Column(nullable = false)
-    private Integer buddyScore;
+    private Double buddyScore;
 
     // 프로필에서 보여주기 위한 참여 횟수
     // 일반 로그인, 소셜 로그인 별도 설정 필요 없음
@@ -159,7 +159,7 @@ public class Member {
     private List<BadgeImage> badgeImages = new ArrayList<>();
 
     @Builder
-    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Integer buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberRole memberRole, ProfileImage profileImage) {
+    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberRole memberRole, ProfileImage profileImage) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
@@ -187,7 +187,7 @@ public class Member {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Integer buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberRole memberRole, ProfileImage profileImage) {
+    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberRole memberRole, ProfileImage profileImage) {
         return Member.builder()
                 .username(username)
                 .password(password)
@@ -309,5 +309,10 @@ public class Member {
     // 리뷰 보낸 횟수 수정 메서드
     public void assignSendReviewCount(Integer monthlySendReviewCount) {
         this.monthlySendReviewCount = monthlySendReviewCount;
+    }
+
+    // 버디 지수 수정 메서드
+    public void assignBuddyScore(Double buddyScore) {
+        this.buddyScore = buddyScore;
     }
 }

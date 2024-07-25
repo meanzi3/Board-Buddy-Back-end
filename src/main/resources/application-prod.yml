@@ -41,4 +41,3 @@ server:
         secure: true
         http-only: true
         same-site: None
-        domain:

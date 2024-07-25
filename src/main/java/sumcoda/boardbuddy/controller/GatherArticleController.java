@@ -4,10 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.GatherArticleRequest;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.dto.auth.oauth2.CustomOAuth2User;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
+import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 import sumcoda.boardbuddy.service.GatherArticleService;
 
 import java.util.List;
@@ -123,7 +128,7 @@ public class GatherArticleController {
      * @param page     페이지 번호
      * @param status   모집 상태 (옵션)
      * @param sort     정렬 기준 (옵션)
-     * @param username 사용자 이름
+     * @param authentication 사용자 이름
      * @return 모집글 리스트
      */
     @GetMapping("/api/gatherArticles")
@@ -131,8 +136,28 @@ public class GatherArticleController {
             @RequestParam Integer page,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String sort,
-            @RequestAttribute String username) {
+//            @RequestAttribute String username
+            Authentication authentication
+    ) {
         log.info("getGatherArticles is working");
+
+        if (authentication == null) {
+            throw new AuthenticationMissingException("유효하지 않은 사용자의 요청입니다.(인터셉터 동작)");
+        }
+
+        String username;
+
+        // OAuth2.0 사용자
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+            username = oauthUser.getUsername();
+
+            // 그외 사용자
+        } else {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = userDetails.getUsername();
+        }
+        log.info(username);
 
         GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(
                 GatherArticleRequest.ReadListDTO.builder()

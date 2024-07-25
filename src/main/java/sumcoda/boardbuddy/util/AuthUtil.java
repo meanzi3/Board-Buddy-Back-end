@@ -1,5 +1,6 @@
 package sumcoda.boardbuddy.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -8,6 +9,7 @@ import sumcoda.boardbuddy.dto.auth.oauth2.CustomOAuth2User;
 import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 
 @Component
+@Slf4j
 public class AuthUtil {
 
     /**
@@ -34,6 +36,7 @@ public class AuthUtil {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             username = userDetails.getUsername();
         }
+        log.info(username);
 
         return username;
     }

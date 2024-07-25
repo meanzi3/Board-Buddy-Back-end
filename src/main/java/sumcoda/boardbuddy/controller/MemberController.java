@@ -25,7 +25,6 @@ import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWit
 public class MemberController {
 
     private final MemberService memberService;
-    private final AuthUtil authUtil;
 
     /**
      * 아이디 중복 확인 요청
@@ -85,7 +84,7 @@ public class MemberController {
     public ResponseEntity<ApiResponse<Void>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO,
                                                             Authentication authentication) {
         log.info("social register is working");
-        String username = authUtil.getUserNameByLoginType(authentication);
+        String username = AuthUtil.getUserNameByLoginType(authentication);
         log.info("######################### username: " + username + " ######################################" );
 
         memberService.registerOAuth2Member(oAuth2RegisterDTO, username);

@@ -25,7 +25,7 @@ public class GatherArticleController {
 
     private final GatherArticleService gatherArticleService;
 
-    private final AuthUtil authUtil;
+//    private final AuthUtil authUtil;
 
     /**
      * 모집글 작성 컨트롤러
@@ -127,7 +127,7 @@ public class GatherArticleController {
      * @param page     페이지 번호
      * @param status   모집 상태 (옵션)
      * @param sort     정렬 기준 (옵션)
-     * @param username 사용자 이름
+     * @param authentication 사용자 이름
      * @return 모집글 리스트
      */
     @GetMapping("/api/gatherArticles")
@@ -138,7 +138,7 @@ public class GatherArticleController {
             Authentication authentication
     ) {
         log.info("getGatherArticles is working");
-        String username = authUtil.getUserNameByLoginType(authentication);
+        String username = AuthUtil.getUserNameByLoginType(authentication);
 
         GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(
                 GatherArticleRequest.ReadListDTO.builder()

@@ -82,7 +82,7 @@ public class MemberService {
     public void registerMember(MemberRequest.RegisterDTO registerDTO) {
 
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
-        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(
+        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findLocationDTOBySidoAndSiguAndDong(
                 registerDTO.getSido(), registerDTO.getSigu(), registerDTO.getDong())
                 .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
@@ -170,7 +170,7 @@ public class MemberService {
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
-        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(
+        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findLocationDTOBySidoAndSiguAndDong(
                 oAuth2RegisterDTO.getSido(), oAuth2RegisterDTO.getSigu(), oAuth2RegisterDTO.getDong())
                 .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
@@ -222,7 +222,7 @@ public class MemberService {
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
-        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(sido, sigu, dong)
+        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findLocationDTOBySidoAndSiguAndDong(sido, sigu, dong)
                 .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 멤버의 위치 업데이트

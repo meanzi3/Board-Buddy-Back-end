@@ -334,16 +334,16 @@ public class GatherArticleService {
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 기준 위치에 해당하는 행정 구역을 조회
-        PublicDistrictResponse.LocationWithIdDTO locationWithIdDTO = publicDistrictRepository.findOneWithIdBySidoAndSiguAndDong(
+        PublicDistrictResponse.LocationWithIdDTO locationWithIdDTO = publicDistrictRepository.findLocationWithIdDTOBySidoAndSiguAndDong(
                         locationWithRadiusDTO.getSido(), locationWithRadiusDTO.getSigu(), locationWithRadiusDTO.getDong())
                 .orElseThrow(() -> new PublicDistrictRetrievalException("유저의 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 사용자의 위치와 반경 정보로 주변 행정 구역 조회
-        List<NearPublicDistrictResponse.LocationDTO> locationDTOS = nearPublicDistrictRepository.findByPublicDistrictIdAndRadius(
+        List<NearPublicDistrictResponse.LocationDTO> locationDTOs = nearPublicDistrictRepository.findLocationDTOsByPublicDistrictIdAndRadius(
                 locationWithIdDTO.getId(), locationWithRadiusDTO.getRadius());
 
         // 주변 행정 구역이 없는 경우 예외 처리
-        if (locationDTOS.isEmpty()) {
+        if (locationDTOs.isEmpty()) {
             throw new NearPublicDistrictRetrievalException("유저의 주변 행정 구역을 찾을 수 없습니다. 관리자에게 문의하세요.");
         }
 
@@ -353,7 +353,7 @@ public class GatherArticleService {
         List<String> dongList = new ArrayList<>();
 
         // 주변 행정 구역 리스트에 데이터 추가
-        locationDTOS.forEach(district -> {
+        locationDTOs.forEach(district -> {
             sidoList.add(district.getSido());
             siguList.add(district.getSigu());
             dongList.add(district.getDong());
@@ -363,7 +363,7 @@ public class GatherArticleService {
         Pageable pageable = PageRequest.of(readListDTO.getPage(), PAGE_SIZE);
 
         // 모집글 리스트 조회
-        Slice<GatherArticleResponse.ReadSliceDTO> readSliceDTO = gatherArticleRepository.findGatherArticlesByLocationAndStatusAndSort(
+        Slice<GatherArticleResponse.ReadSliceDTO> readSliceDTO = gatherArticleRepository.findReadSliceDTOByLocationAndStatusAndSort(
                 sidoList, siguList, dongList, status, sort, pageable);
 
         // 모집글 리스트 DTO 생성 및 반환

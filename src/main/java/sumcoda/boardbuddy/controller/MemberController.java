@@ -86,6 +86,7 @@ public class MemberController {
                                                             Authentication authentication) {
         log.info("social register is working");
         String username = authUtil.getUserNameByLoginType(authentication);
+        log.info("######################### username: " + username + " ######################################" );
 
         memberService.registerOAuth2Member(oAuth2RegisterDTO, username);
 

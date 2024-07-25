@@ -16,6 +16,6 @@ public interface GatherArticleRepositoryCustom {
 
     long countGatherArticlesByMember(Member member, LocalDateTime startOfLastMonth, LocalDateTime endOfLastMonth);
 
-    Slice<GatherArticleResponse.ReadSliceDTO> findGatherArticlesByLocationAndStatusAndSort(
+    Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
             List<String> sidoList, List<String> siguList, List<String> dongList, String status, String sort, Pageable pageable);
 }

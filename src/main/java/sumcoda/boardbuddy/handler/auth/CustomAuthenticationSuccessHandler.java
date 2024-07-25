@@ -53,6 +53,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 .sigu(profileDTO.getSigu())
                 .dong(profileDTO.getDong())
                 .isPhoneNumberVerified(profileDTO.getPhoneNumber() != null)
+                .profileImageS3SavedURL(profileDTO.getProfileImageS3SavedURL())
                 .build();
 
         response.setStatus(HttpStatus.OK.value());

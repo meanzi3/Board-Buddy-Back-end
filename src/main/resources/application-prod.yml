@@ -15,7 +15,7 @@ spring:
       maximum-pool-size: 10
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
   data:
     redis:
       host: ${PROD_REDIS_HOST}

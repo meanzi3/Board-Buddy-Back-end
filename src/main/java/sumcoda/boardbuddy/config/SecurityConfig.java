@@ -111,14 +111,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(
-                                "/api/login/oauth2/code/**",
-                                "/api/auth/register",
-                                "/api/auth/check-username",
-                                "/api/auth/check-nickname",
-                                "/api/auth/sms-certifications/send",
-                                "/api/auth/sms-certifications/verify",
-                                "/api/auth/login",
-                                "/api/oauth2/**").permitAll()
+//                                "/api/login/oauth2/code/**",
+//                                "/api/auth/register",
+//                                "/api/auth/check-username",
+//                                "/api/auth/check-nickname",
+//                                "/api/auth/sms-certifications/send",
+//                                "/api/auth/sms-certifications/verify",
+//                                "/api/auth/login",
+//                                "/api/rankings",
+//                                "/api/oauth2/**",
+                                "/api/**"
+                        ).permitAll()
                         .anyRequest().authenticated())
 
                 // 추가 코드

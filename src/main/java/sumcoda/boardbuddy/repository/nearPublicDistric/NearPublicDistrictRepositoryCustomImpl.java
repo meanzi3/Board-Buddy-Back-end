@@ -15,7 +15,7 @@ public class NearPublicDistrictRepositoryCustomImpl implements NearPublicDistric
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<NearPublicDistrictResponse.InfoDTO> findByPublicDistrictId(Long publicDistrictId) {
+    public List<NearPublicDistrictResponse.InfoDTO> findInfoDTOsByPublicDistrictId(Long publicDistrictId) {
         return jpaQueryFactory
                 .select(Projections.fields(NearPublicDistrictResponse.InfoDTO.class,
                         nearPublicDistrict.sido,
@@ -28,7 +28,7 @@ public class NearPublicDistrictRepositoryCustomImpl implements NearPublicDistric
     }
 
     @Override
-    public List<NearPublicDistrictResponse.LocationDTO> findByPublicDistrictIdAndRadius(Long publicDistrictId, Integer radius) {
+    public List<NearPublicDistrictResponse.LocationDTO> findLocationDTOsByPublicDistrictIdAndRadius(Long publicDistrictId, Integer radius) {
         return jpaQueryFactory
                 .select(Projections.fields(NearPublicDistrictResponse.LocationDTO.class,
                         nearPublicDistrict.sido,

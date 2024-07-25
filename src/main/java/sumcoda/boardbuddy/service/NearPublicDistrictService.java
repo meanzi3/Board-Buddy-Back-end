@@ -48,7 +48,7 @@ public class NearPublicDistrictService {
                 .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 기존에 저장된 주변 행정 구역 정보 조회
-        List<NearPublicDistrictResponse.InfoDTO> existingNearbyDistricts = nearPublicDistrictRepository.findByPublicDistrictId(publicDistrict.getId());
+        List<NearPublicDistrictResponse.InfoDTO> existingNearbyDistricts = nearPublicDistrictRepository.findInfoDTOsByPublicDistrictId(publicDistrict.getId());
 
         // 기존 주변 구역이 있다면 해당 정보를 맵에 담아 반환
         if (!existingNearbyDistricts.isEmpty()) {
@@ -66,7 +66,7 @@ public class NearPublicDistrictService {
         // 추후 로직 적용
 
         // mariadb 를 사용해서 모든 행정 구역 정보를 조회(redis 장애 시 mariadb 에서 조회)
-        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllDistricts();
+        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllPublicDistrictInfoDTOs();
         // 데이터베이스에 새로 추가할 주변 행정 구역 리스트
         List<NearPublicDistrict> allNearPublicDistricts = new ArrayList<>();
 
@@ -130,7 +130,7 @@ public class NearPublicDistrictService {
                 .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 기존에 저장된 주변 행정 구역 정보 조회
-        List<NearPublicDistrictResponse.InfoDTO> existingNearbyDistricts = nearPublicDistrictRepository.findByPublicDistrictId(publicDistrict.getId());
+        List<NearPublicDistrictResponse.InfoDTO> existingNearbyDistricts = nearPublicDistrictRepository.findInfoDTOsByPublicDistrictId(publicDistrict.getId());
 
         // 기존에 저장된 주변 행정 구역이 있다면 바로 리턴
         if (!existingNearbyDistricts.isEmpty()) {
@@ -141,7 +141,7 @@ public class NearPublicDistrictService {
         // 추후 로직 적용
 
         // mariadb 를 사용해서 모든 행정 구역 정보를 조회
-        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllDistricts();
+        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllPublicDistrictInfoDTOs();
         // 데이터베이스에 새로 추가할 주변 행정 구역 리스트
         List<NearPublicDistrict> allNearPublicDistricts = new ArrayList<>();
 

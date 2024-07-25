@@ -82,7 +82,7 @@ public class GatherArticleRepositoryCustomImpl implements sumcoda.boardbuddy.rep
     }
 
     @Override
-    public Slice<GatherArticleResponse.ReadSliceDTO> findGatherArticlesByLocationAndStatusAndSort(
+    public Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
             List<String> sidoList, List<String> siguList, List<String> dongList, String status, String sort, Pageable pageable) {
 
         List<GatherArticleResponse.ReadSliceDTO> results = jpaQueryFactory.select(Projections.fields(

@@ -29,8 +29,6 @@ public class GatherArticleController {
 
     private final GatherArticleService gatherArticleService;
 
-//    private final AuthUtil authUtil;
-
     /**
      * 모집글 작성 컨트롤러
      *
@@ -131,7 +129,7 @@ public class GatherArticleController {
      * @param page     페이지 번호
      * @param status   모집 상태 (옵션)
      * @param sort     정렬 기준 (옵션)
-     * @param authentication 사용자 이름
+     * @param username 사용자 이름
      * @return 모집글 리스트
      */
     @GetMapping("/api/gatherArticles")
@@ -139,26 +137,9 @@ public class GatherArticleController {
             @RequestParam Integer page,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String sort,
-            Authentication authentication
+            @RequestAttribute String username
     ) {
         log.info("getGatherArticles is working");
-
-//        if (!authentication.isAuthenticated()) {
-//            throw new AuthenticationMissingException("유효하지 않은 사용자의 요청입니다.(인터셉터 동작)");
-//        }
-
-        String username;
-
-        if (authentication instanceof OAuth2AuthenticationToken) {
-            // OAuth2.0 사용자
-            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
-            username = oauthUser.getUsername();
-
-            // 그외 사용자
-        } else {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            username = userDetails.getUsername();
-        }
 
         GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(
                 GatherArticleRequest.ReadListDTO.builder()

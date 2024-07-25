@@ -143,7 +143,7 @@ public class GatherArticleController {
     ) {
         log.info("getGatherArticles is working");
 
-        if (authentication == null) {
+        if (!authentication.isAuthenticated()) {
             throw new AuthenticationMissingException("유효하지 않은 사용자의 요청입니다.(인터셉터 동작)");
         }
 

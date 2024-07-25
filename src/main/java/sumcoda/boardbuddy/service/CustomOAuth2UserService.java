@@ -87,7 +87,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .sigu(null)
                     .dong(null)
                     .radius(2)
-                    .buddyScore(50)
+                    .buddyScore(50.0)
                     .joinCount(0)
                     .monthlyExcellentCount(0)
                     .totalExcellentCount(0)
@@ -99,6 +99,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .monthlySendReviewCount(0)
                     .description(null)
                     .rank(null)
+                    .rankScore(0.0)
                     .memberRole(MemberRole.USER)
                     .profileImage(null)
                     .build();

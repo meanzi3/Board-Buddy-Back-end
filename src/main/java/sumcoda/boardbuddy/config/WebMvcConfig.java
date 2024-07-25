@@ -18,7 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor)
-                .addPathPatterns(List.of("/api/gatherArticles", "/api/auth/oauth2/register"))
+                .addPathPatterns(List.of("/api/gatherArticles"))
                 .excludePathPatterns(List.of(
                         "/api/auth/register",
                         "/api/auth/check-username",
@@ -27,9 +27,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/auth/sms-certifications/verify",
                         "/api/auth/login",
                         "/api/oauth2/**",
-                        "/api/login/oauth2/code/**"
-                        // 태스트
+                        "/api/login/oauth2/code/**",
 
+                        // 태스트
+                        "/api/auth/oauth2/register"
                        ));
         WebMvcConfigurer.super.addInterceptors(registry);
     }

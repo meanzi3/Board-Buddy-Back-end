@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.MemberRequest;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.MemberService;
+import sumcoda.boardbuddy.util.AuthUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,7 @@ import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWit
 public class MemberController {
 
     private final MemberService memberService;
+    private final AuthUtil authUtil;
 
     /**
      * 아이디 중복 확인 요청
@@ -75,13 +78,14 @@ public class MemberController {
      * 신규 소셜 로그인 사용자의 회원가입 요청 캐치
      *
      * @param oAuth2RegisterDTO 프론트로부터 전달받은 소셜 로그인 유저 회원가입 정보
-     * @param username 소셜 로그인 사용자 아이디
+     * @param authentication 소셜 로그인 사용자 아이디
      * @return 첫 소셜 로그인 사용자가 회원가입에 성공했다면 약속된 SuccessResponse 반환
      **/
     @PostMapping(value = "/api/auth/oauth2/register")
     public ResponseEntity<ApiResponse<Void>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO,
-                                                            @RequestAttribute String username) {
+                                                            Authentication authentication) {
         log.info("social register is working");
+        String username = authUtil.getUserNameByLoginType(authentication);
 
         memberService.registerOAuth2Member(oAuth2RegisterDTO, username);
 

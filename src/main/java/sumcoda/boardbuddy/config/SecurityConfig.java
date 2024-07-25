@@ -110,7 +110,15 @@ public class SecurityConfig {
                         .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers("/api/**", "/login/oauth2/code/**").permitAll()
+                        .requestMatchers(
+                                "/api/login/oauth2/code/**",
+                                "/api/auth/register",
+                                "/api/auth/check-username",
+                                "/api/auth/check-nickname",
+                                "/api/auth/sms-certifications/send",
+                                "/api/auth/sms-certifications/verify",
+                                "/api/auth/login",
+                                "/api/oauth2/**").permitAll()
                         .anyRequest().authenticated())
 
                 // 추가 코드

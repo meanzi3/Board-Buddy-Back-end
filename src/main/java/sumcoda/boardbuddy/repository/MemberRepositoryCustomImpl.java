@@ -6,16 +6,12 @@ import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.entity.Member;
-import sumcoda.boardbuddy.enumerate.GatherArticleRole;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static sumcoda.boardbuddy.entity.QBadgeImage.badgeImage;
-import static sumcoda.boardbuddy.entity.QComment.*;
 import static sumcoda.boardbuddy.entity.QMember.*;
-import static sumcoda.boardbuddy.entity.QMemberGatherArticle.*;
 import static sumcoda.boardbuddy.entity.QProfileImage.*;
 
 @RequiredArgsConstructor

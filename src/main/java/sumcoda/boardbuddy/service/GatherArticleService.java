@@ -279,7 +279,6 @@ public class GatherArticleService {
      * @param username 회원의 username
      * @return 내가 작성한 모집글 DTO 리스트
      **/
-    @Transactional
     public List<GatherArticleResponse.GatherArticleInfosDTO> getMyGatherArticles(String username) {
 
         if (username == null) {
@@ -295,7 +294,6 @@ public class GatherArticleService {
      * @param username 회원의 username
      * @return 참가한 모집글 DTO 리스트
      **/
-    @Transactional
     public List<GatherArticleResponse.GatherArticleInfosDTO> getMyParticipations(String username) {
 
         if (username == null) {

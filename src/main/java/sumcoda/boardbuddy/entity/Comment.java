@@ -108,4 +108,9 @@ public class Comment extends BaseTimeEntity {
             child.assignParent(this);
         }
     }
+
+    // 댓글 내용 수정 메서드
+    public void assignContent(String content) {
+        this.content = content;
+    }
 }

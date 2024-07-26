@@ -351,10 +351,14 @@ public class MemberService {
      * @param nickname 유저 닉네임
      * @return 해당 닉네임의 유저 프로필
      **/
-    @Transactional
     public MemberResponse.ProfileInfosDTO getMemberProfileByNickname(String nickname) {
+
+        if (nickname == null) {
+            throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
+        }
+
         return memberRepository.findMemberProfileByNickname(nickname)
-                .orElseThrow(() -> new MemberRetrievalException("유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                .orElseThrow(() -> new MemberRetrievalException("프로필을 조회할 수 없습니다. 관리자에게 문의하세요."));
     }
 
     /**

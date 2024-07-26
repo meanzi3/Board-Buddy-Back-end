@@ -61,7 +61,7 @@ public class MemberResponse {
 
         private Integer rank;
 
-        private Integer buddyScore;
+        private Double buddyScore;
 
         private List<String> badges;
 
@@ -74,7 +74,7 @@ public class MemberResponse {
         private Integer totalBadCount;
 
         @Builder(toBuilder = true)
-        public ProfileInfosDTO(String description, Integer rank, Integer buddyScore, List<String> badges, Integer joinCount, Integer totalExcellentCount, Integer totalGoodCount, Integer totalBadCount) {
+        public ProfileInfosDTO(String description, Integer rank, Double buddyScore, List<String> badges, Integer joinCount, Integer totalExcellentCount, Integer totalGoodCount, Integer totalBadCount) {
             this.description = description;
             this.rank = rank;
             this.buddyScore = buddyScore;

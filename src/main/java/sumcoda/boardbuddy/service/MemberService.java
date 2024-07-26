@@ -18,6 +18,7 @@ import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepo
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 import sumcoda.boardbuddy.util.FileStorageUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -397,26 +398,26 @@ public class MemberService {
         if (profileImageFile == null || profileImageFile.isEmpty()) {
             member.assignProfileImage(null);
         } else {
+            // 이미지 파일 형식 검증
+            String contentType = profileImageFile.getContentType();
+            if (contentType != null && !contentType.startsWith("multipart/form-data")) {
+                throw new InvalidFileFormatException("지원되지 않는 파일 형식입니다.");
+            }
             try {
-                if (!profileImageFile.isEmpty()) {
-                    // 이미지 파일 형식 검증
-                    String contentType = profileImageFile.getContentType();
-                    if (contentType != null && !contentType.startsWith("multipart/form-data")) {
-                        throw new InvalidFileFormatException("지원되지 않는 파일 형식입니다.");
-                    }
+                FileDTO fileDTO = FileStorageUtil.saveFile(profileImageFile);
+                String profileImageUrl = FileStorageUtil.getLocalStoreDir(fileDTO.getSavedFilename());
 
-                    FileDTO fileDTO = FileStorageUtil.saveFile(profileImageFile);
-                    String profileImageUrl = FileStorageUtil.getLocalStoreDir(fileDTO.getSavedFilename());
+                ProfileImage newProfileImage = ProfileImage.buildProfileImage(
+                        fileDTO.getOriginalFilename(),
+                        fileDTO.getSavedFilename(),
+                        profileImageUrl
+                );
 
-                    ProfileImage newProfileImage = ProfileImage.buildProfileImage(
-                            fileDTO.getOriginalFilename(),
-                            fileDTO.getSavedFilename(),
-                            profileImageUrl
-                    );
+                profileImageRepository.save(newProfileImage);
+                member.assignProfileImage(newProfileImage);
 
-                    profileImageRepository.save(newProfileImage);
-                    member.assignProfileImage(newProfileImage);
-                }
+                File file = fileDTO.getFile();
+                file.delete();
             } catch (IOException e) {
                 throw new ProfileImageSaveException("프로필 이미지를 저장하는 동안 오류가 발생했습니다.");
             }

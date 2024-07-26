@@ -20,4 +20,6 @@ public interface MemberRepositoryCustom {
     Optional<MemberResponse.ProfileInfosDTO> findMemberProfileByNickname(String nickname);
 
     Optional<MemberResponse.LocationWithRadiusDTO> findLocationWithRadiusDTOByUsername(String username);
+
+    Optional<MemberResponse.UserNameDTO> findUserNameDTOByUsername(String username);
 }

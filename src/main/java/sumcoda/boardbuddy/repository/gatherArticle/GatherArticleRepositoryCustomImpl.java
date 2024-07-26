@@ -23,7 +23,7 @@ import static sumcoda.boardbuddy.entity.QMemberGatherArticle.memberGatherArticle
 
 @Slf4j
 @RequiredArgsConstructor
-public class GatherArticleRepositoryCustomImpl implements sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepositoryCustom {
+public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 

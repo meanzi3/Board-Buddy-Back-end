@@ -3,7 +3,7 @@ package sumcoda.boardbuddy.dto.auth.oauth2;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import sumcoda.boardbuddy.enumerate.MemberRole;
+import sumcoda.boardbuddy.enumerate.Role;
 
 import java.util.*;
 
@@ -12,7 +12,7 @@ public class CustomOAuth2User implements OAuth2User {
 
     private final OAuth2UserInfo oAuth2UserInfo;
 
-    private final MemberRole role;
+    private final Role role;
 
     @Override
     public Map<String, Object> getAttributes() {

@@ -29,7 +29,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .select(Projections.fields(AuthResponse.ProfileDTO.class,
                         member.username,
                         member.password,
-                        member.memberRole
+                        member.role
                 ))
                 .from(member)
                 .where(member.username.eq(username))

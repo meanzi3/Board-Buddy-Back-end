@@ -78,15 +78,13 @@ public class MemberController {
      * 신규 소셜 로그인 사용자의 회원가입 요청 캐치
      *
      * @param oAuth2RegisterDTO 프론트로부터 전달받은 소셜 로그인 유저 회원가입 정보
-     * @param authentication 소셜 로그인 사용자 아이디
+     * @param username 소셜 로그인 사용자 아이디
      * @return 첫 소셜 로그인 사용자가 회원가입에 성공했다면 약속된 SuccessResponse 반환
      **/
     @PostMapping(value = "/api/auth/oauth2/register")
     public ResponseEntity<ApiResponse<Void>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO,
-                                                            Authentication authentication) {
+                                                            @RequestAttribute String username) {
         log.info("social register is working");
-        String username = AuthUtil.getUserNameByLoginType(authentication);
-        log.info("######################### username: " + username + " ######################################" );
 
         memberService.registerOAuth2Member(oAuth2RegisterDTO, username);
 

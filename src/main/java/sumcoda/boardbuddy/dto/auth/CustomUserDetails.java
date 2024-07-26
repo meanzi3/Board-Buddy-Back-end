@@ -17,12 +17,12 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (profileDTO.getMemberRole() == null) {
+        if (profileDTO.getRole() == null) {
             throw new MemberRoleMissingException("사용자의 권한이 누락되었습니다. 관리자에게 문의하세요.");
         }
         Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
-        grantedAuthorities.add((GrantedAuthority) () -> profileDTO.getMemberRole().getValue());
+        grantedAuthorities.add((GrantedAuthority) () -> profileDTO.getRole().getValue());
 
         return grantedAuthorities;
     }

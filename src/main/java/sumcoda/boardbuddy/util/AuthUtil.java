@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.dto.auth.oauth2.CustomOAuth2User;
 import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 
 @Slf4j
+@Component
 public class AuthUtil {
 
     /**
@@ -16,9 +18,9 @@ public class AuthUtil {
      * @param authentication 로그인 정보를 포함하는 사용자 객체
      * @return 사용자의 이름.
      */
-    public static String getUserNameByLoginType(Authentication authentication) {
+    public String getUserNameByLoginType(Authentication authentication) {
 
-        if (authentication == null) {
+        if (!authentication.isAuthenticated()) {
             throw new AuthenticationMissingException("유효하지 않은 사용자의 요청입니다.(인터셉터 동작)");
         }
 

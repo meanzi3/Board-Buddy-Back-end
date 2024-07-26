@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 import sumcoda.boardbuddy.dto.*;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.ProfileImage;
-import sumcoda.boardbuddy.enumerate.MemberRole;
 import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.enumerate.ReviewType;
 import sumcoda.boardbuddy.exception.member.*;
@@ -252,7 +251,7 @@ public class MemberService {
         // 멤버의 반경 업데이트
         member.assignRadius(radiusDTO.getRadius());
     }
-    
+
     /**
      * 리뷰 보내기 요청 캐치
      *

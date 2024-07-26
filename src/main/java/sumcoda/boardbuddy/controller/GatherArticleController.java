@@ -4,17 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.GatherArticleRequest;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
-import sumcoda.boardbuddy.dto.auth.oauth2.CustomOAuth2User;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
-import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 import sumcoda.boardbuddy.service.GatherArticleService;
-import sumcoda.boardbuddy.util.AuthUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -104,7 +98,7 @@ public class GatherArticleController {
 
         List<GatherArticleResponse.GatherArticleInfosDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
 
-        return buildSuccessResponseWithPairKeyData("gatherArticles", gatherArticles, "내 모집글이 성공적으로 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("gatherArticles", gatherArticles, "작성한 모집글이 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -120,7 +114,7 @@ public class GatherArticleController {
 
         List<GatherArticleResponse.GatherArticleInfosDTO> participations = gatherArticleService.getMyParticipations(username);
 
-        return buildSuccessResponseWithPairKeyData("participations", participations, "참가한 모집글이 성공적으로 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("participations", participations, "참여한 모집글이 조회되었습니다.", HttpStatus.OK);
     }
 
     /**

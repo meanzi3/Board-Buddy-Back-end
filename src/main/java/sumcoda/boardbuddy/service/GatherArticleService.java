@@ -8,7 +8,8 @@ import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
-import sumcoda.boardbuddy.enumerate.GatherArticleRole;
+import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
+import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleSaveException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleUpdateException;
@@ -57,8 +58,7 @@ public class GatherArticleService {
         // memberGatherArticle 생성
         MemberGatherArticle memberGatherArticle = MemberGatherArticle.buildMemberGatherArticle(
                 LocalDateTime.now(),
-                true,
-                GatherArticleRole.AUTHOR,
+                MemberGatherArticleRole.AUTHOR,
                 member,
                 gatherArticle
         );
@@ -251,11 +251,11 @@ public class GatherArticleService {
             return "none";
         }
         // 작성자
-        if (memberGatherArticle.getGatherArticleRole() == GatherArticleRole.AUTHOR) {
+        if (memberGatherArticle.getMemberGatherArticleRole() == MemberGatherArticleRole.AUTHOR) {
             return "author";
         }
         // 참가자
-        if (memberGatherArticle.getIsPermit()) {
+        if (memberGatherArticle.getParticipationApplication().getParticipationApplicationStatus() == ParticipationApplicationStatus.APPROVED) {
             return "permitted";
         }
         // 대기자

@@ -11,7 +11,7 @@ import sumcoda.boardbuddy.entity.ParticipationApplication;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
-import sumcoda.boardbuddy.exception.gatherArticle.ArticleClosedException;
+import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleClosedException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleRetrievalException;
 import sumcoda.boardbuddy.exception.gatherArticle.NotAuthorOfGatherArticleException;
@@ -236,7 +236,7 @@ public class ParticipationApplicationService {
                 .orElseThrow(() -> new GatherArticleNotFoundException("해당 모집글이 존재하지 않습니다."));
         // 모집글이 종료된 상태인지 확인
         if (gatherArticle.getGatherArticleStatus() == GatherArticleStatus.CLOSED) {
-            throw new ArticleClosedException("종료된 모집글에서는 참가 신청을 취소할 수 없습니다.");
+            throw new GatherArticleClosedException("종료된 모집글에서는 참가 신청을 취소할 수 없습니다.");
         }
 
         MemberGatherArticle memberGatherArticle = memberGatherArticleRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, username)

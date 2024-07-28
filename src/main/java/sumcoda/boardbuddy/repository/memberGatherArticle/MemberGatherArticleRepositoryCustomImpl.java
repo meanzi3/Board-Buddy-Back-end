@@ -55,12 +55,12 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
   // 유저와 모집글 사이에 isPermit 확인
   @Override
   public boolean isPermit(Long gatherArticleId, String username) {
-    Long count = queryFactory
+    Long count = jpaQueryFactory
             .select(memberGatherArticle.count())
             .from(memberGatherArticle)
             .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
                     .and(memberGatherArticle.member.username.eq(username))
-                    .and(memberGatherArticle.isPermit.eq(true)))
+                    .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.PARTICIPANT)))
             .fetchOne();
 
     return count != null && count > 0;

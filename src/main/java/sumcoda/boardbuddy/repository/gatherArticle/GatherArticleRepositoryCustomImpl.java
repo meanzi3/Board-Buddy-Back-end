@@ -82,14 +82,15 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         .and(member.username.eq(username)
                                 .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))))
                 .fetchOne() != null;
-    
+    }
+
     // 지난 달에 쓴 모집글 갯수 세기
     @Override
     public long countGatherArticlesByMember(Member member, LocalDateTime startOfLastMonth, LocalDateTime endOfLastMonth) {
         return jpaQueryFactory.select(memberGatherArticle.count())
                 .from(memberGatherArticle)
                 .where(memberGatherArticle.member.eq(member)
-                        .and(memberGatherArticle.gatherArticleRole.eq(GatherArticleRole.AUTHOR))
+                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
                         .and(memberGatherArticle.gatherArticle.createdAt.between(startOfLastMonth, endOfLastMonth)))
                 .fetchOne();
     }
@@ -112,7 +113,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.status))
+                        gatherArticle.gatherArticleStatus))
                 .from(gatherArticle)
                 .join(gatherArticle.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.member, member)
@@ -136,7 +137,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
     }
 
     private BooleanExpression eqStatus(String status) {
-        return status != null ? gatherArticle.status.eq(GatherArticleStatus.valueOf(status.toUpperCase())) : null;
+        return status != null ? gatherArticle.gatherArticleStatus.eq(GatherArticleStatus.valueOf(status.toUpperCase())) : null;
     }
 
     private BooleanExpression inLocation(List<String> sidoList, List<String> siguList, List<String> dongList) {

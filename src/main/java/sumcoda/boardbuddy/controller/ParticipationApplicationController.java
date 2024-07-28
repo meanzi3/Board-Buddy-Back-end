@@ -11,8 +11,7 @@ import sumcoda.boardbuddy.service.ParticipationApplicationService;
 import java.util.List;
 import java.util.Map;
 
-import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithData;
-import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithoutData;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -86,6 +85,6 @@ public class ParticipationApplicationController {
     @GetMapping("/api/gather-articles/{gatherArticleId}/participation")
     public ResponseEntity<ApiResponse<Map<String, List<ParticipationApplicationResponse.InfoDTO>>>> getParticipationRequestedMember(@PathVariable Long gatherArticleId, @RequestAttribute String username) {
         List<ParticipationApplicationResponse.InfoDTO> participationAppliedMemberList = participationApplicationService.getParticipationAppliedMemberList(gatherArticleId, username);
-        return buildSuccessResponseWithData("participationAppliedMemberList", participationAppliedMemberList, "해당 모집글의 참가 신청 목록을 성공적으로 조회했습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("participationAppliedMemberList", participationAppliedMemberList, "해당 모집글의 참가 신청 목록을 성공적으로 조회했습니다.", HttpStatus.OK);
     }
 }

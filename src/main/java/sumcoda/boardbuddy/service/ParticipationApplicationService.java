@@ -253,7 +253,7 @@ public class ParticipationApplicationService {
         // 사용자의 참가 신청 상태가 대기 또는 승인 상태인지 확인
         if (participationApplication.getParticipationApplicationStatus() != ParticipationApplicationStatus.PENDING &&
                 participationApplication.getParticipationApplicationStatus() != ParticipationApplicationStatus.APPROVED) {
-            throw new ParticipationApplicationNotPendingOrAcceptedException("참가신청 대기 또는 승인 상태가 아니므로 참가신청을 취소할 수 없습니다.");
+            throw new ParticipationApplicationNotPendingOrApproveException("참가신청 대기 또는 승인 상태가 아니므로 참가신청을 취소할 수 없습니다.");
         }
 
         // 모집글 작성자는 참가 취소를 할 수 없음

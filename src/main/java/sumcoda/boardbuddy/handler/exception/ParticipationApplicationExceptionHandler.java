@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
-import sumcoda.boardbuddy.exception.participationApplication.ParticipationApplicationNotPendingOrAcceptedException;
+import sumcoda.boardbuddy.exception.participationApplication.ParticipationApplicationNotPendingOrApproveException;
 import sumcoda.boardbuddy.exception.participationApplication.CannotReApplyAfterCancellationException;
 import sumcoda.boardbuddy.exception.participationApplication.*;
 
@@ -60,8 +60,8 @@ public class ParticipationApplicationExceptionHandler {
         return buildFailureResponse(e.getMessage(), HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(ParticipationApplicationNotPendingOrAcceptedException.class)
-    public ResponseEntity<ApiResponse<Void>> handleParticipationApplicationNotPendingOrAcceptedException(ParticipationApplicationNotPendingOrAcceptedException e) {
+    @ExceptionHandler(ParticipationApplicationNotPendingOrApproveException.class)
+    public ResponseEntity<ApiResponse<Void>> handleParticipationApplicationNotPendingOrApprovedException(ParticipationApplicationNotPendingOrApproveException e) {
         return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

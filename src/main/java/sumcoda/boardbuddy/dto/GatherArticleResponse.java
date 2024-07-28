@@ -125,7 +125,7 @@ public class GatherArticleResponse {
                     .startDateTime(gatherArticle.getStartDateTime())
                     .endDateTime(gatherArticle.getEndDateTime())
                     .createdAt(gatherArticle.getCreatedAt())
-                    .status(gatherArticle.getStatus())
+                    .status(gatherArticle.getGatherArticleStatus())
                     .participationStatus(participationStatus)
                     .build();
         }

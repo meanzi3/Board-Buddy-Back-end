@@ -5,8 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum GatherArticleRole {
+public enum MemberGatherArticleRole {
 
+    NONE("none"),
     AUTHOR("author"),
     PARTICIPANT("participant");
 

@@ -4,6 +4,7 @@ import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
 
+
 public interface MemberGatherArticleRepositoryCustom {
   Member findAuthorByGatherArticleId(Long gatherArticleId);
 

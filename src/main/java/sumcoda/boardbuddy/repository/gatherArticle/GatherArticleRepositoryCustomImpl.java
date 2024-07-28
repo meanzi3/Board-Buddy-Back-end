@@ -10,8 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 import sumcoda.boardbuddy.entity.Member;
-import sumcoda.boardbuddy.enumerate.GatherArticleRole;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 
 import java.time.LocalDateTime;
@@ -39,12 +39,13 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.status))
+                        gatherArticle.gatherArticleStatus
+                        ))
                 .from(member)
                 .join(member.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.gatherArticle, gatherArticle)
                 .where(member.username.eq(username)
-                        .and(memberGatherArticle.gatherArticleRole.eq(GatherArticleRole.AUTHOR)))
+                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)))
                 .fetch();
     }
 
@@ -60,16 +61,28 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.status))
+                        gatherArticle.gatherArticleStatus
+                ))
                 .from(member)
                 .join(member.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.gatherArticle, gatherArticle)
                 .where(member.username.eq(username)
-                        .and(memberGatherArticle.gatherArticleRole.eq(GatherArticleRole.PARTICIPANT))
-                        .and(memberGatherArticle.isPermit.eq(true)))
+                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.PARTICIPANT)))
                 .fetch();
     }
 
+    @Override
+    public Boolean isMemberAuthorOfGatherArticle(Long gatherArticleId, String username) {
+        return jpaQueryFactory
+                .selectOne()
+                .from(memberGatherArticle)
+                .leftJoin(memberGatherArticle.gatherArticle, gatherArticle)
+                .leftJoin(memberGatherArticle.member, member)
+                .where(gatherArticle.id.eq(gatherArticleId)
+                        .and(member.username.eq(username)
+                                .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))))
+                .fetchOne() != null;
+    
     // 지난 달에 쓴 모집글 갯수 세기
     @Override
     public long countGatherArticlesByMember(Member member, LocalDateTime startOfLastMonth, LocalDateTime endOfLastMonth) {

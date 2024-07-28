@@ -5,8 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sumcoda.boardbuddy.enumerate.MemberRole;
-import sumcoda.boardbuddy.enumerate.ReviewType;
+import sumcoda.boardbuddy.enumerate.Role;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +72,7 @@ public class Member {
     // 사용자의 버디지수
     // 일반 로그인, 소셜 로그인 별도 설정 필요 없음
     @Column(nullable = false)
-    private Integer buddyScore;
+    private Double buddyScore;
 
     // 프로필에서 보여주기 위한 참여 횟수
     // 일반 로그인, 소셜 로그인 별도 설정 필요 없음
@@ -128,11 +127,14 @@ public class Member {
     // 일반 로그인, 소셜 로그인 별도 설정 필요 없음
     private Integer rank;
 
-    // 사용자의 권한을 나타내기위한 memberRole
+    // 랭킹 산정을 위한 점수
+    private Double rankScore;
+
+    // 사용자의 권한을 나타내기위한 role
     // ex) ADMIN, USER
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private MemberRole memberRole;
+    private Role role;
 
     // 연관관게 주인
     // 단방향 연관관계
@@ -157,7 +159,7 @@ public class Member {
     private List<BadgeImage> badgeImages = new ArrayList<>();
 
     @Builder
-    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Integer buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, MemberRole memberRole, ProfileImage profileImage) {
+    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, Role role, ProfileImage profileImage) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
@@ -179,12 +181,13 @@ public class Member {
         this.monthlySendReviewCount = monthlySendReviewCount;
         this.description = description;
         this.rank = rank;
-        this.memberRole = memberRole;
+        this.rankScore = rankScore;
+        this.role = role;
         this.assignProfileImage(profileImage);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Integer buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, MemberRole memberRole, ProfileImage profileImage) {
+    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, Role role, ProfileImage profileImage) {
         return Member.builder()
                 .username(username)
                 .password(password)
@@ -207,7 +210,8 @@ public class Member {
                 .monthlySendReviewCount(monthlySendReviewCount)
                 .description(description)
                 .rank(rank)
-                .memberRole(memberRole)
+                .rankScore(rankScore)
+                .role(role)
                 .profileImage(profileImage)
                 .build();
     }
@@ -250,7 +254,7 @@ public class Member {
 
     // Member 1 <-> N BadgeImage
     // 양방향 연관관계 편의 메서드
-    public void addBadgeImage(sumcoda.boardbuddy.entity.BadgeImage badgeImage) {
+    public void addBadgeImage(BadgeImage badgeImage) {
         this.badgeImages.add(badgeImage);
 
         if (badgeImage.getMember() != this) {
@@ -265,6 +269,18 @@ public class Member {
 
     public void assignPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public void assignNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void assignPassword(String password) {
+        this.password = password;
+    }
+
+    public void assignDescription(String description) {
+        this.description = description;
     }
 
     public void assignSido(String sido) {
@@ -291,29 +307,24 @@ public class Member {
         this.radius = radius;
     }
 
-    // 리뷰 카운트 증가 메서드
-    public void assignReviewCount(ReviewType reviewType) {
-        switch (reviewType) {
-            case EXCELLENT:
-                this.monthlyExcellentCount++;
-                this.totalExcellentCount++;
-                break;
-            case GOOD:
-                this.monthlyGoodCount++;
-                this.totalGoodCount++;
-                break;
-            case BAD:
-                this.monthlyBadCount++;
-                this.totalBadCount++;
-                break;
-            case NOSHOW:
-                this.monthlyNoShowCount++;
-                break;
-        }
+    // 각 리뷰 카운트 수정 메서드
+    public void assignReviewCount(Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount) {
+        this.monthlyExcellentCount = monthlyExcellentCount;
+        this.totalExcellentCount = totalExcellentCount;
+        this.monthlyGoodCount = monthlyGoodCount;
+        this.totalGoodCount = totalGoodCount;
+        this.monthlyBadCount = monthlyBadCount;
+        this.totalBadCount = totalBadCount;
+        this.monthlyNoShowCount = monthlyNoShowCount;
     }
 
-    // 리뷰 보낸 횟수 증가 메서드
-    public void assignSendReviewCount() {
-        this.monthlySendReviewCount++;
+    // 리뷰 보낸 횟수 수정 메서드
+    public void assignSendReviewCount(Integer monthlySendReviewCount) {
+        this.monthlySendReviewCount = monthlySendReviewCount;
+    }
+
+    // 버디 지수 수정 메서드
+    public void assignBuddyScore(Double buddyScore) {
+        this.buddyScore = buddyScore;
     }
 }

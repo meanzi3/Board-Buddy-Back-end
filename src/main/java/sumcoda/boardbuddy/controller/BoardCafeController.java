@@ -16,7 +16,7 @@ import sumcoda.boardbuddy.service.BoardCafeService;
 import java.util.List;
 import java.util.Map;
 
-import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithData;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithPairKeyData;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,6 +50,6 @@ public class BoardCafeController {
                         .build()
                 , username);
 
-        return buildSuccessResponseWithData("cafes", cafes, "보드 게임 카페 조회를 성공하였습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("cafes", cafes, "보드 게임 카페 조회를 성공하였습니다.", HttpStatus.OK);
     }
 }

@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.entity.*;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
+import static sumcoda.boardbuddy.entity.QMemberGatherArticle.memberGatherArticle;
+
 @RequiredArgsConstructor
 public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArticleRepositoryCustom {
   private final JPAQueryFactory jpaQueryFactory;
@@ -48,5 +50,19 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
             .where(memberGatherArticle.gatherArticle.eq(gatherArticle)
                     .and(memberGatherArticle.member.eq(member)))
             .fetchOne();
+  }
+
+  // 유저와 모집글 사이에 isPermit 확인
+  @Override
+  public boolean isPermit(Long gatherArticleId, String username) {
+    Long count = queryFactory
+            .select(memberGatherArticle.count())
+            .from(memberGatherArticle)
+            .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
+                    .and(memberGatherArticle.member.username.eq(username))
+                    .and(memberGatherArticle.isPermit.eq(true)))
+            .fetchOne();
+
+    return count != null && count > 0;
   }
 }

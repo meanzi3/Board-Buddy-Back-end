@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum MemberRole {
+public enum Role {
 
-    ADMIN("admin"),
-    USER("user");
+    USER("USER"),
+    ADMIN("ADMIN");
 
     private final String value;
 }

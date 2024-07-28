@@ -1,10 +1,12 @@
 package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.boardbuddy.dto.GatherArticleRequest;
-import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.dto.*;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
@@ -14,12 +16,20 @@ import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleSaveException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleUpdateException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleAccessDeniedException;
+
+import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
+import sumcoda.boardbuddy.exception.gatherArticle.*;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
+import sumcoda.boardbuddy.exception.nearPublicDistrict.NearPublicDistrictRetrievalException;
+import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.MemberRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
+import sumcoda.boardbuddy.repository.nearPublicDistric.NearPublicDistrictRepository;
+import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,6 +42,12 @@ public class GatherArticleService {
     private final GatherArticleRepository gatherArticleRepository;
 
     private final MemberGatherArticleRepository memberGatherArticleRepository;
+
+    private final NearPublicDistrictRepository nearPublicDistrictRepository;
+
+    private final PublicDistrictRepository publicDistrictRepository;
+
+    private static final int PAGE_SIZE = 15;
 
     /**
      * 모집글 작성
@@ -268,7 +284,6 @@ public class GatherArticleService {
      * @param username 회원의 username
      * @return 내가 작성한 모집글 DTO 리스트
      **/
-    @Transactional
     public List<GatherArticleResponse.GatherArticleInfosDTO> getMyGatherArticles(String username) {
 
         if (username == null) {
@@ -284,7 +299,6 @@ public class GatherArticleService {
      * @param username 회원의 username
      * @return 참가한 모집글 DTO 리스트
      **/
-    @Transactional
     public List<GatherArticleResponse.GatherArticleInfosDTO> getMyParticipations(String username) {
 
         if (username == null) {
@@ -292,5 +306,73 @@ public class GatherArticleService {
         }
 
         return gatherArticleRepository.findParticipationsByUsername(username);
+    }
+
+    /**
+     * 모집글 리스트 조회
+     *
+     * @param readListDTO 모집글 리스트 조회 요청 DTO
+     * @param username    사용자 이름
+     * @return 모집글 리스트 DTO
+     */
+    public GatherArticleResponse.ReadListDTO getGatherArticles(GatherArticleRequest.ReadListDTO readListDTO, String username) {
+
+        // 사용자가 입력한 정렬 기준
+        String sort = readListDTO.getSort();
+        // 사용자가 입력한 모집글 상태
+        String status = readListDTO.getStatus();
+
+        // 정렬 기준 검증
+        if (sort != null && !sort.equals(GatherArticleStatus.SOON.getValue())) {
+            throw new GatherArticleSortException("유효하지 않은 정렬 기준입니다.");
+        }
+
+        // 모집글 상태 검증
+        if (status != null && !status.equals(GatherArticleStatus.OPEN.getValue())) {
+            throw new GatherArticleStatusException("유효하지 않은 모집글 상태입니다.");
+        }
+
+        // 사용자 위치 및 반경 정보 조회
+        MemberResponse.LocationWithRadiusDTO locationWithRadiusDTO = memberRepository.findLocationWithRadiusDTOByUsername(username)
+                .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        // 기준 위치에 해당하는 행정 구역을 조회
+        PublicDistrictResponse.LocationWithIdDTO locationWithIdDTO = publicDistrictRepository.findLocationWithIdDTOBySidoAndSiguAndDong(
+                        locationWithRadiusDTO.getSido(), locationWithRadiusDTO.getSigu(), locationWithRadiusDTO.getDong())
+                .orElseThrow(() -> new PublicDistrictRetrievalException("유저의 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        // 사용자의 위치와 반경 정보로 주변 행정 구역 조회
+        List<NearPublicDistrictResponse.LocationDTO> locationDTOs = nearPublicDistrictRepository.findLocationDTOsByPublicDistrictIdAndRadius(
+                locationWithIdDTO.getId(), locationWithRadiusDTO.getRadius());
+
+        // 주변 행정 구역이 없는 경우 예외 처리
+        if (locationDTOs.isEmpty()) {
+            throw new NearPublicDistrictRetrievalException("유저의 주변 행정 구역을 찾을 수 없습니다. 관리자에게 문의하세요.");
+        }
+
+        // 주변 행정 구역 리스트 생성
+        List<String> sidoList = new ArrayList<>();
+        List<String> siguList = new ArrayList<>();
+        List<String> dongList = new ArrayList<>();
+
+        // 주변 행정 구역 리스트에 데이터 추가
+        locationDTOs.forEach(district -> {
+            sidoList.add(district.getSido());
+            siguList.add(district.getSigu());
+            dongList.add(district.getDong());
+        });
+
+        // 페이징 정보 생성
+        Pageable pageable = PageRequest.of(readListDTO.getPage(), PAGE_SIZE);
+
+        // 모집글 리스트 조회
+        Slice<GatherArticleResponse.ReadSliceDTO> readSliceDTO = gatherArticleRepository.findReadSliceDTOByLocationAndStatusAndSort(
+                sidoList, siguList, dongList, status, sort, pageable);
+
+        // 모집글 리스트 DTO 생성 및 반환
+        return GatherArticleResponse.ReadListDTO.builder()
+                .posts(readSliceDTO.getContent())
+                .last(readSliceDTO.isLast())
+                .build();
     }
 }

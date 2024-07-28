@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static sumcoda.boardbuddy.builder.ResponseBuilder.*;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithMultiplePairKeyData;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class GatherArticleController {
             @RequestBody GatherArticleRequest.CreateDTO createRequest,
             @RequestAttribute String username){
         GatherArticleResponse.CreateDTO createResponse = gatherArticleService.createGatherArticle(createRequest, username);
-        return buildSuccessResponseWithData("post", createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
+        return buildSuccessResponseWithPairKeyData("post", createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
     }
 
     /**
@@ -49,7 +50,7 @@ public class GatherArticleController {
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username) {
         GatherArticleResponse.ReadDTO readResponse = gatherArticleService.getGatherArticle(gatherArticleId, username);
-        return buildSuccessResponseWithData("post", readResponse, "성공적으로 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("post", readResponse, "성공적으로 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -66,7 +67,7 @@ public class GatherArticleController {
             @RequestBody GatherArticleRequest.UpdateDTO updateRequest,
             @RequestAttribute String username) {
         GatherArticleResponse.UpdateDTO updateResponse = gatherArticleService.updateGatherArticle(gatherArticleId, updateRequest, username);
-        return buildSuccessResponseWithData("post", updateResponse, "모집글이 수정되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("post", updateResponse, "모집글이 수정되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -81,7 +82,7 @@ public class GatherArticleController {
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username){
         GatherArticleResponse.DeleteDTO deleteResponse = gatherArticleService.deleteGatherArticle(gatherArticleId, username);
-        return buildSuccessResponseWithData("post", deleteResponse, "모집글이 삭제되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("post", deleteResponse, "모집글이 삭제되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -97,7 +98,7 @@ public class GatherArticleController {
 
         List<GatherArticleResponse.GatherArticleInfosDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
 
-        return buildSuccessResponseWithData("gatherArticles", gatherArticles, "내 모집글이 성공적으로 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("gatherArticles", gatherArticles, "작성한 모집글이 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -113,7 +114,36 @@ public class GatherArticleController {
 
         List<GatherArticleResponse.GatherArticleInfosDTO> participations = gatherArticleService.getMyParticipations(username);
 
-        return buildSuccessResponseWithData("participations", participations, "참가한 모집글이 성공적으로 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("participations", participations, "참여한 모집글이 조회되었습니다.", HttpStatus.OK);
+    }
+
+    /**
+     * 모집글 리스트 조회 요청
+     *
+     * @param page     페이지 번호
+     * @param status   모집 상태 (옵션)
+     * @param sort     정렬 기준 (옵션)
+     * @param username 사용자 이름
+     * @return 모집글 리스트
+     */
+    @GetMapping("/api/gatherArticles")
+    public ResponseEntity<ApiResponse<GatherArticleResponse.ReadListDTO>> getGatherArticles(
+            @RequestParam Integer page,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String sort,
+            @RequestAttribute String username
+    ) {
+        log.info("getGatherArticles is working");
+
+        GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(
+                GatherArticleRequest.ReadListDTO.builder()
+                        .page(page)
+                        .status(status)
+                        .sort(sort)
+                        .build()
+                , username);
+
+        return buildSuccessResponseWithMultiplePairKeyData(posts, "모집글 리스트 조회를 성공하였습니다.", HttpStatus.OK);
     }
 }
 

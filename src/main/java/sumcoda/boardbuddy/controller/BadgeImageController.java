@@ -14,7 +14,7 @@ import sumcoda.boardbuddy.service.BadgeImageService;
 import java.util.List;
 import java.util.Map;
 
-import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithData;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithPairKeyData;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,6 +35,6 @@ public class BadgeImageController {
 
         List<BadgeImageResponse.BadgeImageUrlDTO> badgeImageListDTOs = badgeImageService.getBadges(nickname);
 
-        return buildSuccessResponseWithData("badges", badgeImageListDTOs,"뱃지가 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("badges", badgeImageListDTOs,"뱃지가 조회되었습니다.", HttpStatus.OK);
     }
 }

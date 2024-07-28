@@ -8,6 +8,7 @@ import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.exception.gatherArticle.*;
 import sumcoda.boardbuddy.exception.gatherArticle.NotAuthorOfGatherArticleException;
 
+
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildErrorResponse;
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildFailureResponse;
 
@@ -38,7 +39,7 @@ public class GatherArticleExceptionHandler {
     return buildFailureResponse(e.getMessage(), HttpStatus.FORBIDDEN);
   }
 
-  // 작성자 확인 예외 처리 핸들러
+
   @ExceptionHandler(GatherArticleClosedException.class)
   public ResponseEntity<ApiResponse<Void>> handleArticleClosedException(GatherArticleClosedException e) {
     return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -54,5 +55,15 @@ public class GatherArticleExceptionHandler {
     return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
+  // 유효하지 않은 정렬 기준 예외 처리 핸들러
+  @ExceptionHandler(GatherArticleSortException.class)
+  public ResponseEntity<ApiResponse<Void>> handleGatherArticleSortException(GatherArticleSortException e) {
+    return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+  }
 
+  // 유효하지 않은 모집글 상태 예외 처리 핸들러
+  @ExceptionHandler(GatherArticleStatusException.class)
+  public ResponseEntity<ApiResponse<Void>> handleGatherArticleStatusException(GatherArticleStatusException e) {
+    return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+  }
 }

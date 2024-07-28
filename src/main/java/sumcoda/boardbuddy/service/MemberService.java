@@ -4,19 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.boardbuddy.dto.MemberRequest;
-import sumcoda.boardbuddy.dto.MemberResponse;
-import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
-import sumcoda.boardbuddy.dto.PublicDistrictResponse;
+import org.springframework.web.multipart.MultipartFile;
+import sumcoda.boardbuddy.dto.*;
 import sumcoda.boardbuddy.entity.Member;
-import sumcoda.boardbuddy.enumerate.MemberRole;
+import sumcoda.boardbuddy.entity.ProfileImage;
+import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.enumerate.ReviewType;
 import sumcoda.boardbuddy.exception.member.*;
-import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictNotFoundException;
+import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.ProfileImageRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
+import sumcoda.boardbuddy.util.FileStorageUtil;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,8 @@ public class MemberService {
     private final NearPublicDistrictService nearPublicDistrictService;
 
     private final MemberGatherArticleRepository memberGatherArticleRepository;
+
+    private final ProfileImageRepository profileImageRepository;
 
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -82,9 +86,9 @@ public class MemberService {
     public void registerMember(MemberRequest.RegisterDTO registerDTO) {
 
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
-        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(
+        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findLocationDTOBySidoAndSiguAndDong(
                 registerDTO.getSido(), registerDTO.getSigu(), registerDTO.getDong())
-                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         Long memberId = memberRepository.save(Member.buildMember(
                 registerDTO.getUsername(),
@@ -96,7 +100,7 @@ public class MemberService {
                 registerDTO.getSigu(),
                 registerDTO.getDong(),
                 2,
-                50,
+                50.0,
                 0,
                 0,
                 0,
@@ -108,7 +112,8 @@ public class MemberService {
                 0,
                 null,
                 null,
-                MemberRole.USER,
+                0.0,
+                Role.USER,
                 null)).getId();
 
         if (memberId == null) {
@@ -138,7 +143,7 @@ public class MemberService {
                 "강남구",
                 "삼성동",
                 2,
-                50,
+                50.0,
                 0,
                 0,
                 0,
@@ -150,7 +155,8 @@ public class MemberService {
                 0,
                 null,
                 null,
-                MemberRole.USER,
+                0.0,
+                Role.USER,
                 null)
         );
     }
@@ -168,9 +174,9 @@ public class MemberService {
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
-        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(
+        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findLocationDTOBySidoAndSiguAndDong(
                 oAuth2RegisterDTO.getSido(), oAuth2RegisterDTO.getSigu(), oAuth2RegisterDTO.getDong())
-                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         member.assignPhoneNumber(oAuth2RegisterDTO.getPhoneNumber());
         member.assignSido(oAuth2RegisterDTO.getSido());
@@ -220,8 +226,8 @@ public class MemberService {
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 데이터베이스에 사용자가 입력한 행정 구역이 있는지 검증
-        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findOneBySidoAndSiguAndDong(sido, sigu, dong)
-                .orElseThrow(() -> new PublicDistrictNotFoundException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+        PublicDistrictResponse.LocationDTO baseLocation = publicDistrictRepository.findLocationDTOBySidoAndSiguAndDong(sido, sigu, dong)
+                .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 멤버의 위치 업데이트
         member.assignLocation(sido, sigu, dong);
@@ -247,17 +253,6 @@ public class MemberService {
     }
 
     /**
-     * 랭킹 조회
-     *
-     * @return TOP3 RankingsDTO list
-     */
-    @Transactional
-    public List<MemberResponse.RankingsDTO> getTop3Rankings(){
-
-        return memberRepository.findTop3RankingMembers();
-    }
-
-    /**
      * 리뷰 보내기 요청 캐치
      *
      * @param gatherArticleId 모집글 Id
@@ -271,10 +266,8 @@ public class MemberService {
                 .orElseThrow(() -> new MemberRetrievalException("리뷰를 보내는 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 리뷰를 보내는 유저가 해당 모집글에 참가했는지 확인
-        boolean isRelated = memberGatherArticleRepository.existsByGatherArticleIdAndMemberUsername(gatherArticleId, username);
-
-        if (!isRelated) {
-            throw new MemberNotJoinedGatherArticleException("잘못된 접근입니다.");
+        if (!memberGatherArticleRepository.isPermit(gatherArticleId, username)) {
+            throw new MemberNotJoinedGatherArticleException("리뷰를 보낼 권한이 없습니다.");
         }
 
         // 리뷰 받는 유저 조회
@@ -283,7 +276,150 @@ public class MemberService {
 
         ReviewType reviewType = ReviewType.valueOf(String.valueOf(reviewDTO.getReview()));
 
-        reviewee.assignReviewCount(reviewType);
-        reviewer.assignSendReviewCount();
+        incrementReviewCounts(reviewee, reviewType);
+        incrementSendReviewCount(reviewer);
+        updateBuddyScore(reviewee, reviewType);
+    }
+
+    /**
+     * 각 리뷰 카운트 증가 메서드
+     *
+     * @param reviewee 리뷰를 받는 유저
+     * @param reviewType 리뷰 타입
+     **/
+    private void incrementReviewCounts(Member reviewee, ReviewType reviewType) {
+        Integer newMonthlyExcellentCount = reviewee.getMonthlyExcellentCount();
+        Integer newTotalExcellentCount = reviewee.getTotalExcellentCount();
+        Integer newMonthlyGoodCount = reviewee.getMonthlyGoodCount();
+        Integer newTotalGoodCount = reviewee.getTotalGoodCount();
+        Integer newMonthlyBadCount = reviewee.getMonthlyBadCount();
+        Integer newTotalBadCount = reviewee.getTotalBadCount();
+        Integer newMonthlyNoShowCount = reviewee.getMonthlyNoShowCount();
+
+        switch (reviewType) {
+            case EXCELLENT:
+                newMonthlyExcellentCount++;
+                newTotalExcellentCount++;
+                break;
+            case GOOD:
+                newMonthlyGoodCount++;
+                newTotalGoodCount++;
+                break;
+            case BAD:
+                newMonthlyBadCount++;
+                newTotalBadCount++;
+                break;
+            case NOSHOW:
+                newMonthlyNoShowCount++;
+                break;
+        }
+
+        reviewee.assignReviewCount(newMonthlyExcellentCount, newTotalExcellentCount, newMonthlyGoodCount, newTotalGoodCount, newMonthlyBadCount, newTotalBadCount, newMonthlyNoShowCount);
+    }
+
+    /**
+     * 리뷰 보낸 횟수 증가 메서드
+     *
+     * @param reviewer 리뷰를 보낸 유저
+     **/
+    private void incrementSendReviewCount(Member reviewer) {
+        Integer newSendReviewCount = reviewer.getMonthlySendReviewCount() + 1;
+
+        reviewer.assignSendReviewCount(newSendReviewCount);
+    }
+
+    /**
+     * 버디지수 업데이트 메서드
+     *
+     * @param reviewee 리뷰를 받는 유저
+     * @param reviewType 리뷰 타입
+     **/
+    private void updateBuddyScore(Member reviewee, ReviewType reviewType) {
+        // 리뷰 타입에 따라 얻는 버디 지수
+        double gettingBuddyScore = reviewType.getScore();
+
+        // 새로 계산된 버디 지수
+        double newBuddyScore = reviewee.getBuddyScore() + gettingBuddyScore;
+
+        // 버디 지수 업데이트
+        reviewee.assignBuddyScore(newBuddyScore);
+    }
+
+    /**
+     * 프로필 조회 요청 캐치
+     *
+     * @param nickname 유저 닉네임
+     * @return 해당 닉네임의 유저 프로필
+     **/
+    public MemberResponse.ProfileInfosDTO getMemberProfileByNickname(String nickname) {
+
+        if (nickname == null) {
+            throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
+        }
+
+        return memberRepository.findMemberProfileByNickname(nickname)
+                .orElseThrow(() -> new MemberRetrievalException("프로필을 조회할 수 없습니다. 관리자에게 문의하세요."));
+    }
+
+    /**
+     * 프로필 수정 요청 캐치
+     *
+     * @param username 유저 아이디
+     * @param updateProfileDTO 수정할 정보가 담겨있는 DTO
+     * @param profileImageFile 수정할 프로필 이미지 파일
+     **/
+    @Transactional
+    public void updateProfile(String username, MemberRequest.UpdateProfileDTO updateProfileDTO, MultipartFile profileImageFile) {
+        // 유저 아이디로 조회
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberRetrievalException("유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        // 닉네임이 null이 아니면 업데이트
+        if (updateProfileDTO.getNickname() != null) {
+            member.assignNickname(updateProfileDTO.getNickname());
+        }
+
+        // 비밀번호가 null이 아니면 암호화 후 업데이트
+        if (updateProfileDTO.getPassword() != null && !updateProfileDTO.getPassword().isEmpty()) {
+            member.assignPassword(bCryptPasswordEncoder.encode(updateProfileDTO.getPassword()));
+        }
+
+        // 핸드폰 번호가 null이 아니면 업데이트
+        if (updateProfileDTO.getPhoneNumber() != null) {
+            member.assignPhoneNumber(updateProfileDTO.getPhoneNumber());
+        }
+
+        // 자기소개가 null이 아니면 업데이트
+        if (updateProfileDTO.getDescription() != null) {
+            member.assignDescription(updateProfileDTO.getDescription());
+        }
+
+        if (profileImageFile == null || profileImageFile.isEmpty()) {
+            member.assignProfileImage(null);
+        } else {
+            try {
+                if (!profileImageFile.isEmpty()) {
+                    // 이미지 파일 형식 검증
+                    String contentType = profileImageFile.getContentType();
+                    if (contentType != null && !contentType.startsWith("multipart/form-data")) {
+                        throw new InvalidFileFormatException("지원되지 않는 파일 형식입니다.");
+                    }
+
+                    FileDTO fileDTO = FileStorageUtil.saveFile(profileImageFile);
+                    String profileImageUrl = FileStorageUtil.getLocalStoreDir(fileDTO.getSavedFilename());
+
+                    ProfileImage newProfileImage = ProfileImage.buildProfileImage(
+                            fileDTO.getOriginalFilename(),
+                            fileDTO.getSavedFilename(),
+                            profileImageUrl
+                    );
+
+                    profileImageRepository.save(newProfileImage);
+                    member.assignProfileImage(newProfileImage);
+                }
+            } catch (IOException e) {
+                throw new ProfileImageSaveException("프로필 이미지를 저장하는 동안 오류가 발생했습니다.");
+            }
+        }
     }
 }

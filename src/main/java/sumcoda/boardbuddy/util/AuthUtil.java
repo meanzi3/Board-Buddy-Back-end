@@ -1,5 +1,6 @@
 package sumcoda.boardbuddy.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.dto.auth.oauth2.CustomOAuth2User;
 import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 
+@Slf4j
 @Component
 public class AuthUtil {
 
@@ -18,14 +20,14 @@ public class AuthUtil {
      */
     public String getUserNameByLoginType(Authentication authentication) {
 
-        if (authentication == null) {
+        if (!authentication.isAuthenticated()) {
             throw new AuthenticationMissingException("유효하지 않은 사용자의 요청입니다.(인터셉터 동작)");
         }
 
         String username;
 
-        // OAuth2.0 사용자
         if (authentication instanceof OAuth2AuthenticationToken) {
+            // OAuth2.0 사용자
             CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
             username = oauthUser.getUsername();
 

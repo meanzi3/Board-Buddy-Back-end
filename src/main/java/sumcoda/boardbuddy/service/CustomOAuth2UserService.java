@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import sumcoda.boardbuddy.dto.auth.oauth2.*;
 import sumcoda.boardbuddy.entity.Member;
-import sumcoda.boardbuddy.enumerate.MemberRole;
+import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.exception.auth.ClientRegistrationRetrievalException;
 import sumcoda.boardbuddy.exception.auth.SocialUserInfoRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
@@ -70,7 +70,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 유저 이름을 바탕으로 DB 조회
         Member findMember = memberRepository.findByUsername(username).orElse(null);
 
-        MemberRole role = MemberRole.USER;
+        Role role = Role.USER;
 
         SecureRandom secureRandom = new SecureRandom();
         int randomNumber = 10000000 + secureRandom.nextInt(90000000);
@@ -87,7 +87,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .sigu(null)
                     .dong(null)
                     .radius(2)
-                    .buddyScore(50)
+                    .buddyScore(50.0)
                     .joinCount(0)
                     .monthlyExcellentCount(0)
                     .totalExcellentCount(0)
@@ -99,7 +99,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .monthlySendReviewCount(0)
                     .description(null)
                     .rank(null)
-                    .memberRole(MemberRole.USER)
+                    .rankScore(0.0)
+                    .role(Role.USER)
                     .profileImage(null)
                     .build();
 
@@ -109,7 +110,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         } else {
 
             // 해당 유저가 특정 경로에 접근할때 인가 작업에 필요한 role 값 업데이트
-            role = findMember.getMemberRole();
+            role = findMember.getRole();
 
             // Dirty Checking 으로 업데이트 값 자동으로 DB 반영
             findMember.assignEmail(oAuth2UserInfo.getEmail());

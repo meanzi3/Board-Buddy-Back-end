@@ -41,4 +41,22 @@ public class PublicDistrictResponse {
             this.dong = dong;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class LocationWithIdDTO {
+
+        private String sido;
+        private String sigu;
+        private String dong;
+        private Long id;
+
+        @Builder
+        public LocationWithIdDTO(String sido, String sigu, String dong, Long id) {
+            this.sido = sido;
+            this.sigu = sigu;
+            this.dong = dong;
+            this.id = id;
+        }
+    }
 }

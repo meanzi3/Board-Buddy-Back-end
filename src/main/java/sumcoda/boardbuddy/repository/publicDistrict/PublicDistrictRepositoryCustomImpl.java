@@ -15,7 +15,7 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Optional<PublicDistrictResponse.LocationDTO> findOneBySidoAndSiguAndDong(String sido, String sigu, String dong) {
+    public Optional<PublicDistrictResponse.LocationDTO> findLocationDTOBySidoAndSiguAndDong(String sido, String sigu, String dong) {
 
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(PublicDistrictResponse.LocationDTO.class,
@@ -30,7 +30,7 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
     }
 
     @Override
-    public List<PublicDistrictResponse.InfoDTO> findAllDistricts() {
+    public List<PublicDistrictResponse.InfoDTO> findAllPublicDistrictInfoDTOs() {
 
         return jpaQueryFactory
                 .select(Projections.fields(PublicDistrictResponse.InfoDTO.class,
@@ -41,5 +41,20 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
                         publicDistrict.longitude))
                 .from(publicDistrict)
                 .fetch();
+    }
+
+    public Optional<PublicDistrictResponse.LocationWithIdDTO> findLocationWithIdDTOBySidoAndSiguAndDong(String sido, String sigu, String dong) {
+
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(PublicDistrictResponse.LocationWithIdDTO.class,
+                        publicDistrict.sido,
+                        publicDistrict.sigu,
+                        publicDistrict.dong,
+                        publicDistrict.id))
+                .from(publicDistrict)
+                .where(publicDistrict.sido.eq(sido)
+                        .and(publicDistrict.sigu.eq(sigu))
+                        .and(publicDistrict.dong.eq(dong)))
+                .fetchOne());
     }
 }

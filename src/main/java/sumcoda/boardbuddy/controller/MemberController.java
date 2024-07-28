@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sumcoda.boardbuddy.dto.MemberRequest;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
@@ -14,7 +15,7 @@ import sumcoda.boardbuddy.service.MemberService;
 import java.util.List;
 import java.util.Map;
 
-import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithData;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithPairKeyData;
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithoutData;
 
 @RestController
@@ -79,7 +80,8 @@ public class MemberController {
      * @return 첫 소셜 로그인 사용자가 회원가입에 성공했다면 약속된 SuccessResponse 반환
      **/
     @PostMapping(value = "/api/auth/oauth2/register")
-    public ResponseEntity<ApiResponse<Void>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO, @RequestAttribute String username) {
+    public ResponseEntity<ApiResponse<Void>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO,
+                                                            @RequestAttribute String username) {
         log.info("social register is working");
 
         memberService.registerOAuth2Member(oAuth2RegisterDTO, username);
@@ -115,7 +117,7 @@ public class MemberController {
 
         Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> locations = memberService.updateMemberLocation(locationDTO, username);
 
-        return buildSuccessResponseWithData("locations", locations, "위치 정보 설정을 성공하였습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("locations", locations, "위치 정보 설정을 성공하였습니다.", HttpStatus.OK);
     }
 
     /**
@@ -137,17 +139,6 @@ public class MemberController {
     }
 
     /**
-     * 랭킹 조회 요청 캐치
-     *
-     * @return TOP3 리스트를 조회하여 약속된 SuccessResponse 반환
-     */
-    @GetMapping("/api/rankings")
-    public ResponseEntity<ApiResponse<Map<String, List<MemberResponse.RankingsDTO>>>> getTop3Rankings() {
-        List<MemberResponse.RankingsDTO> rankingsDTO = memberService.getTop3Rankings();
-        return buildSuccessResponseWithData("rankings", rankingsDTO,"랭킹 조회에 성공했습니다.", HttpStatus.OK);
-    }
-
-    /**
      * 리뷰 보내기 요청 캐치
      *
      * @param gatherArticleId 모집글 Id
@@ -165,5 +156,40 @@ public class MemberController {
         memberService.sendReview(gatherArticleId, reviewDTO, username);
 
         return buildSuccessResponseWithoutData("후기가 전송되었습니다.", HttpStatus.OK);
+    }
+
+    /**
+     * 프로필 조회 요청 캐치
+     *
+     * @param nickname 유저 닉네임
+     * @return 프로필 조회가 성공했다면 약속된 SuccessResponse 반환
+     **/
+    @GetMapping("/api/profiles/{nickname}")
+    public ResponseEntity<ApiResponse<Map<String, MemberResponse.ProfileInfosDTO>>> getMemberProfileByNickname (@PathVariable String nickname) {
+        log.info("get member profile is working");
+
+        MemberResponse.ProfileInfosDTO profileInfosDTO = memberService.getMemberProfileByNickname(nickname);
+
+        return buildSuccessResponseWithPairKeyData("profile", profileInfosDTO, "프로필이 조회되었습니다.", HttpStatus.OK);
+    }
+
+    /**
+     * 프로필 수정 요청 캐치
+     *
+     * @param username         유저 아이디
+     * @param updateProfileDTO 수정할 정보가 담겨있는 DTO
+     * @param profileImageFile 수정할 프로필 이미지 파일
+     * @return 프로필 조회가 성공했다면 약속된 SuccessResponse 반환
+     **/
+    @PutMapping("/api/profiles")
+    public ResponseEntity<ApiResponse<Void>> updateProfile(
+            @RequestAttribute String username,
+            @RequestPart(value = "UpdateProfileDTO") MemberRequest.UpdateProfileDTO updateProfileDTO,
+            @RequestPart(value = "profileImageFile", required = false) MultipartFile profileImageFile) {
+        log.info("update Profile is working");
+
+        memberService.updateProfile(username, updateProfileDTO, profileImageFile);
+
+        return buildSuccessResponseWithoutData("프로필이 수정되었습니다.", HttpStatus.OK);
     }
 }

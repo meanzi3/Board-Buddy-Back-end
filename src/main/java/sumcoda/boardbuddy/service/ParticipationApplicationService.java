@@ -8,10 +8,8 @@ import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
 import sumcoda.boardbuddy.entity.ParticipationApplication;
-import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
-import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleClosedException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleRetrievalException;
 import sumcoda.boardbuddy.exception.gatherArticle.NotAuthorOfGatherArticleException;
@@ -61,17 +59,17 @@ public class ParticipationApplicationService {
 
             // 해당 모집글에 이미 참가 확정이 되었는지 확인
             if (participationApplication.getParticipationApplicationStatus() == ParticipationApplicationStatus.APPROVED){
-                throw new AlreadyApprovedParticipantException("이미 참가 승인된 모집글 입니다.");
+                throw new AlreadyApprovedParticipantException("이미 참가 승인된 모집글입니다.");
             }
 
             // 동일한 모집글의 참가신청 거절 이력이 3번을 초과하는지 확인
             if (participationApplication.getParticipationApplicationStatus() == ParticipationApplicationStatus.REJECTED) {
-                throw new MaxRejectionsExceededException("동일한 모집글에 대해서 3번이상 거절 당했으므로, 더 이상 참가 신청할 수 없는 사용자입니다.");
+                throw new MaxRejectionsExceededException("동일한 모집글에 대해서 3번이상 거절 당했으므로, 더 이상 참가 신청할 수 없는 모집글입니다.");
             }
 
             // 본인이 참가 취소 신청을 했는지 확인
             if (participationApplication.getParticipationApplicationStatus() == ParticipationApplicationStatus.CANCELED) {
-                throw new CannotReApplyAfterCancellationException("참가 신청자 본인의 참가 취소 신청으로 인해 동일한 모집글에 다시 참여 신청할 수 없는 사용자입니다.");
+                throw new CannotReApplyAfterCancellationException("참가 신청자 본인의 참가취소로 인해 동일한 모집글에 다시 참가 신청할 수 없는 모집글입니다.");
             }
 
             // 참가 인원 정원을 초과한 참가 신청인지 확인
@@ -138,7 +136,7 @@ public class ParticipationApplicationService {
 
         // 해당 모집글에 이미 참가 완료 되었는지 확인
         if (participationApplication.getParticipationApplicationStatus() == ParticipationApplicationStatus.APPROVED) {
-            throw new AlreadyApprovedParticipantException("이미 참가 승인된 사용자 입니다.");
+            throw new AlreadyApprovedParticipantException("이미 참가 승인된 사용자입니다.");
         }
 
         // 동일한 모집글의 참가신청 거절 이력이 3번을 초과하는지 확인
@@ -198,14 +196,14 @@ public class ParticipationApplicationService {
         ParticipationApplication participationApplication = participationApplicationRepository.findById(participationApplicationId)
                 .orElseThrow(() -> new ParticipationApplicationNotFoundException("유효하지 않은 참가 신청입니다."));
 
-        // 동일한 모집글의 참가신청 거절 이력이 3번을 초과하는지 확인
-        if (participationApplication.getParticipationApplicationStatus() == ParticipationApplicationStatus.REJECTED) {
-            throw new MaxRejectionsExceededException("동일한 모집글에 대해서 3번이상 거절 당했으므로, 더 이상 참가 신청할 수 없는 사용자입니다.");
-        }
-
         // 해당 모집글에 이미 참가 확정이 되었는지 확인
         if (participationApplication.getParticipationApplicationStatus() == ParticipationApplicationStatus.APPROVED) {
             throw new AlreadyApprovedParticipantException("이미 참가 승인된 사용자 입니다.");
+        }
+
+        // 동일한 모집글의 참가신청 거절 이력이 3번을 초과하는지 확인
+        if (participationApplication.getParticipationApplicationStatus() == ParticipationApplicationStatus.REJECTED) {
+            throw new MaxRejectionsExceededException("동일한 모집글에 대해서 3번이상 거절 당했으므로, 더 이상 참가 신청할 수 없는 사용자입니다.");
         }
 
         // 해당 유저의 참가신청 상태 수정
@@ -234,10 +232,6 @@ public class ParticipationApplicationService {
 
         GatherArticle gatherArticle = gatherArticleRepository.findById(gatherArticleId)
                 .orElseThrow(() -> new GatherArticleNotFoundException("해당 모집글이 존재하지 않습니다."));
-        // 모집글이 종료된 상태인지 확인
-        if (gatherArticle.getGatherArticleStatus() == GatherArticleStatus.CLOSED) {
-            throw new GatherArticleClosedException("종료된 모집글에서는 참가 신청을 취소할 수 없습니다.");
-        }
 
         MemberGatherArticle memberGatherArticle = memberGatherArticleRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, username)
                 .orElseThrow(() -> new MemberGatherArticleRetrievalException("서버 문제로 해당 모집글 관련한 사용자의 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
@@ -290,7 +284,7 @@ public class ParticipationApplicationService {
         Boolean isMemberAuthorOfGatherArticle = gatherArticleRepository.isMemberAuthorOfGatherArticle(gatherArticleId, username);
 
         if (!isMemberAuthorOfGatherArticle) {
-            throw new NotAuthorOfGatherArticleException("해당 모집글의 작성자가 아니므로 참가신청 현황을 조회할 수 없습니다.");
+            throw new NotAuthorOfGatherArticleException("해당 모집글의 작성자가 아니므로 참가신청 목록을 조회할 수 없습니다.");
         }
 
         // 참가 신청 현황 조회

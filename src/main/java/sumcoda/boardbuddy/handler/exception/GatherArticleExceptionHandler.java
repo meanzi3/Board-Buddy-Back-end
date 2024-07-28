@@ -5,11 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
-import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
-import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleSaveException;
-import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleUpdateException;
-import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleAccessDeniedException;
+import sumcoda.boardbuddy.exception.gatherArticle.*;
+import sumcoda.boardbuddy.exception.gatherArticle.NotAuthorOfGatherArticleException;
 
+import static sumcoda.boardbuddy.builder.ResponseBuilder.buildErrorResponse;
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildFailureResponse;
 
 @RestControllerAdvice
@@ -37,6 +36,22 @@ public class GatherArticleExceptionHandler {
   @ExceptionHandler(GatherArticleAccessDeniedException.class)
   public ResponseEntity<ApiResponse<Void>> handleGatherArticleAccessDeniedException(GatherArticleAccessDeniedException e) {
     return buildFailureResponse(e.getMessage(), HttpStatus.FORBIDDEN);
+  }
+
+  // 작성자 확인 예외 처리 핸들러
+  @ExceptionHandler(GatherArticleClosedException.class)
+  public ResponseEntity<ApiResponse<Void>> handleArticleClosedException(GatherArticleClosedException e) {
+    return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(NotAuthorOfGatherArticleException.class)
+  public ResponseEntity<ApiResponse<Void>> handleNotAuthorOfGatherArticleException(NotAuthorOfGatherArticleException e) {
+    return buildFailureResponse(e.getMessage(), HttpStatus.FORBIDDEN);
+  }
+
+  @ExceptionHandler(GatherArticleRetrievalException.class)
+  public ResponseEntity<ApiResponse<Void>> handleGatherArticleRetrievalException(GatherArticleRetrievalException e) {
+    return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
 

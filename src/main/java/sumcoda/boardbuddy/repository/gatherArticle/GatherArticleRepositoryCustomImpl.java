@@ -5,7 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
-import sumcoda.boardbuddy.enumerate.GatherArticleRole;
+import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import static sumcoda.boardbuddy.entity.QMemberGatherArticle.memberGatherArticle
 
 @Slf4j
 @RequiredArgsConstructor
-public class GatherArticleRepositoryCustomImpl implements sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepositoryCustom {
+public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -31,12 +31,13 @@ public class GatherArticleRepositoryCustomImpl implements sumcoda.boardbuddy.rep
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.status))
+                        gatherArticle.gatherArticleStatus
+                        ))
                 .from(member)
                 .join(member.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.gatherArticle, gatherArticle)
                 .where(member.username.eq(username)
-                        .and(memberGatherArticle.gatherArticleRole.eq(GatherArticleRole.AUTHOR)))
+                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)))
                 .fetch();
     }
 
@@ -52,13 +53,26 @@ public class GatherArticleRepositoryCustomImpl implements sumcoda.boardbuddy.rep
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.status))
+                        gatherArticle.gatherArticleStatus
+                ))
                 .from(member)
                 .join(member.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.gatherArticle, gatherArticle)
                 .where(member.username.eq(username)
-                        .and(memberGatherArticle.gatherArticleRole.eq(GatherArticleRole.PARTICIPANT))
-                        .and(memberGatherArticle.isPermit.eq(true)))
+                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.PARTICIPANT)))
                 .fetch();
+    }
+
+    @Override
+    public Boolean isMemberAuthorOfGatherArticle(Long gatherArticleId, String username) {
+        return jpaQueryFactory
+                .selectOne()
+                .from(memberGatherArticle)
+                .leftJoin(memberGatherArticle.gatherArticle, gatherArticle)
+                .leftJoin(memberGatherArticle.member, member)
+                .where(gatherArticle.id.eq(gatherArticleId)
+                        .and(member.username.eq(username)
+                                .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))))
+                .fetchOne() != null;
     }
 }

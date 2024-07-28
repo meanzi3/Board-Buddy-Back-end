@@ -2,26 +2,23 @@ package sumcoda.boardbuddy.repository.memberGatherArticle;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import sumcoda.boardbuddy.entity.GatherArticle;
-import sumcoda.boardbuddy.entity.Member;
-import sumcoda.boardbuddy.entity.MemberGatherArticle;
-import sumcoda.boardbuddy.entity.QMemberGatherArticle;
-import sumcoda.boardbuddy.enumerate.GatherArticleRole;
+import sumcoda.boardbuddy.entity.*;
+import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
 @RequiredArgsConstructor
-public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArticleRepositoryCustom{
-  private final JPAQueryFactory queryFactory;
+public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArticleRepositoryCustom {
+  private final JPAQueryFactory jpaQueryFactory;
 
   // 모집글의 작성자를 찾음
   @Override
   public Member findAuthorByGatherArticleId(Long gatherArticleId) {
     QMemberGatherArticle memberGatherArticle = QMemberGatherArticle.memberGatherArticle;
 
-    return queryFactory
+    return jpaQueryFactory
             .select(memberGatherArticle.member)
             .from(memberGatherArticle)
             .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
-                    .and(memberGatherArticle.gatherArticleRole.eq(GatherArticleRole.AUTHOR)))
+                    .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)))
             .fetchOne();
   }
 
@@ -30,12 +27,12 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
   public boolean isAuthor(Long gatherArticleId, Long memberId) {
     QMemberGatherArticle memberGatherArticle = QMemberGatherArticle.memberGatherArticle;
 
-    Long count = queryFactory
+    Long count = jpaQueryFactory
             .select(memberGatherArticle.count())
             .from(memberGatherArticle)
             .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
                     .and(memberGatherArticle.member.id.eq(memberId))
-                    .and(memberGatherArticle.gatherArticleRole.eq(GatherArticleRole.AUTHOR)))
+                    .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)))
             .fetchOne();
 
     return count != null && count > 0;
@@ -46,7 +43,7 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
   public MemberGatherArticle findByGatherArticleAndMember(GatherArticle gatherArticle, Member member) {
     QMemberGatherArticle memberGatherArticle = QMemberGatherArticle.memberGatherArticle;
 
-    return queryFactory
+    return jpaQueryFactory
             .selectFrom(memberGatherArticle)
             .where(memberGatherArticle.gatherArticle.eq(gatherArticle)
                     .and(memberGatherArticle.member.eq(member)))

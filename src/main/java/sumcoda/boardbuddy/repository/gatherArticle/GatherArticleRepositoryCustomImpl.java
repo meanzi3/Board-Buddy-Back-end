@@ -16,6 +16,7 @@ import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static sumcoda.boardbuddy.entity.QGatherArticle.gatherArticle;
 import static sumcoda.boardbuddy.entity.QMember.member;
@@ -93,6 +94,16 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
                         .and(memberGatherArticle.gatherArticle.createdAt.between(startOfLastMonth, endOfLastMonth)))
                 .fetchOne();
+    }
+
+    @Override
+    public Optional<GatherArticleResponse.IdDTO> findIdDTOById(Long gatherArticleId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(GatherArticleResponse.IdDTO.class,
+                        gatherArticle.id))
+                .from(gatherArticle)
+                .where(gatherArticle.id.eq(gatherArticleId))
+                .fetchOne());
     }
 
     @Override

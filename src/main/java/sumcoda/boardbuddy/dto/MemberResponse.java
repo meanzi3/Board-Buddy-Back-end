@@ -103,4 +103,15 @@ public class MemberResponse {
             this.radius = radius;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class UserNameDTO {
+        private String username;
+
+        @Builder
+        public UserNameDTO(String username) {
+            this.username = username;
+        }
+    }
 }

@@ -196,6 +196,17 @@ public class GatherArticleResponse {
 
     @Getter
     @NoArgsConstructor
+    public static class IdDTO {
+        private Long id;
+
+        @Builder
+        public IdDTO(Long id) {
+            this.id = id;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
     public static class ReadSliceDTO {
         private Long id;
         private String title;

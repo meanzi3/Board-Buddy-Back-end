@@ -9,5 +9,5 @@ public interface MemberGatherArticleRepositoryCustom {
 
   boolean isAuthor(Long gatherArticleId, Long memberId);
 
-  boolean isPermit(Long gatherArticleId, String username);
+  boolean isHasRole(Long gatherArticleId, String username);
 }

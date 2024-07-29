@@ -4,6 +4,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
+import static sumcoda.boardbuddy.entity.QGatherArticle.gatherArticle;
+import static sumcoda.boardbuddy.entity.QMember.member;
 import static sumcoda.boardbuddy.entity.QMemberGatherArticle.memberGatherArticle;
 
 @RequiredArgsConstructor
@@ -24,15 +26,17 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
     return count != null && count > 0;
   }
 
-  // 유저와 모집글 사이에 isPermit 확인
+  // 유저와 모집글 사이에 Role이 있는지 확인
   @Override
-  public boolean isPermit(Long gatherArticleId, String username) {
+  public boolean isHasRole(Long gatherArticleId, String username) {
     Long count = jpaQueryFactory
             .select(memberGatherArticle.count())
             .from(memberGatherArticle)
-            .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
-                    .and(memberGatherArticle.member.username.eq(username))
-                    .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.PARTICIPANT)))
+            .join(memberGatherArticle.gatherArticle, gatherArticle)
+            .join(memberGatherArticle.member, member)
+            .where(gatherArticle.id.eq(gatherArticleId)
+                    .and(member.username.eq(username))
+                    .and(memberGatherArticle.memberGatherArticleRole.in(MemberGatherArticleRole.AUTHOR, MemberGatherArticleRole.PARTICIPANT)))
             .fetchOne();
 
     return count != null && count > 0;

@@ -22,4 +22,6 @@ public interface MemberRepositoryCustom {
     Optional<MemberResponse.LocationWithRadiusDTO> findLocationWithRadiusDTOByUsername(String username);
 
     Optional<MemberResponse.UserNameDTO> findUserNameDTOByUsername(String username);
+
+    Optional<MemberResponse.IdDTO> findMemberIdByUsername(String username);
 }

@@ -124,7 +124,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.gatherArticleStatus))
+                        gatherArticle.gatherArticleStatus.as("status")))
                 .from(gatherArticle)
                 .join(gatherArticle.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.member, member)

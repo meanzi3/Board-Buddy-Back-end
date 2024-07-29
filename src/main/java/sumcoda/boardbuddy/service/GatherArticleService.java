@@ -104,7 +104,7 @@ public class GatherArticleService {
                 .orElseThrow(() -> new GatherArticleNotFoundException("존재하지 않는 모집글입니다."));
 
         // 사용자 검증
-        MemberResponse.IdDTO memberIdDTO = memberRepository.findMemberIdByUsername(username)
+        MemberResponse.IdDTO memberIdDTO = memberRepository.findIdDTOByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("유효하지 않은 사용자입니다."));
 
         return gatherArticleRepository.findGatherArticleReadDTOByGatherArticleId(gatherArticleIdDTO.getId(), memberIdDTO.getId());
@@ -125,7 +125,7 @@ public class GatherArticleService {
                 .orElseThrow(() -> new GatherArticleNotFoundException("존재하지 않는 모집글입니다."));
 
         // 사용자 검증
-        MemberResponse.IdDTO memberIdDTO = memberRepository.findMemberIdByUsername(username)
+        MemberResponse.IdDTO memberIdDTO = memberRepository.findIdDTOByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("유효하지 않은 사용자입니다."));
 
         // 작성자 검증
@@ -169,7 +169,7 @@ public class GatherArticleService {
                 .orElseThrow(() -> new GatherArticleNotFoundException("존재하지 않는 모집글입니다."));
 
         // 사용자 검증
-        MemberResponse.IdDTO memberIdDTO = memberRepository.findMemberIdByUsername(username)
+        MemberResponse.IdDTO memberIdDTO = memberRepository.findIdDTOByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("유효하지 않은 사용자입니다."));
 
         // 작성자인지 검증

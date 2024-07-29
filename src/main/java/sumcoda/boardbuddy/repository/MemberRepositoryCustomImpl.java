@@ -121,7 +121,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Optional<MemberResponse.IdDTO> findMemberIdByUsername(String username) {
+    public Optional<MemberResponse.IdDTO> findIdDTOByUsername(String username) {
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(MemberResponse.IdDTO.class,
                         member.id))

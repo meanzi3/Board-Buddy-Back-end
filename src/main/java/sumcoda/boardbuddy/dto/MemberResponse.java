@@ -114,4 +114,15 @@ public class MemberResponse {
             this.username = username;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class IdDTO {
+        private Long id;
+
+        @Builder
+        public IdDTO(Long id) {
+            this.id = id;
+        }
+    }
 }

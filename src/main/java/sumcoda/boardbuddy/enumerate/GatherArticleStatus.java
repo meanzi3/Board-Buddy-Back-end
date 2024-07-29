@@ -10,7 +10,8 @@ public enum GatherArticleStatus {
 
   OPEN("open"),
   CLOSED("closed"),
-  SOON("soon");
+  SOON("soon"),
+  COMPLETED("completed");
 
   @JsonValue
   private final String value;

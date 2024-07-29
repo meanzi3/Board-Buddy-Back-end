@@ -107,11 +107,6 @@ public class GatherArticleRequest {
       this.endDateTime = endDateTime;
     }
 
-    // 엔티티 수정
-    public void updateEntity(GatherArticle gatherArticle) {
-      gatherArticle.update(this.title, this.description, this.meetingLocation, this.sido, this.sgg, this.emd, this.x, this. y, this.maxParticipants, this.startDateTime, this.endDateTime);
-    }
-
   }
 
   @Getter

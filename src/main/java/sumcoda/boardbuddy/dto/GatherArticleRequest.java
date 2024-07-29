@@ -23,9 +23,9 @@ public class GatherArticleRequest {
 
     private String sido;
 
-    private String sigu;
+    private String sgg;
 
-    private String dong;
+    private String emd;
 
     private Double x;
 
@@ -40,13 +40,13 @@ public class GatherArticleRequest {
     private LocalDateTime endDateTime;
 
     @Builder
-    public CreateDTO(String title, String description, String meetingLocation, String sido, String sigu, String dong, Double x, Double y, Integer maxParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public CreateDTO(String title, String description, String meetingLocation, String sido, String sgg, String emd, Double x, Double y, Integer maxParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime) {
       this.title = title;
       this.description = description;
       this.meetingLocation = meetingLocation;
       this.sido = sido;
-      this.sigu = sigu;
-      this.dong = dong;
+      this.sgg = sgg;
+      this.emd = emd;
       this.x = x;
       this.y = y;
       this.maxParticipants = maxParticipants;
@@ -57,7 +57,7 @@ public class GatherArticleRequest {
     // 엔티티로 변환
     public GatherArticle toEntity() {
       return GatherArticle.buildGatherArticle(this.title, 1, this.maxParticipants, GatherArticleStatus.OPEN, this.description, this.startDateTime, this.endDateTime,
-              this.sido, this. sigu, this.dong,  this.meetingLocation, this.x, this.y);
+              this.sido, this.sgg, this.emd,  this.meetingLocation, this.x, this.y);
     }
   }
 
@@ -76,9 +76,9 @@ public class GatherArticleRequest {
 
     private String sido;
 
-    private String sigu;
+    private String sgg;
 
-    private String dong;
+    private String emd;
 
     private Double x;
 
@@ -93,23 +93,18 @@ public class GatherArticleRequest {
     private LocalDateTime endDateTime;
 
     @Builder
-    public UpdateDTO(String title, String description, String meetingLocation, String sido, String sigu, String dong, Double x, Double y, Integer maxParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public UpdateDTO(String title, String description, String meetingLocation, String sido, String sgg, String emd, Double x, Double y, Integer maxParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime) {
       this.title = title;
       this.description = description;
       this.meetingLocation = meetingLocation;
       this.sido = sido;
-      this.sigu = sigu;
-      this.dong = dong;
+      this.sgg = sgg;
+      this.emd = emd;
       this.x = x;
       this.y = y;
       this.maxParticipants = maxParticipants;
       this.startDateTime = startDateTime;
       this.endDateTime = endDateTime;
-    }
-
-    // 엔티티 수정
-    public void updateEntity(GatherArticle gatherArticle) {
-      gatherArticle.update(this.title, this.description, this.meetingLocation, this.sido, this.sigu, this.dong, this.x, this. y, this.maxParticipants, this.startDateTime, this.endDateTime);
     }
 
   }

@@ -38,8 +38,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .select(Projections.fields(MemberResponse.ProfileDTO.class,
                         member.nickname,
                         member.sido,
-                        member.sigu,
-                        member.dong,
+                        member.sgg,
+                        member.emd,
                         member.phoneNumber,
                         profileImage.profileImageS3SavedURL
                 ))
@@ -101,8 +101,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(MemberResponse.LocationWithRadiusDTO.class,
                         member.sido,
-                        member.sigu,
-                        member.dong,
+                        member.sgg,
+                        member.emd,
                         member.radius
                 ))
                 .from(member)
@@ -115,6 +115,16 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(MemberResponse.UserNameDTO.class,
                         member.username))
+                .from(member)
+                .where(member.username.eq(username))
+                .fetchOne());
+    }
+
+    @Override
+    public Optional<MemberResponse.IdDTO> findIdDTOByUsername(String username) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(MemberResponse.IdDTO.class,
+                        member.id))
                 .from(member)
                 .where(member.username.eq(username))
                 .fetchOne());

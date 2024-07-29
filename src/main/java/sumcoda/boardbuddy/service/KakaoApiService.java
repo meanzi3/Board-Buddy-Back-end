@@ -96,8 +96,8 @@ public class KakaoApiService {
                                             .x(documentDTO.getX())
                                             .y(documentDTO.getY())
                                             .sido(regionDTO.getRegion1depthName())
-                                            .sigu(regionDTO.getRegion2depthName())
-                                            .dong(regionDTO.getRegion3depthName())
+                                            .sgg(regionDTO.getRegion2depthName())
+                                            .emd(regionDTO.getRegion3depthName())
                                             .build();
                                 })
                         .toList();
@@ -144,7 +144,7 @@ public class KakaoApiService {
         // 법정동 정보를 가져옴
         KakaoApiResponse.RegionDTO regionDTO = response.getRegionDTOs().get(LEGAL_DONG_INDEX);
 
-        // sido 가 세종특별자치시인 경우 sido 와 sigu 를 동일하게 설정
+        // sido 가 세종특별자치시인 경우 sido 와 sgg 를 동일하게 설정
         if (SEJONG_SPECIAL_SELF_GOVERNING_CITY.equals(regionDTO.getRegion1depthName())) {
             return KakaoApiResponse.RegionDTO.builder()
                     .region1depthName(SEJONG_SPECIAL_SELF_GOVERNING_CITY)

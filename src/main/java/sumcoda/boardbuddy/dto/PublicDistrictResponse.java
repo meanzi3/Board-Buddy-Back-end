@@ -11,16 +11,16 @@ public class PublicDistrictResponse {
     public static class InfoDTO {
 
         private String sido;
-        private String sigu;
-        private String dong;
+        private String sgg;
+        private String emd;
         private Double latitude;
         private Double longitude;
 
         @Builder
-        public InfoDTO(String sido, String sigu, String dong, Double latitude, Double longitude) {
+        public InfoDTO(String sido, String sgg, String emd, Double latitude, Double longitude) {
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
             this.latitude = latitude;
             this.longitude = longitude;
         }
@@ -31,14 +31,14 @@ public class PublicDistrictResponse {
     public static class LocationDTO {
 
         private String sido;
-        private String sigu;
-        private String dong;
+        private String sgg;
+        private String emd;
 
         @Builder
-        public LocationDTO(String sido, String sigu, String dong) {
+        public LocationDTO(String sido, String sgg, String emd) {
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
         }
     }
 
@@ -47,15 +47,15 @@ public class PublicDistrictResponse {
     public static class LocationWithIdDTO {
 
         private String sido;
-        private String sigu;
-        private String dong;
+        private String sgg;
+        private String emd;
         private Long id;
 
         @Builder
-        public LocationWithIdDTO(String sido, String sigu, String dong, Long id) {
+        public LocationWithIdDTO(String sido, String sgg, String emd, Long id) {
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
             this.id = id;
         }
     }

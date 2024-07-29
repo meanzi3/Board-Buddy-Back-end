@@ -21,20 +21,20 @@ public class MemberRequest {
 
         private String sido;
 
-        private String sigu;
+        private String sgg;
 
-        private String dong;
+        private String emd;
 
         @Builder
-        public RegisterDTO(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong) {
+        public RegisterDTO(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd) {
             this.username = username;
             this.password = password;
             this.nickname = nickname;
             this.email = email;
             this.phoneNumber = phoneNumber;
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
         }
     }
 
@@ -46,16 +46,16 @@ public class MemberRequest {
 
         private String sido;
 
-        private String sigu;
+        private String sgg;
 
-        private String dong;
+        private String emd;
 
         @Builder
-        public OAuth2RegisterDTO(String phoneNumber, String sido, String sigu, String dong) {
+        public OAuth2RegisterDTO(String phoneNumber, String sido, String sgg, String emd) {
             this.phoneNumber = phoneNumber;
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
         }
     }
 
@@ -89,14 +89,14 @@ public class MemberRequest {
     public static class LocationDTO {
 
         private String sido;
-        private String sigu;
-        private String dong;
+        private String sgg;
+        private String emd;
 
         @Builder
-        public LocationDTO(String sido, String sigu, String dong) {
+        public LocationDTO(String sido, String sgg, String emd) {
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
         }
     }
 

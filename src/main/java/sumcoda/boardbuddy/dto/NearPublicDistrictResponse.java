@@ -11,15 +11,15 @@ public class NearPublicDistrictResponse {
     public static class InfoDTO {
 
         private String sido;
-        private String sigu;
-        private String dong;
+        private String sgg;
+        private String emd;
         private Integer radius;
 
         @Builder
-        public InfoDTO(String sido, String sigu, String dong, Integer radius) {
+        public InfoDTO(String sido, String sgg, String emd, Integer radius) {
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
             this.radius = radius;
         }
 
@@ -30,14 +30,14 @@ public class NearPublicDistrictResponse {
     public static class LocationDTO {
 
         private String sido;
-        private String sigu;
-        private String dong;
+        private String sgg;
+        private String emd;
 
         @Builder
-        public LocationDTO(String sido, String sigu, String dong) {
+        public LocationDTO(String sido, String sgg, String emd) {
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
         }
     }
 }

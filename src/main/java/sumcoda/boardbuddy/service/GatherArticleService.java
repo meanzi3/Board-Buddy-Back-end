@@ -186,10 +186,10 @@ public class GatherArticleService {
         if (createRequest.getSido() == null || createRequest.getSido().isEmpty()) {
             throw new GatherArticleSaveException("시, 도가 입력되지 않았습니다.");
         }
-        if (createRequest.getSigu() == null || createRequest.getSigu().isEmpty()) {
+        if (createRequest.getSgg() == null || createRequest.getSgg().isEmpty()) {
             throw new GatherArticleSaveException("시, 구가 입력되지 않았습니다.");
         }
-        if (createRequest.getDong() == null || createRequest.getDong().isEmpty()) {
+        if (createRequest.getEmd() == null || createRequest.getEmd().isEmpty()) {
             throw new GatherArticleSaveException("동이 입력되지 않았습니다.");
         }
         if (createRequest.getX() == null) {
@@ -226,10 +226,10 @@ public class GatherArticleService {
         if (updateRequest.getSido() == null || updateRequest.getSido().isEmpty()) {
             throw new GatherArticleUpdateException("시도가 입력되지 않았습니다.");
         }
-        if (updateRequest.getSigu() == null || updateRequest.getSigu().isEmpty()) {
+        if (updateRequest.getSgg() == null || updateRequest.getSgg().isEmpty()) {
             throw new GatherArticleUpdateException("시구가 입력되지 않았습니다.");
         }
-        if (updateRequest.getDong() == null || updateRequest.getDong().isEmpty()) {
+        if (updateRequest.getEmd() == null || updateRequest.getEmd().isEmpty()) {
             throw new GatherArticleUpdateException("동이 입력되지 않았습니다.");
         }
         if (updateRequest.getX() == null) {
@@ -337,8 +337,8 @@ public class GatherArticleService {
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 기준 위치에 해당하는 행정 구역을 조회
-        PublicDistrictResponse.LocationWithIdDTO locationWithIdDTO = publicDistrictRepository.findLocationWithIdDTOBySidoAndSiguAndDong(
-                        locationWithRadiusDTO.getSido(), locationWithRadiusDTO.getSigu(), locationWithRadiusDTO.getDong())
+        PublicDistrictResponse.LocationWithIdDTO locationWithIdDTO = publicDistrictRepository.findLocationWithIdDTOBySidoAndSggAndEmd(
+                        locationWithRadiusDTO.getSido(), locationWithRadiusDTO.getSgg(), locationWithRadiusDTO.getEmd())
                 .orElseThrow(() -> new PublicDistrictRetrievalException("유저의 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 사용자의 위치와 반경 정보로 주변 행정 구역 조회
@@ -352,14 +352,14 @@ public class GatherArticleService {
 
         // 주변 행정 구역 리스트 생성
         List<String> sidoList = new ArrayList<>();
-        List<String> siguList = new ArrayList<>();
-        List<String> dongList = new ArrayList<>();
+        List<String> sggList = new ArrayList<>();
+        List<String> emdList = new ArrayList<>();
 
         // 주변 행정 구역 리스트에 데이터 추가
         locationDTOs.forEach(district -> {
             sidoList.add(district.getSido());
-            siguList.add(district.getSigu());
-            dongList.add(district.getDong());
+            sggList.add(district.getSgg());
+            emdList.add(district.getEmd());
         });
 
         // 페이징 정보 생성
@@ -367,7 +367,7 @@ public class GatherArticleService {
 
         // 모집글 리스트 조회
         Slice<GatherArticleResponse.ReadSliceDTO> readSliceDTO = gatherArticleRepository.findReadSliceDTOByLocationAndStatusAndSort(
-                sidoList, siguList, dongList, status, sort, pageable);
+                sidoList, sggList, emdList, status, sort, pageable);
 
         // 모집글 리스트 DTO 생성 및 반환
         return GatherArticleResponse.ReadListDTO.builder()

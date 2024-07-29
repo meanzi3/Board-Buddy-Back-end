@@ -132,8 +132,8 @@ public class AuthService {
                 .builder()
                 .nickname(profileDTO.getNickname())
                 .sido(profileDTO.getSido())
-                .sigu(profileDTO.getSigu())
-                .dong(profileDTO.getDong())
+                .sgg(profileDTO.getSgg())
+                .emd(profileDTO.getEmd())
                 .isPhoneNumberVerified(profileDTO.getPhoneNumber() != null)
                 .profileImageS3SavedURL(profileDTO.getProfileImageS3SavedURL())
                 .build();

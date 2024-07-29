@@ -45,8 +45,8 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.gatherArticleStatus
-                        ))
+                        gatherArticle.gatherArticleStatus.as("status")
+                ))
                 .from(member)
                 .join(member.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.gatherArticle, gatherArticle)
@@ -67,7 +67,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.gatherArticleStatus
+                        gatherArticle.gatherArticleStatus.as("status")
                 ))
                 .from(member)
                 .join(member.memberGatherArticles, memberGatherArticle)

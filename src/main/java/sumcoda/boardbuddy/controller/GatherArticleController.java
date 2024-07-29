@@ -98,7 +98,7 @@ public class GatherArticleController {
 
         List<GatherArticleResponse.GatherArticleInfosDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
 
-        return buildSuccessResponseWithPairKeyData("gatherArticles", gatherArticles, "작성한 모집글이 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("posts", gatherArticles, "작성한 모집글이 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -114,7 +114,7 @@ public class GatherArticleController {
 
         List<GatherArticleResponse.GatherArticleInfosDTO> participations = gatherArticleService.getMyParticipations(username);
 
-        return buildSuccessResponseWithPairKeyData("participations", participations, "참여한 모집글이 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("posts", participations, "참가한 모집글이 조회되었습니다.", HttpStatus.OK);
     }
 
     /**

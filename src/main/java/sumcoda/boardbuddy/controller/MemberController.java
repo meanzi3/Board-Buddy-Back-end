@@ -31,7 +31,7 @@ public class MemberController {
      * @param verifyUsernameDuplicationDTO 사용자가 입력한 아이디
      * @return 아이디가 중복되지 않았다면 약속된 SuccessResponse 반환
      **/
-    @PostMapping(value = "/api/auth/check-username")
+    @PostMapping(value = "/api/auth/username/check")
     public ResponseEntity<ApiResponse<Void>> verifyUsernameDuplication(
             @RequestBody MemberRequest.VerifyUsernameDuplicationDTO verifyUsernameDuplicationDTO) {
         log.info("verify username duplication is working");
@@ -47,7 +47,7 @@ public class MemberController {
      * @param verifyNicknameDuplicationDTO 사용자가 입력한 닉네임
      * @return 닉네임이 중복되지 않았다면 약속된 SuccessResponse 반환
      **/
-    @PostMapping(value = "/api/auth/check-nickname")
+    @PostMapping(value = "/api/auth/nickname/check")
     public ResponseEntity<ApiResponse<Void>> verifyNicknameDuplication(
             @RequestBody MemberRequest.VerifyNicknameDuplicationDTO verifyNicknameDuplicationDTO) {
         log.info("verify nickname duplication is working");

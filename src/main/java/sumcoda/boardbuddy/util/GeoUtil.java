@@ -13,13 +13,13 @@ public class GeoUtil {
 
     /**
      * 하버사인 공식을 사용하여 두 위치 간의 거리를 계산하는 메서드
-     * @param lat1 첫 번째 위치의 위도
      * @param lon1 첫 번째 위치의 경도
-     * @param lat2 두 번째 위치의 위도
+     * @param lat1 첫 번째 위치의 위도
      * @param lon2 두 번째 위치의 경도
+     * @param lat2 두 번째 위치의 위도
      * @return 두 위치 간의 거리 (단위: km)
      */
-    public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    public static double calculateDistance(double lon1, double lat1, double lon2, double lat2) {
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lon2 - lon1);
         double a = Math.sin(latDistance / TWO) * Math.sin(latDistance / TWO)

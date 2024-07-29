@@ -76,10 +76,10 @@ public class NearPublicDistrictService {
             // 반경 범위에 대해 주변 행정 구역 찾기
             List<PublicDistrictResponse.InfoDTO> filteredLocations = allLocations.stream()
                     .filter(infoDTO -> GeoUtil.calculateDistance(
-                            publicDistrict.getLatitude(),
                             publicDistrict.getLongitude(),
-                            infoDTO.getLatitude(),
-                            infoDTO.getLongitude()) <= range.getRadius())
+                            publicDistrict.getLatitude(),
+                            infoDTO.getLongitude(),
+                            infoDTO.getLatitude()) <= range.getRadius())
                     .collect(Collectors.toList());
 
             // 주변 행정 구역 객체 생성
@@ -150,10 +150,10 @@ public class NearPublicDistrictService {
             // 반경 범위에 대해 주변 행정 구역 찾기
             List<PublicDistrictResponse.InfoDTO> filteredLocations = allLocations.stream()
                     .filter(infoDTO -> GeoUtil.calculateDistance(
-                            publicDistrict.getLatitude(),
                             publicDistrict.getLongitude(),
-                            infoDTO.getLatitude(),
-                            infoDTO.getLongitude()) <= range.getRadius())
+                            publicDistrict.getLatitude(),
+                            infoDTO.getLongitude(),
+                            infoDTO.getLatitude()) <= range.getRadius())
                     .collect(Collectors.toList());
 
             // 주변 행정 구역 객체 생성

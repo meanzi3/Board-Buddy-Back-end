@@ -12,5 +12,5 @@ public interface MemberGatherArticleRepositoryCustom {
 
   MemberGatherArticle findByGatherArticleAndMember(GatherArticle gatherArticle, Member member);
 
-  boolean isPermit(Long gatherArticleId, String username);
+  boolean isHasRole(Long gatherArticleId, String username);
 }

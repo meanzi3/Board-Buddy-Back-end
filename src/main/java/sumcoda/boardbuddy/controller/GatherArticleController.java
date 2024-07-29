@@ -30,7 +30,7 @@ public class GatherArticleController {
      * @param username
      * @return
      */
-    @PostMapping(value = "/api/gatherArticles")
+    @PostMapping(value = "/api/gather-articles")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.CreateDTO>>> createGatherArticle(
             @RequestBody GatherArticleRequest.CreateDTO createRequest,
             @RequestAttribute String username){
@@ -45,7 +45,7 @@ public class GatherArticleController {
      * @param username
      * @return
      */
-    @GetMapping(value = "/api/gatherArticles/{gatherArticleId}")
+    @GetMapping(value = "/api/gather-articles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.ReadDTO>>> getGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username) {
@@ -61,7 +61,7 @@ public class GatherArticleController {
      * @param username
      * @return
      */
-    @PutMapping(value = "/api/gatherArticles/{gatherArticleId}")
+    @PutMapping(value = "/api/gather-articles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.UpdateDTO>>> updateGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestBody GatherArticleRequest.UpdateDTO updateRequest,
@@ -77,7 +77,7 @@ public class GatherArticleController {
      * @param username
      * @return
      */
-    @DeleteMapping(value = "/api/gatherArticles/{gatherArticleId}")
+    @DeleteMapping(value = "/api/gather-articles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.DeleteDTO>>> deleteGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username){
@@ -91,7 +91,7 @@ public class GatherArticleController {
      * @param username 사용자 username
      * @return 내가 작성한 모집글 리스트
      **/
-    @GetMapping(value = "/api/my/gatherArticles")
+    @GetMapping(value = "/api/my/gather-articles")
     public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.GatherArticleInfosDTO>>>> getMyGatherArticles (
             @RequestAttribute String username) {
         log.info("get gather articles is working");
@@ -126,7 +126,7 @@ public class GatherArticleController {
      * @param username 사용자 이름
      * @return 모집글 리스트
      */
-    @GetMapping("/api/gatherArticles")
+    @GetMapping("/api/gather-articles")
     public ResponseEntity<ApiResponse<GatherArticleResponse.ReadListDTO>> getGatherArticles(
             @RequestParam Integer page,
             @RequestParam(required = false) String status,

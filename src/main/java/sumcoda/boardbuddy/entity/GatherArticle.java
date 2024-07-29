@@ -172,4 +172,8 @@ public class GatherArticle extends BaseTimeEntity {
     public void assignCurrentParticipants(Integer currentParticipants) {
         this.currentParticipants = currentParticipants;
     }
+
+    public void assignGatherArticleStatus(GatherArticleStatus gatherArticleStatus) {
+        this.gatherArticleStatus = gatherArticleStatus;
+    }
 }

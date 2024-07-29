@@ -17,9 +17,9 @@ public class MemberResponse {
 
         private String sido;
 
-        private String sigu;
+        private String sgg;
 
-        private String dong;
+        private String emd;
 
         // phoneNumber 필드가 null 일 때 JSON 반환하지 않도록하는 어노테이션
         @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -30,11 +30,11 @@ public class MemberResponse {
         private String profileImageS3SavedURL;
 
         @Builder
-        public ProfileDTO(String nickname, String sido, String sigu, String dong, String phoneNumber, Boolean isPhoneNumberVerified, String profileImageS3SavedURL) {
+        public ProfileDTO(String nickname, String sido, String sgg, String emd, String phoneNumber, Boolean isPhoneNumberVerified, String profileImageS3SavedURL) {
             this.nickname = nickname;
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
             this.phoneNumber = phoneNumber;
             this.isPhoneNumberVerified = isPhoneNumberVerified;
             this.profileImageS3SavedURL = profileImageS3SavedURL;
@@ -91,15 +91,15 @@ public class MemberResponse {
     public static class LocationWithRadiusDTO {
 
         private String sido;
-        private String sigu;
-        private String dong;
+        private String sgg;
+        private String emd;
         private Integer radius;
 
         @Builder
-        public LocationWithRadiusDTO(String sido, String sigu, String dong, Integer radius) {
+        public LocationWithRadiusDTO(String sido, String sgg, String emd, Integer radius) {
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
             this.radius = radius;
         }
     }

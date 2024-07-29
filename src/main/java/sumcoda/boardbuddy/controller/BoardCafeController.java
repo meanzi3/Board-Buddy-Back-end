@@ -34,7 +34,7 @@ public class BoardCafeController {
      * @param username 사용자 이름
      * @return 보드게임 카페 목록을 포함한 ApiResponse 객체
      */
-    @GetMapping("/api/boardCafes")
+    @GetMapping("/api/board-cafes")
     public ResponseEntity<ApiResponse<Map<String, List<BoardCafeResponse.InfoDTO>>>> getBoardCafes(
             @RequestParam Double x,
             @RequestParam Double y,

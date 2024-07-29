@@ -13,16 +13,16 @@ public class PublicDistrictResponse {
         private String sido;
         private String sgg;
         private String emd;
-        private Double latitude;
         private Double longitude;
+        private Double latitude;
 
         @Builder
-        public InfoDTO(String sido, String sgg, String emd, Double latitude, Double longitude) {
+        public InfoDTO(String sido, String sgg, String emd, Double longitude, Double latitude) {
             this.sido = sido;
             this.sgg = sgg;
             this.emd = emd;
-            this.latitude = latitude;
             this.longitude = longitude;
+            this.latitude = latitude;
         }
     }
 

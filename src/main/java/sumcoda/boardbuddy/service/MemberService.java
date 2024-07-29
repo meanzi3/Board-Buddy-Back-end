@@ -266,8 +266,8 @@ public class MemberService {
         Member reviewer = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("리뷰를 보내는 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        // 리뷰를 보내는 유저가 해당 모집글에 참가했는지 확인
-        if (!memberGatherArticleRepository.isPermit(gatherArticleId, username)) {
+        // 리뷰를 보내는 유저가 해당 모집글에 참가했는지 (Role이 있는지) 확인
+        if (!memberGatherArticleRepository.isHasRole(gatherArticleId, username)) {
             throw new MemberNotJoinedGatherArticleException("리뷰를 보낼 권한이 없습니다.");
         }
 

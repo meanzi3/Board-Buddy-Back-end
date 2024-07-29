@@ -37,8 +37,8 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
                         publicDistrict.sido,
                         publicDistrict.sgg,
                         publicDistrict.emd,
-                        publicDistrict.latitude,
-                        publicDistrict.longitude))
+                        publicDistrict.longitude,
+                        publicDistrict.latitude))
                 .from(publicDistrict)
                 .fetch();
     }

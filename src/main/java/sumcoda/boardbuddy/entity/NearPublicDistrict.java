@@ -19,13 +19,13 @@ public class NearPublicDistrict {
     @Column(nullable = false)
     private String sido;
 
-    // 주변의 oo시, oo구
+    // 주변의 oo시, oo군, oo구
     @Column(nullable = false)
-    private String sigu;
+    private String sgg;
 
-    // 주변의 00동
+    // 주변의 oo읍, oo면, oo동
     @Column(nullable = false)
-    private String dong;
+    private String emd;
 
     // 반경 정보
     @Column(nullable = false)
@@ -37,20 +37,20 @@ public class NearPublicDistrict {
     private PublicDistrict publicDistrict;
 
     @Builder
-    public NearPublicDistrict(String sido, String sigu, String dong, Integer radius, PublicDistrict publicDistrict) {
+    public NearPublicDistrict(String sido, String sgg, String emd, Integer radius, PublicDistrict publicDistrict) {
         this.sido = sido;
-        this.sigu = sigu;
-        this.dong = dong;
+        this.sgg = sgg;
+        this.emd = emd;
         this.radius = radius;
         this.assignPublicDistrict(publicDistrict);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static NearPublicDistrict buildNearPublicDistrict(String sido, String sigu, String dong, Integer radius, PublicDistrict publicDistrict) {
+    public static NearPublicDistrict buildNearPublicDistrict(String sido, String sgg, String emd, Integer radius, PublicDistrict publicDistrict) {
         return NearPublicDistrict.builder()
                 .sido(sido)
-                .sigu(sigu)
-                .dong(dong)
+                .sgg(sgg)
+                .emd(emd)
                 .radius(radius)
                 .publicDistrict(publicDistrict)
                 .build();

@@ -53,15 +53,15 @@ public class Member {
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
     private String sido;
 
-    // 사용자가 거주하는 oo시, oo구
+    // 사용자가 거주하는 oo시, oo군, oo구
     // 일반 로그인 = 회원가입시 설정 가능
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
-    private String sigu;
+    private String sgg;
 
-    // 사용자가 거주하는 oo동
+    // 사용자가 거주하는 oo읍, oo면, oo동
     // 일반 로그인 = 회원가입시 설정 가능
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
-    private String dong;
+    private String emd;
 
     // 사용자 위치를 기준으로 주변 범위를 조절하기 위한 필드
     // 일반 로그인 = 회원가입시 설정 가능
@@ -159,15 +159,15 @@ public class Member {
     private List<BadgeImage> badgeImages = new ArrayList<>();
 
     @Builder
-    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, Role role, ProfileImage profileImage) {
+    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, Role role, ProfileImage profileImage) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.sido = sido;
-        this.sigu = sigu;
-        this.dong = dong;
+        this.sgg = sgg;
+        this.emd = emd;
         this.radius = radius;
         this.buddyScore = buddyScore;
         this.joinCount = joinCount;
@@ -187,7 +187,7 @@ public class Member {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sigu, String dong, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, Role role, ProfileImage profileImage) {
+    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, Role role, ProfileImage profileImage) {
         return Member.builder()
                 .username(username)
                 .password(password)
@@ -195,8 +195,8 @@ public class Member {
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .sido(sido)
-                .sigu(sigu)
-                .dong(dong)
+                .sgg(sgg)
+                .emd(emd)
                 .radius(radius)
                 .buddyScore(buddyScore)
                 .joinCount(joinCount)
@@ -287,19 +287,19 @@ public class Member {
         this.sido = sido;
     }
 
-    public void assignSigu(String sigu) {
-        this.sigu = sigu;
+    public void assignSgg(String sgg) {
+        this.sgg = sgg;
     }
 
-    public void assignDong(String dong) {
-        this.dong = dong;
+    public void assignEmd(String emd) {
+        this.emd = emd;
     }
 
     // Member 위치 수정 메서드
-    public void assignLocation(String sido, String sigu, String dong) {
+    public void assignLocation(String sido, String sgg, String emd) {
         this.sido = sido;
-        this.sigu = sigu;
-        this.dong = dong;
+        this.sgg = sgg;
+        this.emd = emd;
     }
 
     // Member 반경 수정 메서드

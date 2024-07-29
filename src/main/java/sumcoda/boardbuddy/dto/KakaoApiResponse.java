@@ -87,4 +87,38 @@ public class KakaoApiResponse {
             this.isEnd = isEnd;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class CoordinateToRegionDTO {
+
+        @JsonProperty("documents")
+        private List<RegionDTO> regionDTOs;
+
+        @Builder
+        public CoordinateToRegionDTO(List<RegionDTO> regionDTOs) {
+            this.regionDTOs = regionDTOs;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class RegionDTO {
+
+        @JsonProperty("region_1depth_name")
+        private String region1depthName;
+
+        @JsonProperty("region_2depth_name")
+        private String region2depthName;
+
+        @JsonProperty("region_3depth_name")
+        private String region3depthName;
+
+        @Builder
+        public RegionDTO(String region1depthName, String region2depthName, String region3depthName) {
+            this.region1depthName = region1depthName;
+            this.region2depthName = region2depthName;
+            this.region3depthName = region3depthName;
+        }
+    }
 }

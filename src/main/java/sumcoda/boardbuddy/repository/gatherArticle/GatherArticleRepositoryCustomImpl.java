@@ -108,7 +108,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
 
     @Override
     public Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
-            List<String> sidoList, List<String> siguList, List<String> dongList, String status, String sort, Pageable pageable) {
+            List<String> sidoList, List<String> sggList, List<String> emdList, String status, String sort, Pageable pageable) {
 
         List<GatherArticleResponse.ReadSliceDTO> results = jpaQueryFactory.select(Projections.fields(
                         GatherArticleResponse.ReadSliceDTO.class,
@@ -129,7 +129,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .join(gatherArticle.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.member, member)
                 .where(
-                        inLocation(sidoList, siguList, dongList),
+                        inLocation(sidoList, sggList, emdList),
                         eqStatus(status)
                 )
                 .orderBy(getOrderSpecifier(sort))
@@ -151,10 +151,10 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
         return status != null ? gatherArticle.gatherArticleStatus.eq(GatherArticleStatus.valueOf(status.toUpperCase())) : null;
     }
 
-    private BooleanExpression inLocation(List<String> sidoList, List<String> siguList, List<String> dongList) {
+    private BooleanExpression inLocation(List<String> sidoList, List<String> sggList, List<String> emdList) {
         return gatherArticle.sido.in(sidoList)
-                .and(gatherArticle.sigu.in(siguList))
-                .and(gatherArticle.dong.in(dongList));
+                .and(gatherArticle.sgg.in(sggList))
+                .and(gatherArticle.emd.in(emdList));
     }
 
     private OrderSpecifier<?> getOrderSpecifier(String sort) {

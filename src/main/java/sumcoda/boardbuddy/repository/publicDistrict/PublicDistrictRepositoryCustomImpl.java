@@ -15,17 +15,17 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Optional<PublicDistrictResponse.LocationDTO> findLocationDTOBySidoAndSiguAndDong(String sido, String sigu, String dong) {
+    public Optional<PublicDistrictResponse.LocationDTO> findLocationDTOBySidoAndSggAndEmd(String sido, String sgg, String emd) {
 
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(PublicDistrictResponse.LocationDTO.class,
                         publicDistrict.sido,
-                        publicDistrict.sigu,
-                        publicDistrict.dong))
+                        publicDistrict.sgg,
+                        publicDistrict.emd))
                 .from(publicDistrict)
                 .where(publicDistrict.sido.eq(sido)
-                        .and(publicDistrict.sigu.eq(sigu))
-                        .and(publicDistrict.dong.eq(dong)))
+                        .and(publicDistrict.sgg.eq(sgg))
+                        .and(publicDistrict.emd.eq(emd)))
                 .fetchOne());
     }
 
@@ -35,26 +35,26 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
         return jpaQueryFactory
                 .select(Projections.fields(PublicDistrictResponse.InfoDTO.class,
                         publicDistrict.sido,
-                        publicDistrict.sigu,
-                        publicDistrict.dong,
+                        publicDistrict.sgg,
+                        publicDistrict.emd,
                         publicDistrict.latitude,
                         publicDistrict.longitude))
                 .from(publicDistrict)
                 .fetch();
     }
 
-    public Optional<PublicDistrictResponse.LocationWithIdDTO> findLocationWithIdDTOBySidoAndSiguAndDong(String sido, String sigu, String dong) {
+    public Optional<PublicDistrictResponse.LocationWithIdDTO> findLocationWithIdDTOBySidoAndSggAndEmd(String sido, String sgg, String emd) {
 
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(PublicDistrictResponse.LocationWithIdDTO.class,
                         publicDistrict.sido,
-                        publicDistrict.sigu,
-                        publicDistrict.dong,
+                        publicDistrict.sgg,
+                        publicDistrict.emd,
                         publicDistrict.id))
                 .from(publicDistrict)
                 .where(publicDistrict.sido.eq(sido)
-                        .and(publicDistrict.sigu.eq(sigu))
-                        .and(publicDistrict.dong.eq(dong)))
+                        .and(publicDistrict.sgg.eq(sgg))
+                        .and(publicDistrict.emd.eq(emd)))
                 .fetchOne());
     }
 }

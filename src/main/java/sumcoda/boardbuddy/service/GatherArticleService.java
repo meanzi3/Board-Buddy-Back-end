@@ -78,6 +78,7 @@ public class GatherArticleService {
         MemberGatherArticle memberGatherArticle = MemberGatherArticle.buildMemberGatherArticle(
                 LocalDateTime.now(),
                 MemberGatherArticleRole.AUTHOR,
+                0,
                 member,
                 gatherArticle
         );

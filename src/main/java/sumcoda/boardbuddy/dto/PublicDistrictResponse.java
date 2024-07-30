@@ -44,18 +44,12 @@ public class PublicDistrictResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class LocationWithIdDTO {
+    public static class IdDTO {
 
-        private String sido;
-        private String sgg;
-        private String emd;
         private Long id;
 
         @Builder
-        public LocationWithIdDTO(String sido, String sgg, String emd, Long id) {
-            this.sido = sido;
-            this.sgg = sgg;
-            this.emd = emd;
+        public IdDTO(Long id) {
             this.id = id;
         }
     }

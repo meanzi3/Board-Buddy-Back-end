@@ -15,22 +15,8 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Optional<PublicDistrictResponse.LocationDTO> findLocationDTOBySidoAndSggAndEmd(String sido, String sgg, String emd) {
-
-        return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.fields(PublicDistrictResponse.LocationDTO.class,
-                        publicDistrict.sido,
-                        publicDistrict.sgg,
-                        publicDistrict.emd))
-                .from(publicDistrict)
-                .where(publicDistrict.sido.eq(sido)
-                        .and(publicDistrict.sgg.eq(sgg))
-                        .and(publicDistrict.emd.eq(emd)))
-                .fetchOne());
-    }
-
     @Override
-    public List<PublicDistrictResponse.InfoDTO> findAllPublicDistrictInfoDTOs() {
+    public List<PublicDistrictResponse.InfoDTO> findAllInfoDTOs() {
 
         return jpaQueryFactory
                 .select(Projections.fields(PublicDistrictResponse.InfoDTO.class,
@@ -41,21 +27,6 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
                         publicDistrict.latitude))
                 .from(publicDistrict)
                 .fetch();
-    }
-
-    public Optional<PublicDistrictResponse.LocationWithIdDTO> findLocationWithIdDTOBySidoAndSggAndEmd(String sido, String sgg, String emd) {
-
-        return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.fields(PublicDistrictResponse.LocationWithIdDTO.class,
-                        publicDistrict.sido,
-                        publicDistrict.sgg,
-                        publicDistrict.emd,
-                        publicDistrict.id))
-                .from(publicDistrict)
-                .where(publicDistrict.sido.eq(sido)
-                        .and(publicDistrict.sgg.eq(sgg))
-                        .and(publicDistrict.emd.eq(emd)))
-                .fetchOne());
     }
 
     @Override
@@ -72,5 +43,16 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
                 .where(publicDistrict.emd.contains(emd))
                 .orderBy(publicDistrict.sido.asc())
                 .fetch();
+    }
+
+    public Optional<PublicDistrictResponse.IdDTO> findIdDTOBySidoAndSggAndEmd(String sido, String sgg, String emd) {
+
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(PublicDistrictResponse.IdDTO.class, publicDistrict.id))
+                .from(publicDistrict)
+                .where(publicDistrict.sido.eq(sido)
+                        .and(publicDistrict.sgg.eq(sgg))
+                        .and(publicDistrict.emd.eq(emd)))
+                .fetchOne());
     }
 }

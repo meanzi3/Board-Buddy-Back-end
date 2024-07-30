@@ -3,6 +3,7 @@ package sumcoda.boardbuddy.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sumcoda.boardbuddy.dto.NearPublicDistrictRequest;
 import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.entity.NearPublicDistrict;
@@ -38,7 +39,7 @@ public class NearPublicDistrictService {
      * @return 주변 행정 구역의 정보
      */
     @Transactional
-    public Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> saveNearDistrictByUpdateLocation(PublicDistrictResponse.LocationDTO baseLocation) {
+    public Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> saveNearDistrictByUpdateLocation(NearPublicDistrictRequest.LocationDTO baseLocation) {
 
         // 반환할 주변 위치 정보를 담을 맵
         Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> nearbyLocations = new HashMap<>();
@@ -66,7 +67,7 @@ public class NearPublicDistrictService {
         // 추후 로직 적용
 
         // mariadb 를 사용해서 모든 행정 구역 정보를 조회(redis 장애 시 mariadb 에서 조회)
-        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllPublicDistrictInfoDTOs();
+        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllInfoDTOs();
         // 데이터베이스에 새로 추가할 주변 행정 구역 리스트
         List<NearPublicDistrict> allNearPublicDistricts = new ArrayList<>();
 
@@ -123,7 +124,7 @@ public class NearPublicDistrictService {
      * @param baseLocation 기준 위치
      */
     @Transactional
-    public void saveNearDistrictByRegisterLocation(PublicDistrictResponse.LocationDTO baseLocation) {
+    public void saveNearDistrictByRegisterLocation(NearPublicDistrictRequest.LocationDTO baseLocation) {
 
         // 기준 위치에 해당하는 행정 구역을 조회
         PublicDistrict publicDistrict = publicDistrictRepository.findBySidoAndSggAndEmd(baseLocation.getSido(), baseLocation.getSgg(), baseLocation.getEmd())
@@ -141,7 +142,7 @@ public class NearPublicDistrictService {
         // 추후 로직 적용
 
         // mariadb 를 사용해서 모든 행정 구역 정보를 조회
-        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllPublicDistrictInfoDTOs();
+        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllInfoDTOs();
         // 데이터베이스에 새로 추가할 주변 행정 구역 리스트
         List<NearPublicDistrict> allNearPublicDistricts = new ArrayList<>();
 

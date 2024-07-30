@@ -357,13 +357,13 @@ public class GatherArticleService {
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 기준 위치에 해당하는 행정 구역을 조회
-        PublicDistrictResponse.LocationWithIdDTO locationWithIdDTO = publicDistrictRepository.findLocationWithIdDTOBySidoAndSggAndEmd(
+        PublicDistrictResponse.IdDTO idDTO = publicDistrictRepository.findIdDTOBySidoAndSggAndEmd(
                         locationWithRadiusDTO.getSido(), locationWithRadiusDTO.getSgg(), locationWithRadiusDTO.getEmd())
                 .orElseThrow(() -> new PublicDistrictRetrievalException("유저의 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 사용자의 위치와 반경 정보로 주변 행정 구역 조회
         List<NearPublicDistrictResponse.LocationDTO> locationDTOs = nearPublicDistrictRepository.findLocationDTOsByPublicDistrictIdAndRadius(
-                locationWithIdDTO.getId(), locationWithRadiusDTO.getRadius());
+                idDTO.getId(), locationWithRadiusDTO.getRadius());
 
         // 주변 행정 구역이 없는 경우 예외 처리
         if (locationDTOs.isEmpty()) {

@@ -12,4 +12,6 @@ public interface PublicDistrictRepositoryCustom {
     List<PublicDistrictResponse.InfoDTO> findAllPublicDistrictInfoDTOs();
 
     Optional<PublicDistrictResponse.LocationWithIdDTO> findLocationWithIdDTOBySidoAndSggAndEmd(String sido, String sgg, String emd);
+
+    List<PublicDistrictResponse.InfoDTO> findInfoDTOsByEmd(String emd);
 }

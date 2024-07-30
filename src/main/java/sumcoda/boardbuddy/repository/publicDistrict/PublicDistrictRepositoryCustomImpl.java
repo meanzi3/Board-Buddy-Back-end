@@ -57,4 +57,20 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
                         .and(publicDistrict.emd.eq(emd)))
                 .fetchOne());
     }
+
+    @Override
+    public List<PublicDistrictResponse.InfoDTO> findInfoDTOsByEmd(String emd) {
+
+        return jpaQueryFactory
+                .select(Projections.fields(PublicDistrictResponse.InfoDTO.class,
+                        publicDistrict.sido,
+                        publicDistrict.sgg,
+                        publicDistrict.emd,
+                        publicDistrict.latitude,
+                        publicDistrict.longitude))
+                .from(publicDistrict)
+                .where(publicDistrict.emd.contains(emd))
+                .orderBy(publicDistrict.sido.asc())
+                .fetch();
+    }
 }

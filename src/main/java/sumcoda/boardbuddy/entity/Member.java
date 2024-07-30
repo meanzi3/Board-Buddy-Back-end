@@ -327,4 +327,9 @@ public class Member {
     public void assignBuddyScore(Double buddyScore) {
         this.buddyScore = buddyScore;
     }
+
+    // 참가 횟수 수정 메서드
+    public void assignJoinCount(Integer joinCount) {
+        this.joinCount = joinCount;
+    }
 }

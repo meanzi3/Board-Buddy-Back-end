@@ -27,6 +27,10 @@ public class MemberGatherArticle {
     @Enumerated(EnumType.STRING)
     private MemberGatherArticleRole memberGatherArticleRole;
 
+    // 각 참가자의 노쇼예요 횟수를 나타내기 위한 카운트
+    @Column(nullable = false)
+    private Integer receiveNoShowCount;
+
     // 양방향 연관관계
     // 연관관계 주인
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,18 +48,20 @@ public class MemberGatherArticle {
     private ParticipationApplication participationApplication;
 
     @Builder
-    public MemberGatherArticle(LocalDateTime joinedAt, MemberGatherArticleRole memberGatherArticleRole, Member member, GatherArticle gatherArticle) {
+    public MemberGatherArticle(LocalDateTime joinedAt, MemberGatherArticleRole memberGatherArticleRole, Integer receiveNoShowCount, Member member, GatherArticle gatherArticle) {
         this.joinedAt = joinedAt;
         this.memberGatherArticleRole = memberGatherArticleRole;
+        this.receiveNoShowCount = receiveNoShowCount;
         this.assignMember(member);
         this.assignGatherArticle(gatherArticle);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static MemberGatherArticle buildMemberGatherArticle(LocalDateTime joinedAt, MemberGatherArticleRole memberGatherArticleRole, Member member, GatherArticle gatherArticle) {
+    public static MemberGatherArticle buildMemberGatherArticle(LocalDateTime joinedAt, MemberGatherArticleRole memberGatherArticleRole, Integer receiveNoShowCount, Member member, GatherArticle gatherArticle) {
         return MemberGatherArticle.builder()
                 .joinedAt(joinedAt)
                 .memberGatherArticleRole(memberGatherArticleRole)
+                .receiveNoShowCount(receiveNoShowCount)
                 .member(member)
                 .gatherArticle(gatherArticle)
                 .build();
@@ -109,5 +115,9 @@ public class MemberGatherArticle {
         this.memberGatherArticleRole = memberGatherArticleRole;
     }
 
+    // 각 참가자에 대한 노쇼예요 횟수 업데이트
+    public void assignReceiveNoShowCount(Integer receiveNoShowCount) {
+        this.receiveNoShowCount = receiveNoShowCount;
+    }
 
 }

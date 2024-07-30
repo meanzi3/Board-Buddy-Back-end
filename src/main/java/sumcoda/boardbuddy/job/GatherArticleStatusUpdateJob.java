@@ -6,6 +6,7 @@ import org.quartz.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.entity.GatherArticle;
+import sumcoda.boardbuddy.entity.MemberGatherArticle;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.exception.gatherArticle.job.GatherArticleScheduleExecuteException;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
@@ -34,7 +35,9 @@ public class GatherArticleStatusUpdateJob implements Job{
 
         log.info("Status updated successfully for article ID: {} " + gatherArticleId);
 
-        // TODO: 해당하는 gatherArticle 참가자들의 참가 횟수 +1
-
+        // 해당 모집글의 모든 참가자들의 참가 횟수 1 증가
+        gatherArticle.getMemberGatherArticles().stream()
+                .map(MemberGatherArticle::getMember)
+                .forEach(member -> member.assignJoinCount(member.getJoinCount() + 1));
     }
 }

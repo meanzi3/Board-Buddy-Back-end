@@ -50,6 +50,8 @@ public class GatherArticleService {
     private static final int PAGE_SIZE = 15;
     private final ParticipationApplicationRepository participationApplicationRepository;
 
+    private final GatherArticleStatusUpdateSchedulingService gatherArticleStatusUpdateSchedulingService;
+
     /**
      * 모집글 작성
      * @param createRequest
@@ -88,6 +90,9 @@ public class GatherArticleService {
 
         // 저장
         participationApplicationRepository.save(participationApplication);
+
+        // 모임 완료 상태 업데이트 작업 스케줄링
+        gatherArticleStatusUpdateSchedulingService.scheduleStatusUpdateJob(gatherArticle.getId(), gatherArticle.getEndDateTime());
 
         return GatherArticleResponse.CreateDTO.builder().id(gatherArticle.getId()).build();
     }
@@ -136,6 +141,9 @@ public class GatherArticleService {
         // 예외 검증, 처리
         validateUpdateRequest(updateRequest, gatherArticle.getCurrentParticipants());
 
+        // 기존 endDateTime
+        LocalDateTime originalEndDateTime = gatherArticle.getEndDateTime();
+
         // 수정
         gatherArticle.update(updateRequest.getTitle(),
                 updateRequest.getDescription(),
@@ -151,6 +159,11 @@ public class GatherArticleService {
 
         // 모집글 상태 확인, 업데이트
         updateGatherArticleStatusBasedOnParticipants(gatherArticle);
+
+        // endDateTime 이 바뀌었을 때만 리스케줄링 수행
+        if (!originalEndDateTime.equals(updateRequest.getEndDateTime())) {
+            gatherArticleStatusUpdateSchedulingService.rescheduleStatusUpdateJob(gatherArticle.getId(), gatherArticle.getEndDateTime());
+        }
 
         return GatherArticleResponse.UpdateDTO.builder().id(gatherArticle.getId()).build();
     }
@@ -179,6 +192,9 @@ public class GatherArticleService {
 
         // 삭제
         gatherArticleRepository.deleteById(GatherArticleIdDTO.getId());
+
+        // 스케줄링 작업 취소
+        gatherArticleStatusUpdateSchedulingService.unscheduleStatusUpdateJob(GatherArticleIdDTO.getId());
 
         return GatherArticleResponse.DeleteDTO.builder().id(GatherArticleIdDTO.getId()).build();
     }

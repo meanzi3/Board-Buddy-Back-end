@@ -6,14 +6,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sumcoda.boardbuddy.dto.*;
+import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
+import sumcoda.boardbuddy.entity.MemberGatherArticle;
 import sumcoda.boardbuddy.entity.ProfileImage;
+import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.enumerate.ReviewType;
+import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotCompletedException;
+import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.member.*;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
 import sumcoda.boardbuddy.repository.MemberRepository;
 import sumcoda.boardbuddy.repository.ProfileImageRepository;
+import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 import sumcoda.boardbuddy.util.FileStorageUtil;
@@ -38,6 +44,8 @@ public class MemberService {
     private final MemberGatherArticleRepository memberGatherArticleRepository;
 
     private final ProfileImageRepository profileImageRepository;
+
+    private final GatherArticleRepository gatherArticleRepository;
 
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -264,6 +272,14 @@ public class MemberService {
      **/
     @Transactional
     public void sendReview(Long gatherArticleId, MemberRequest.ReviewDTO reviewDTO, String username) {
+        GatherArticle gatherArticle = gatherArticleRepository.findById(gatherArticleId)
+                .orElseThrow(() -> new GatherArticleNotFoundException("해당 모집글을 찾을 수 없습니다."));
+
+        // 해당 모집글의 상태가 completed 인지 확인
+        if (gatherArticle.getGatherArticleStatus() != GatherArticleStatus.COMPLETED) {
+            throw new GatherArticleNotCompletedException("모임이 종료된 모집글만 리뷰를 보낼 수 있습니다.");
+        }
+
         //리뷰 보내는 유저 조회
         Member reviewer = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("리뷰를 보내는 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
@@ -279,7 +295,7 @@ public class MemberService {
 
         ReviewType reviewType = ReviewType.valueOf(String.valueOf(reviewDTO.getReview()));
 
-        incrementReviewCounts(reviewee, reviewType);
+        incrementReviewCounts(reviewee, reviewType, gatherArticleId);
         incrementSendReviewCount(reviewer);
         updateBuddyScore(reviewee, reviewType);
     }
@@ -289,8 +305,9 @@ public class MemberService {
      *
      * @param reviewee 리뷰를 받는 유저
      * @param reviewType 리뷰 타입
+     * @param gatherArticleId 모집글 Id
      **/
-    private void incrementReviewCounts(Member reviewee, ReviewType reviewType) {
+    private void incrementReviewCounts(Member reviewee, ReviewType reviewType, Long gatherArticleId) {
         Integer newMonthlyExcellentCount = reviewee.getMonthlyExcellentCount();
         Integer newTotalExcellentCount = reviewee.getTotalExcellentCount();
         Integer newMonthlyGoodCount = reviewee.getMonthlyGoodCount();
@@ -314,6 +331,7 @@ public class MemberService {
                 break;
             case NOSHOW:
                 newMonthlyNoShowCount++;
+                adjustReceiveNoShowCount(gatherArticleId, reviewee);
                 break;
         }
 
@@ -329,6 +347,28 @@ public class MemberService {
         Integer newSendReviewCount = reviewer.getMonthlySendReviewCount() + 1;
 
         reviewer.assignSendReviewCount(newSendReviewCount);
+    }
+
+    /**
+     * 받은 리뷰가 노쇼예요면 해당 유저의 노쇼 카운트를 확인하고 증감하는 메서드
+     *
+     * @param gatherArticleId 모집글 Id
+     * @param reviewee 리뷰를 받은 유저
+     **/
+    private void adjustReceiveNoShowCount(Long gatherArticleId, Member reviewee) {
+        MemberGatherArticle memberGatherArticle = memberGatherArticleRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, reviewee.getUsername())
+                .orElseThrow(() -> new MemberNotJoinedGatherArticleException("해당 유저는 해당 모집글에 참여하지 않았습니다."));
+
+        GatherArticle gatherArticle = gatherArticleRepository.findById(gatherArticleId)
+                .orElseThrow(() -> new GatherArticleNotFoundException("해당 모집글을 찾을 수 없습니다."));
+
+        memberGatherArticle.assignReceiveNoShowCount(memberGatherArticle.getReceiveNoShowCount() + 1);
+
+        // 노쇼예요 횟수가 모집글 참가인원의 절반 이상(본인 제외)이 되면 참가 횟수 -1
+        if (memberGatherArticle.getReceiveNoShowCount() >= (gatherArticle.getCurrentParticipants() - 1) / 2) {
+            reviewee.assignJoinCount(reviewee.getJoinCount() - 1);
+            memberGatherArticle.assignReceiveNoShowCount(-1);
+        }
     }
 
     /**

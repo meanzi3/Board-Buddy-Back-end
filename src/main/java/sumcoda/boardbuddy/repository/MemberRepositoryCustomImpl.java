@@ -76,7 +76,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     public Optional<MemberResponse.ProfileInfosDTO> findMemberProfileByNickname(String nickname) {
         List<String> badges = jpaQueryFactory.select(badgeImage.badgeImageS3SavedURL)
                 .from(badgeImage)
-                .where(badgeImage.member.nickname.eq(nickname))
+                .leftJoin(badgeImage.member, member)
+                .where(member.nickname.eq(nickname))
                 .orderBy(badgeImage.id.desc())
                 .limit(3)
                 .fetch();

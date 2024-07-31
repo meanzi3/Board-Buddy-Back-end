@@ -147,6 +147,28 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
         return new SliceImpl<>(results, pageable, hasNext);
     }
 
+    /**
+     * 특정 모집글 Id로 간단한 모집글 정보 조회
+     *
+     * @param gatherArticleId 모집글 Id
+     * @return 모집글 정보가 포함된 SummaryInfoDTO 객체
+     **/
+    @Override
+    public Optional<GatherArticleResponse.SummaryInfoDTO> findSimpleInfoByGatherArticleId(Long gatherArticleId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(GatherArticleResponse.SummaryInfoDTO.class,
+                        gatherArticle.title,
+                        gatherArticle.meetingLocation,
+                        gatherArticle.maxParticipants,
+                        gatherArticle.currentParticipants,
+                        gatherArticle.startDateTime,
+                        gatherArticle.endDateTime
+                ))
+                .from(gatherArticle)
+                .where(gatherArticle.id.eq(gatherArticleId))
+                .fetchOne());
+    }
+
     private BooleanExpression eqStatus(String status) {
         return status != null ? gatherArticle.gatherArticleStatus.eq(GatherArticleStatus.valueOf(status.toUpperCase())) : null;
     }

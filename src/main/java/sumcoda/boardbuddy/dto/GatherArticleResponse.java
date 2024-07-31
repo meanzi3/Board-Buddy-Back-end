@@ -267,4 +267,57 @@ public class GatherArticleResponse {
             this.last = last;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class SummaryInfoDTO {
+
+        private String title;
+
+        private String meetingLocation;
+
+        private Integer maxParticipants;
+
+        private Integer currentParticipants;
+
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime startDateTime;
+
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime endDateTime;
+
+        @Builder
+        public SummaryInfoDTO(String title, String meetingLocation, Integer maxParticipants, Integer currentParticipants, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+            this.title = title;
+            this.meetingLocation = meetingLocation;
+            this.maxParticipants = maxParticipants;
+            this.currentParticipants = currentParticipants;
+            this.startDateTime = startDateTime;
+            this.endDateTime = endDateTime;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class SimpleInfoDTO {
+
+        private Long gatherArticleId;
+
+        private String title;
+
+        private String meetingLocation;
+
+        private Integer currentParticipants;
+
+        @Builder
+        public SimpleInfoDTO(Long gatherArticleId, String title, String meetingLocation, Integer currentParticipants) {
+            this.gatherArticleId = gatherArticleId;
+            this.title = title;
+            this.meetingLocation = meetingLocation;
+            this.currentParticipants = currentParticipants;
+        }
+    }
+
+
+
 }

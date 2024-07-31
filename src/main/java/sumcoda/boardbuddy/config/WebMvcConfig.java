@@ -21,8 +21,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(List.of(
                         "/api/auth/register",
-                        "/api/auth/check-username",
-                        "/api/auth/check-nickname",
+                        "/api/auth/username/check",
+                        "/api/auth/nickname/check",
                         "/api/auth/sms-certifications/send",
                         "/api/auth/sms-certifications/verify",
                         "/api/auth/login",

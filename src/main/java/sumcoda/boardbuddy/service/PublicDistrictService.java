@@ -27,12 +27,12 @@ public class PublicDistrictService {
      * @param emd 읍면동 검색어
      * @return 검색된 위치 정보 리스트
      */
-    public List<PublicDistrictResponse.InfoDTO> searchLocations(String emd, String username) {
+    public List<PublicDistrictResponse.InfoDTO> searchLocations(String emd) {
 
-        // 유저 검증
-        if (username == null) {
-            throw new MemberRetrievalException("위치 검색 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
-        }
+//        // 유저 검증
+//        if (username == null) {
+//            throw new MemberRetrievalException("위치 검색 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
+//        }
 
         // 검색어 길이 검증
         if (emd.length() < MINIMUM_SEARCH_LENGTH) {

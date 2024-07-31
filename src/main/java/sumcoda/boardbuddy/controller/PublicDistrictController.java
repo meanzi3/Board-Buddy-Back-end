@@ -29,11 +29,12 @@ public class PublicDistrictController {
      */
     @GetMapping("/api/locations/search")
     public ResponseEntity<ApiResponse<Map<String, List<PublicDistrictResponse.InfoDTO>>>> searchLocations(
-            @RequestParam String emd,
-            @RequestAttribute String username) {
+            @RequestParam String emd
+//            @RequestAttribute String username
+    ) {
         log.info("searchLocations is working");
 
-        List<PublicDistrictResponse.InfoDTO> locations = publicDistrictService.searchLocations(emd, username);
+        List<PublicDistrictResponse.InfoDTO> locations = publicDistrictService.searchLocations(emd);
 
         return buildSuccessResponseWithPairKeyData("locations", locations, "위치 검색을 성공하였습니다.", HttpStatus.OK);
     }

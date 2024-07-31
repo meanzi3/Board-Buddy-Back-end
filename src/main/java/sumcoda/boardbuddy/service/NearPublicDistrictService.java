@@ -1,6 +1,7 @@
 package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.NearPublicDistrictRequest;
@@ -15,12 +16,10 @@ import sumcoda.boardbuddy.repository.nearPublicDistric.NearPublicDistrictReposit
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 import sumcoda.boardbuddy.util.GeoUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -32,6 +31,8 @@ public class NearPublicDistrictService {
     private final NearPublicDistrictRepository nearPublicDistrictRepository;
     // bulk insert query 를 실행하기 위해 NearPublicDistrictJdbcRepository 주입
     private final NearPublicDistrictJdbcRepository nearPublicDistrictJdbcRepository;
+    // 레디스에서 행정 구역을 조회하기 위해 PublicDistrictRedisService 주입
+    private final PublicDistrictRedisService publicDistrictRedisService;
 
     /**
      * 위치 설정 시 주어진 위치를 기준으로 주변 행정 구역을 저장하는 메서드
@@ -44,9 +45,19 @@ public class NearPublicDistrictService {
         // 반환할 주변 위치 정보를 담을 맵
         Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> nearbyLocations = new HashMap<>();
 
-        // 기준 위치에 해당하는 행정 구역을 조회
-        PublicDistrict publicDistrict = publicDistrictRepository.findBySidoAndSggAndEmd(baseLocation.getSido(), baseLocation.getSgg(), baseLocation.getEmd())
-                .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+        // 기준 위치 선언
+        String sido = baseLocation.getSido();
+        String sgg = baseLocation.getSgg();
+        String emd = baseLocation.getEmd();
+
+        // redis 에서 조회 - 기준 위치에 해당하는 행정 구역을 조회
+        PublicDistrict publicDistrict = publicDistrictRedisService.findBySidoAndSggAndEmd(sido, sgg, emd)
+                .orElseGet(() -> {
+                    // mariadb 에서 조회 - 기준 위치에 해당하는 행정 구역을 조회(redis 장애 발생 시 mariadb 에서 조회)
+                    log.error("[redis findBySidoAndSggAndEmd() error]");
+                    return publicDistrictRepository.findBySidoAndSggAndEmd(sido, sgg, emd)
+                            .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                });
 
         // 기존에 저장된 주변 행정 구역 정보 조회
         List<NearPublicDistrictResponse.InfoDTO> existingNearbyDistricts = nearPublicDistrictRepository.findInfoDTOsByPublicDistrictId(publicDistrict.getId());
@@ -63,11 +74,17 @@ public class NearPublicDistrictService {
             return nearbyLocations;
         }
 
-        // redis 를 사용해서 모든 행정 구역 정보를 조회
-        // 추후 로직 적용
+        // redis 에서 조회 - 모든 행정 구역 정보를 조회
+        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRedisService.findAllInfoDTOs();
 
-        // mariadb 를 사용해서 모든 행정 구역 정보를 조회(redis 장애 시 mariadb 에서 조회)
-        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllInfoDTOs();
+        // mariadb 에서 조회 - 모든 행정 구역 정보를 조회(redis 장애 발생 시 mariadb 에서 조회)
+        if (!allLocations.isEmpty()) {
+            log.info("[redis findAllInfoDTOs() success]");
+        } else {
+            log.error("[redis findAllInfoDTOs() error]");
+            allLocations = publicDistrictRepository.findAllInfoDTOs();
+        }
+
         // 데이터베이스에 새로 추가할 주변 행정 구역 리스트
         List<NearPublicDistrict> allNearPublicDistricts = new ArrayList<>();
 
@@ -126,9 +143,19 @@ public class NearPublicDistrictService {
     @Transactional
     public void saveNearDistrictByRegisterLocation(NearPublicDistrictRequest.LocationDTO baseLocation) {
 
-        // 기준 위치에 해당하는 행정 구역을 조회
-        PublicDistrict publicDistrict = publicDistrictRepository.findBySidoAndSggAndEmd(baseLocation.getSido(), baseLocation.getSgg(), baseLocation.getEmd())
-                .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+        // 기준 위치 선언
+        String sido = baseLocation.getSido();
+        String sgg = baseLocation.getSgg();
+        String emd = baseLocation.getEmd();
+
+        // redis 에서 조회 - 기준 위치에 해당하는 행정 구역을 조회
+        PublicDistrict publicDistrict = publicDistrictRedisService.findBySidoAndSggAndEmd(sido, sgg, emd)
+                .orElseGet(() -> {
+                    // mariadb 에서 조회 - 기준 위치에 해당하는 행정 구역을 조회(redis 장애 발생 시 mariadb 에서 조회)
+                    log.error("[redis findBySidoAndSggAndEmd() error]");
+                    return publicDistrictRepository.findBySidoAndSggAndEmd(sido, sgg, emd)
+                            .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                });
 
         // 기존에 저장된 주변 행정 구역 정보 조회
         List<NearPublicDistrictResponse.InfoDTO> existingNearbyDistricts = nearPublicDistrictRepository.findInfoDTOsByPublicDistrictId(publicDistrict.getId());
@@ -138,11 +165,17 @@ public class NearPublicDistrictService {
             return;
         }
 
-        // redis 를 사용해서 모든 행정 구역 정보를 조회
-        // 추후 로직 적용
+        // redis 에서 조회 - redis 를 사용해서 모든 행정 구역 정보를 조회
+        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRedisService.findAllInfoDTOs();
 
-        // mariadb 를 사용해서 모든 행정 구역 정보를 조회
-        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRepository.findAllInfoDTOs();
+        // mariadb 에서 조회 - mariadb 를 사용해서 모든 행정 구역 정보를 조회(redis 장애 발생 시 mariadb 에서 조회)
+        if (!allLocations.isEmpty()) {
+            log.info("[redis findAllInfoDTOs() success]");
+        } else {
+            log.error("[redis findAllInfoDTOs() error]");
+            allLocations = publicDistrictRepository.findAllInfoDTOs();
+        }
+
         // 데이터베이스에 새로 추가할 주변 행정 구역 리스트
         List<NearPublicDistrict> allNearPublicDistricts = new ArrayList<>();
 

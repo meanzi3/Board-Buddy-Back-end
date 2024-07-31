@@ -28,7 +28,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/auth/login",
                         "/api/oauth2/**",
                         "/api/login/oauth2/code/**",
-                        "/api/rankings"
+                        "/api/rankings",
+                        "/api/locations/search"
                        ));
         WebMvcConfigurer.super.addInterceptors(registry);
     }

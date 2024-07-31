@@ -56,7 +56,7 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
                                 gatherArticle.meetingLocation,
                                 gatherArticle.currentParticipants
                         ).as("gatherArticleSimpleInfo"),
-                        Projections.fields(ChatMessageResponse.LastChatMessageInfoDTO.class,
+                        Projections.fields(ChatMessageResponse.LatestChatMessageInfoDTO.class,
                                 chatMessage.content,
                                 chatMessage.createdAt.as("sentAt")
                         )

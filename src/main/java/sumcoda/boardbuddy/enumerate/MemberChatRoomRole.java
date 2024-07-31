@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ChatRoomRole {
+public enum MemberChatRoomRole {
 
-    AUTHOR("author"),
+    HOST("host"),
     PARTICIPANT("participant");
 
     private final String value;

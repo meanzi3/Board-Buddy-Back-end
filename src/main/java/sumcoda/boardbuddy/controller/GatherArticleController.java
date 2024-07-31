@@ -98,7 +98,7 @@ public class GatherArticleController {
 
         List<GatherArticleResponse.GatherArticleInfosDTO> gatherArticles = gatherArticleService.getMyGatherArticles(username);
 
-        return buildSuccessResponseWithPairKeyData("gatherArticles", gatherArticles, "작성한 모집글이 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("posts", gatherArticles, "작성한 모집글이 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -114,7 +114,7 @@ public class GatherArticleController {
 
         List<GatherArticleResponse.GatherArticleInfosDTO> participations = gatherArticleService.getMyParticipations(username);
 
-        return buildSuccessResponseWithPairKeyData("participations", participations, "참여한 모집글이 조회되었습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("posts", participations, "참가한 모집글이 조회되었습니다.", HttpStatus.OK);
     }
 
     /**
@@ -131,17 +131,10 @@ public class GatherArticleController {
             @RequestParam Integer page,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String sort,
-            @RequestAttribute String username
-    ) {
+            @RequestAttribute String username) {
         log.info("getGatherArticles is working");
 
-        GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(
-                GatherArticleRequest.ReadListDTO.builder()
-                        .page(page)
-                        .status(status)
-                        .sort(sort)
-                        .build()
-                , username);
+        GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(page, status, sort, username);
 
         return buildSuccessResponseWithMultiplePairKeyData(posts, "모집글 리스트 조회를 성공하였습니다.", HttpStatus.OK);
     }

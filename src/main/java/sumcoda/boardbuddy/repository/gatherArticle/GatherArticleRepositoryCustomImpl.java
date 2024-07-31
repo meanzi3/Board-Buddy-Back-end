@@ -3,6 +3,8 @@ package sumcoda.boardbuddy.repository.gatherArticle;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.entity.QMemberGatherArticle;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
+import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +25,7 @@ import java.util.Optional;
 import static sumcoda.boardbuddy.entity.QGatherArticle.gatherArticle;
 import static sumcoda.boardbuddy.entity.QMember.member;
 import static sumcoda.boardbuddy.entity.QMemberGatherArticle.memberGatherArticle;
+import static sumcoda.boardbuddy.entity.QProfileImage.profileImage;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,8 +45,8 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.gatherArticleStatus
-                        ))
+                        gatherArticle.gatherArticleStatus.as("status")
+                ))
                 .from(member)
                 .join(member.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.gatherArticle, gatherArticle)
@@ -62,7 +67,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.gatherArticleStatus
+                        gatherArticle.gatherArticleStatus.as("status")
                 ))
                 .from(member)
                 .join(member.memberGatherArticles, memberGatherArticle)
@@ -108,7 +113,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
 
     @Override
     public Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
-            List<String> sidoList, List<String> siguList, List<String> dongList, String status, String sort, Pageable pageable) {
+            List<String> sidoList, List<String> sggList, List<String> emdList, String status, String sort, Pageable pageable) {
 
         List<GatherArticleResponse.ReadSliceDTO> results = jpaQueryFactory.select(Projections.fields(
                         GatherArticleResponse.ReadSliceDTO.class,
@@ -124,12 +129,12 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.gatherArticleStatus))
+                        gatherArticle.gatherArticleStatus.as("status")))
                 .from(gatherArticle)
                 .join(gatherArticle.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.member, member)
                 .where(
-                        inLocation(sidoList, siguList, dongList),
+                        inLocation(sidoList, sggList, emdList),
                         eqStatus(status)
                 )
                 .orderBy(getOrderSpecifier(sort))
@@ -173,10 +178,10 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
         return status != null ? gatherArticle.gatherArticleStatus.eq(GatherArticleStatus.valueOf(status.toUpperCase())) : null;
     }
 
-    private BooleanExpression inLocation(List<String> sidoList, List<String> siguList, List<String> dongList) {
+    private BooleanExpression inLocation(List<String> sidoList, List<String> sggList, List<String> emdList) {
         return gatherArticle.sido.in(sidoList)
-                .and(gatherArticle.sigu.in(siguList))
-                .and(gatherArticle.dong.in(dongList));
+                .and(gatherArticle.sgg.in(sggList))
+                .and(gatherArticle.emd.in(emdList));
     }
 
     private OrderSpecifier<?> getOrderSpecifier(String sort) {
@@ -185,5 +190,52 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
         } else {
             return gatherArticle.id.desc();
         }
+    }
+
+    @Override
+    public GatherArticleResponse.ReadDTO findGatherArticleReadDTOByGatherArticleId(Long gatherArticleId, Long memberId) {
+
+        // 현재 사용자의 참여 상태를 위한 서브쿼리
+        QMemberGatherArticle currentUserParticipation = new QMemberGatherArticle("currentUserParticipation");
+
+        return jpaQueryFactory
+                .select(Projections.fields(
+                        GatherArticleResponse.ReadDTO.class,
+                        gatherArticle.title,
+                        gatherArticle.description,
+                        Projections.fields(GatherArticleResponse.AuthorDTO.class,
+                                member.nickname.as("nickname"),
+                                member.rank.as("rank"),
+                                member.profileImage.profileImageS3SavedURL.as("profileImageS3SavedURL"),
+                                member.description.as("description")
+                        ).as("author"),
+                        gatherArticle.sido,
+                        gatherArticle.sgg,
+                        gatherArticle.emd,
+                        gatherArticle.meetingLocation,
+                        gatherArticle.x,
+                        gatherArticle.y,
+                        gatherArticle.maxParticipants,
+                        gatherArticle.currentParticipants,
+                        gatherArticle.startDateTime,
+                        gatherArticle.endDateTime,
+                        gatherArticle.createdAt,
+                        gatherArticle.gatherArticleStatus.as("status"),
+                        new CaseBuilder()
+                                .when(currentUserParticipation.isNull())
+                                .then(Expressions.constant(ParticipationApplicationStatus.NONE))
+                                .when(currentUserParticipation.participationApplication.isNull())
+                                .then(Expressions.constant(ParticipationApplicationStatus.NONE))
+                                .otherwise(currentUserParticipation.participationApplication.participationApplicationStatus).as("participationApplicationStatus")
+                ))
+                .from(gatherArticle)
+                .leftJoin(gatherArticle.memberGatherArticles, memberGatherArticle)
+                .leftJoin(memberGatherArticle.member, member)
+                .leftJoin(member.profileImage, profileImage)
+                .leftJoin(currentUserParticipation).on(currentUserParticipation.gatherArticle.eq(gatherArticle).and(currentUserParticipation.member.id.eq(memberId)))
+                .where(gatherArticle.id.eq(gatherArticleId)
+                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
+                        .and(memberGatherArticle.member.eq(member)))
+                .fetchOne();
     }
 }

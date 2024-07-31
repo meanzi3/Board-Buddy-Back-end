@@ -5,21 +5,21 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class BoardCafeRequest {
+public class NearPublicDistrictRequest {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class LocationDTO {
 
-        private Double x;
-        private Double y;
-        private Integer radius;
+        private String sido;
+        private String sgg;
+        private String emd;
 
         @Builder
-        public LocationDTO(Double x, Double y, Integer radius) {
-            this.x = x;
-            this.y = y;
-            this.radius = radius;
+        public LocationDTO(String sido, String sgg, String emd) {
+            this.sido = sido;
+            this.sgg = sgg;
+            this.emd = emd;
         }
     }
 }

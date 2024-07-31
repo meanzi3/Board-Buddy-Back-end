@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface PublicDistrictRepository extends JpaRepository<PublicDistrict, Long>, PublicDistrictRepositoryCustom {
-    Optional<PublicDistrict> findBySidoAndSiguAndDong(String sido, String sigu, String dong);
+    Optional<PublicDistrict> findBySidoAndSggAndEmd(String sido, String sgg, String emd);
 }

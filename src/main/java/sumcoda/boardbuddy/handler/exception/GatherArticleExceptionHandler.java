@@ -66,4 +66,10 @@ public class GatherArticleExceptionHandler {
   public ResponseEntity<ApiResponse<Void>> handleGatherArticleStatusException(GatherArticleStatusException e) {
     return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
   }
+
+  // 모집글 상태 확인 예외 처리 핸들러
+  @ExceptionHandler(GatherArticleNotCompletedException.class)
+  public ResponseEntity<ApiResponse<Void>> handleGatherArticleNotCompletedException(GatherArticleNotCompletedException e) {
+    return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+  }
 }

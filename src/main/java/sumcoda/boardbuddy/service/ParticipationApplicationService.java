@@ -91,7 +91,7 @@ public class ParticipationApplicationService {
                 .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         MemberGatherArticle memberGatherArticle = MemberGatherArticle.buildMemberGatherArticle(
-                null, MemberGatherArticleRole.NONE, member, gatherArticle);
+                null, MemberGatherArticleRole.NONE, 0, member, gatherArticle);
 
         Long memberGatherArticleId = memberGatherArticleRepository.save(memberGatherArticle).getId();
 

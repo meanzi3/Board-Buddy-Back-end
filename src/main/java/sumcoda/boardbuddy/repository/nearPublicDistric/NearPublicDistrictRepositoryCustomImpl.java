@@ -19,8 +19,8 @@ public class NearPublicDistrictRepositoryCustomImpl implements NearPublicDistric
         return jpaQueryFactory
                 .select(Projections.fields(NearPublicDistrictResponse.InfoDTO.class,
                         nearPublicDistrict.sido,
-                        nearPublicDistrict.sigu,
-                        nearPublicDistrict.dong,
+                        nearPublicDistrict.sgg,
+                        nearPublicDistrict.emd,
                         nearPublicDistrict.radius))
                 .from(nearPublicDistrict)
                 .where(nearPublicDistrict.publicDistrict.id.eq(publicDistrictId))
@@ -32,8 +32,8 @@ public class NearPublicDistrictRepositoryCustomImpl implements NearPublicDistric
         return jpaQueryFactory
                 .select(Projections.fields(NearPublicDistrictResponse.LocationDTO.class,
                         nearPublicDistrict.sido,
-                        nearPublicDistrict.sigu,
-                        nearPublicDistrict.dong))
+                        nearPublicDistrict.sgg,
+                        nearPublicDistrict.emd))
                 .from(nearPublicDistrict)
                 .where(nearPublicDistrict.publicDistrict.id.eq(publicDistrictId)
                         .and(nearPublicDistrict.radius.eq(radius)))

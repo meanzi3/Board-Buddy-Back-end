@@ -7,9 +7,9 @@ import java.util.Optional;
 
 public interface PublicDistrictRepositoryCustom {
 
-    Optional<PublicDistrictResponse.LocationDTO> findLocationDTOBySidoAndSiguAndDong(String sido, String sigu, String dong);
+    List<PublicDistrictResponse.InfoDTO> findAllInfoDTOs();
 
-    List<PublicDistrictResponse.InfoDTO> findAllPublicDistrictInfoDTOs();
+    List<PublicDistrictResponse.InfoDTO> findInfoDTOsByEmd(String emd);
 
-    Optional<PublicDistrictResponse.LocationWithIdDTO> findLocationWithIdDTOBySidoAndSiguAndDong(String sido, String sigu, String dong);
+    Optional<PublicDistrictResponse.IdDTO> findIdDTOBySidoAndSggAndEmd(String sido, String sgg, String emd);
 }

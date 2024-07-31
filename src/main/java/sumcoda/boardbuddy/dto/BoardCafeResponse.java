@@ -30,12 +30,12 @@ public class BoardCafeResponse {
 
         private String sido;
 
-        private String sigu;
+        private String sgg;
 
-        private String dong;
+        private String emd;
 
         @Builder
-        public InfoDTO(String addressName, Integer distance, Integer id, String phone, String placeName, String placeUrl, String roadAddressName, Double x, Double y, String sido, String sigu, String dong) {
+        public InfoDTO(String addressName, Integer distance, Integer id, String phone, String placeName, String placeUrl, String roadAddressName, Double x, Double y, String sido, String sgg, String emd) {
             this.addressName = addressName;
             this.distance = distance;
             this.id = id;
@@ -46,8 +46,8 @@ public class BoardCafeResponse {
             this.x = x;
             this.y = y;
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
         }
     }
 }

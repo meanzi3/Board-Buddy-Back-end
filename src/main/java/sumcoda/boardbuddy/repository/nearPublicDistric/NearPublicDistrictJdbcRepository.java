@@ -17,14 +17,14 @@ public class NearPublicDistrictJdbcRepository {
 
     @Transactional
     public void saveAll(List<NearPublicDistrict> nearPublicDistricts) {
-        String sql = "INSERT INTO near_public_district (sido, sigu, dong, radius, public_district_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO near_public_district (sido, sgg, emd, radius, public_district_id) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.batchUpdate(sql,
                 nearPublicDistricts,
                 nearPublicDistricts.size(),
                 (PreparedStatement ps, NearPublicDistrict nearPublicDistrict) -> {
                     ps.setString(1, nearPublicDistrict.getSido());
-                    ps.setString(2, nearPublicDistrict.getSigu());
-                    ps.setString(3, nearPublicDistrict.getDong());
+                    ps.setString(2, nearPublicDistrict.getSgg());
+                    ps.setString(3, nearPublicDistrict.getEmd());
                     ps.setInt(4, nearPublicDistrict.getRadius());
                     ps.setLong(5, nearPublicDistrict.getPublicDistrict().getId());
                 });

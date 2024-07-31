@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sumcoda.boardbuddy.entity.GatherArticle;
-import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
+import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,11 +64,6 @@ public class GatherArticleResponse {
             this.id = id;
         }
 
-        public static GatherArticleResponse.CreateDTO from(GatherArticle gatherArticle) {
-            return GatherArticleResponse.CreateDTO.builder()
-                    .id(gatherArticle.getId())
-                    .build();
-        }
     }
 
     @Getter
@@ -78,6 +72,9 @@ public class GatherArticleResponse {
         private String title;
         private String description;
         private GatherArticleResponse.AuthorDTO author;
+        private String sido;
+        private String sgg;
+        private String emd;
         private String meetingLocation;
         private Double x;
         private Double y;
@@ -90,15 +87,18 @@ public class GatherArticleResponse {
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
         private LocalDateTime createdAt;
         private GatherArticleStatus status;
-        private String participationStatus;
+        private ParticipationApplicationStatus participationApplicationStatus;
 
         @Builder
-        public ReadDTO(String title, String description, AuthorDTO author, String meetingLocation, Double x, Double y,
+        public ReadDTO(String title, String description, AuthorDTO author, String sido, String sgg, String emd, String meetingLocation, Double x, Double y,
                        Integer maxParticipants, Integer currentParticipants, LocalDateTime startDateTime,
-                       LocalDateTime endDateTime, LocalDateTime createdAt, GatherArticleStatus status, String participationStatus) {
+                       LocalDateTime endDateTime, LocalDateTime createdAt, GatherArticleStatus status, ParticipationApplicationStatus participationApplicationStatus) {
             this.title = title;
             this.description = description;
             this.author = author;
+            this.sido = sido;
+            this.sgg = sgg;
+            this.emd = emd;
             this.meetingLocation = meetingLocation;
             this.x = x;
             this.y = y;
@@ -108,27 +108,9 @@ public class GatherArticleResponse {
             this.endDateTime = endDateTime;
             this.createdAt = createdAt;
             this.status = status;
-            this.participationStatus = participationStatus;
+            this.participationApplicationStatus = participationApplicationStatus;
         }
 
-        // 엔티티를 response dto로 변환
-        public static GatherArticleResponse.ReadDTO from(GatherArticle gatherArticle, Member member, String participationStatus) {
-            return ReadDTO.builder()
-                    .title(gatherArticle.getTitle())
-                    .description(gatherArticle.getDescription())
-                    .author(AuthorDTO.from(member))
-                    .meetingLocation(gatherArticle.getMeetingLocation())
-                    .x(gatherArticle.getX())
-                    .y(gatherArticle.getY())
-                    .maxParticipants(gatherArticle.getMaxParticipants())
-                    .currentParticipants(gatherArticle.getCurrentParticipants())
-                    .startDateTime(gatherArticle.getStartDateTime())
-                    .endDateTime(gatherArticle.getEndDateTime())
-                    .createdAt(gatherArticle.getCreatedAt())
-                    .status(gatherArticle.getGatherArticleStatus())
-                    .participationStatus(participationStatus)
-                    .build();
-        }
     }
 
     @Getter
@@ -147,15 +129,6 @@ public class GatherArticleResponse {
             this.description = description;
         }
 
-        // 엔티티를 response dto로 변환
-        public static GatherArticleResponse.AuthorDTO from(Member member) {
-            return GatherArticleResponse.AuthorDTO.builder()
-                    .nickname(member.getNickname())
-                    .rank(member.getRank())
-                    .profileImageS3SavedURL(member.getProfileImage() != null ? member.getProfileImage().getProfileImageS3SavedURL() : null)
-                    .description(member.getDescription())
-                    .build();
-        }
     }
 
     @Getter
@@ -168,12 +141,6 @@ public class GatherArticleResponse {
             this.id = id;
         }
 
-        // 엔티티를 response dto로 변환
-        public static GatherArticleResponse.UpdateDTO from(GatherArticle gatherArticle) {
-            return GatherArticleResponse.UpdateDTO.builder()
-                    .id(gatherArticle.getId())
-                    .build();
-        }
     }
 
     @Getter
@@ -186,12 +153,6 @@ public class GatherArticleResponse {
             this.id = id;
         }
 
-        // 엔티티를 response dto로 변환
-        public static GatherArticleResponse.DeleteDTO from(GatherArticle gatherArticle) {
-            return GatherArticleResponse.DeleteDTO.builder()
-                    .id(gatherArticle.getId())
-                    .build();
-        }
     }
 
     @Getter

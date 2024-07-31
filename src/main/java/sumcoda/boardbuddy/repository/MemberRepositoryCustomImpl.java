@@ -38,8 +38,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .select(Projections.fields(MemberResponse.ProfileDTO.class,
                         member.nickname,
                         member.sido,
-                        member.sigu,
-                        member.dong,
+                        member.sgg,
+                        member.emd,
                         member.phoneNumber,
                         profileImage.profileImageS3SavedURL
                 ))
@@ -76,7 +76,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     public Optional<MemberResponse.ProfileInfosDTO> findMemberProfileByNickname(String nickname) {
         List<String> badges = jpaQueryFactory.select(badgeImage.badgeImageS3SavedURL)
                 .from(badgeImage)
-                .where(badgeImage.member.nickname.eq(nickname))
+                .leftJoin(badgeImage.member, member)
+                .where(member.nickname.eq(nickname))
                 .orderBy(badgeImage.id.desc())
                 .limit(3)
                 .fetch();
@@ -101,8 +102,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(MemberResponse.LocationWithRadiusDTO.class,
                         member.sido,
-                        member.sigu,
-                        member.dong,
+                        member.sgg,
+                        member.emd,
                         member.radius
                 ))
                 .from(member)
@@ -115,6 +116,16 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(MemberResponse.UserNameDTO.class,
                         member.username))
+                .from(member)
+                .where(member.username.eq(username))
+                .fetchOne());
+    }
+
+    @Override
+    public Optional<MemberResponse.IdDTO> findIdDTOByUsername(String username) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(MemberResponse.IdDTO.class,
+                        member.id))
                 .from(member)
                 .where(member.username.eq(username))
                 .fetchOne());

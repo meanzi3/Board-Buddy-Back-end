@@ -11,18 +11,18 @@ public class PublicDistrictResponse {
     public static class InfoDTO {
 
         private String sido;
-        private String sigu;
-        private String dong;
-        private Double latitude;
+        private String sgg;
+        private String emd;
         private Double longitude;
+        private Double latitude;
 
         @Builder
-        public InfoDTO(String sido, String sigu, String dong, Double latitude, Double longitude) {
+        public InfoDTO(String sido, String sgg, String emd, Double longitude, Double latitude) {
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
-            this.latitude = latitude;
+            this.sgg = sgg;
+            this.emd = emd;
             this.longitude = longitude;
+            this.latitude = latitude;
         }
     }
 
@@ -31,31 +31,25 @@ public class PublicDistrictResponse {
     public static class LocationDTO {
 
         private String sido;
-        private String sigu;
-        private String dong;
+        private String sgg;
+        private String emd;
 
         @Builder
-        public LocationDTO(String sido, String sigu, String dong) {
+        public LocationDTO(String sido, String sgg, String emd) {
             this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+            this.sgg = sgg;
+            this.emd = emd;
         }
     }
 
     @Getter
     @NoArgsConstructor
-    public static class LocationWithIdDTO {
+    public static class IdDTO {
 
-        private String sido;
-        private String sigu;
-        private String dong;
         private Long id;
 
         @Builder
-        public LocationWithIdDTO(String sido, String sigu, String dong, Long id) {
-            this.sido = sido;
-            this.sigu = sigu;
-            this.dong = dong;
+        public IdDTO(Long id) {
             this.id = id;
         }
     }

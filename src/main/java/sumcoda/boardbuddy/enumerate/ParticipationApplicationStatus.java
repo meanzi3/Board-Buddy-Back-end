@@ -1,5 +1,6 @@
 package sumcoda.boardbuddy.enumerate;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -13,5 +14,6 @@ public enum ParticipationApplicationStatus {
     REJECTED("rejected"), // 참여 거절 상태
     CANCELED("canceled");  // 참여 취소 상태
 
+    @JsonValue
     private final String value;
 }

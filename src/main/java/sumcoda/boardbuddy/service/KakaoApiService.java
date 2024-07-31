@@ -8,7 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import sumcoda.boardbuddy.dto.BoardCafeRequest;
+import sumcoda.boardbuddy.dto.KakaoApiRequest;
 import sumcoda.boardbuddy.dto.BoardCafeResponse;
 import sumcoda.boardbuddy.dto.KakaoApiResponse;
 import sumcoda.boardbuddy.exception.kakaoApi.KakaoApiServerException;
@@ -46,9 +46,9 @@ public class KakaoApiService {
      * 키워드로 장소 검색 API 요청 처리 메서드
      *
      * @param locationDTO 검색 요청에 대한 위치 정보가 담긴 DTO
-     * @return 검색된 보드카페 정보 DTO 리스트
+     * @return 보드게임 카페 리스트
      */
-    public List<BoardCafeResponse.InfoDTO> requestBoardCafeKeywordSearch(BoardCafeRequest.LocationDTO locationDTO) {
+    public List<BoardCafeResponse.InfoDTO> requestBoardCafeKeywordSearch(KakaoApiRequest.LocationDTO locationDTO) {
 
         // 첫 페이지 번호 초기화
         int page = FIRST_PAGE_NUMBER;
@@ -96,8 +96,8 @@ public class KakaoApiService {
                                             .x(documentDTO.getX())
                                             .y(documentDTO.getY())
                                             .sido(regionDTO.getRegion1depthName())
-                                            .sigu(regionDTO.getRegion2depthName())
-                                            .dong(regionDTO.getRegion3depthName())
+                                            .sgg(regionDTO.getRegion2depthName())
+                                            .emd(regionDTO.getRegion3depthName())
                                             .build();
                                 })
                         .toList();
@@ -144,7 +144,7 @@ public class KakaoApiService {
         // 법정동 정보를 가져옴
         KakaoApiResponse.RegionDTO regionDTO = response.getRegionDTOs().get(LEGAL_DONG_INDEX);
 
-        // sido 가 세종특별자치시인 경우 sido 와 sigu 를 동일하게 설정
+        // sido 가 세종특별자치시인 경우 sido 와 sgg 를 동일하게 설정
         if (SEJONG_SPECIAL_SELF_GOVERNING_CITY.equals(regionDTO.getRegion1depthName())) {
             return KakaoApiResponse.RegionDTO.builder()
                     .region1depthName(SEJONG_SPECIAL_SELF_GOVERNING_CITY)

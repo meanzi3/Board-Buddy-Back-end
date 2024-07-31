@@ -22,43 +22,43 @@ public class PublicDistrict {
     @Column(nullable = false)
     private String sido;
 
-    // 시, 구
+    // 시, 군, 구
     @Column(nullable = false)
-    private String sigu;
+    private String sgg;
 
-    // 동
+    // 읍, 면, 동
     @Column(nullable = false)
-    private String dong;
-
-    // 위도
-    @Column(nullable = false)
-    private Double latitude;
+    private String emd;
 
     // 경도
     @Column(nullable = false)
     private Double longitude;
+
+    // 위도
+    @Column(nullable = false)
+    private Double latitude;
 
     // 연관 관계 설정
     @OneToMany(mappedBy = "publicDistrict")
     private List<NearPublicDistrict> nearPublicDistricts = new ArrayList<>();
 
     @Builder
-    public PublicDistrict(String sido, String sigu, String dong, Double latitude, Double longitude) {
+    public PublicDistrict(String sido, String sgg, String emd, Double longitude, Double latitude) {
         this.sido = sido;
-        this.sigu = sigu;
-        this.dong = dong;
-        this.latitude = latitude;
+        this.sgg = sgg;
+        this.emd = emd;
         this.longitude = longitude;
+        this.latitude = latitude;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static PublicDistrict buildPublicDistrict(String sido, String sigu, String dong, Double latitude, Double longitude) {
+    public static PublicDistrict buildPublicDistrict(String sido, String sgg, String emd, Double longitude, Double latitude) {
         return PublicDistrict.builder()
                 .sido(sido)
-                .sigu(sigu)
-                .dong(dong)
-                .latitude(latitude)
+                .sgg(sgg)
+                .emd(emd)
                 .longitude(longitude)
+                .latitude(latitude)
                 .build();
     }
 

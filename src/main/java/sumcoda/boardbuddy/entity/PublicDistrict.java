@@ -43,7 +43,8 @@ public class PublicDistrict {
     private List<NearPublicDistrict> nearPublicDistricts = new ArrayList<>();
 
     @Builder
-    public PublicDistrict(String sido, String sgg, String emd, Double longitude, Double latitude) {
+    public PublicDistrict(Long id, String sido, String sgg, String emd, Double longitude, Double latitude) {
+        this.id = id;
         this.sido = sido;
         this.sgg = sgg;
         this.emd = emd;
@@ -51,9 +52,21 @@ public class PublicDistrict {
         this.latitude = latitude;
     }
 
-    // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
+    // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성(id 를 제외한 생성자)
     public static PublicDistrict buildPublicDistrict(String sido, String sgg, String emd, Double longitude, Double latitude) {
         return PublicDistrict.builder()
+                .sido(sido)
+                .sgg(sgg)
+                .emd(emd)
+                .longitude(longitude)
+                .latitude(latitude)
+                .build();
+    }
+
+    // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성(id 를 포함한 생성자)
+    public static PublicDistrict buildIdWithPublicDistrict(Long id, String sido, String sgg, String emd, Double longitude, Double latitude) {
+        return PublicDistrict.builder()
+                .id(id)
                 .sido(sido)
                 .sgg(sgg)
                 .emd(emd)

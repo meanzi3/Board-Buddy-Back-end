@@ -37,4 +37,9 @@ public class ChatRoomExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleChatRoomAccessDeniedException(ChatRoomAccessDeniedException e) {
         return buildFailureResponse(e.getMessage(), HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(ChatRoomSaveException.class)
+    public ResponseEntity<ApiResponse<Void>> handleChatRoomSaveException(ChatRoomSaveException e) {
+        return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

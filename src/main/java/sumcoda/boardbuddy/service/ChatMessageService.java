@@ -74,36 +74,14 @@ public class ChatMessageService {
     }
 
     /**
-     * 채팅방 입장 메세지 발행 및채팅방에 사용자 입장 메세지 전송
+     * 채팅방 입장/퇴장 메세지 발행 및 채팅방에 사용자 입장/퇴장 메세지 전송
      *
      * @param chatRoomId 채팅방 Id
-     * @param nickname 입장하는 사용자 닉네임
+     * @param messageType 메세지 유형 (입장/퇴장)
+     * @param username 입장하는 사용자 아이디
      **/
     @Transactional
-    public void publishEnterChatMessage(Long chatRoomId, String nickname) {
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new ChatRoomNotFoundException("해당 채팅방이 존재하지 않습니다."));
-
-        Member member = memberRepository.findByNickname(nickname)
-                .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
-
-        Boolean isMemberChatRoomExists = memberChatRoomRepository.existsByChatRoomIdAndMemberNickname(chatRoomId, nickname);
-        if (!isMemberChatRoomExists) {
-            throw new MemberChatRoomRetrievalException("서버 문제로 해당 채팅방의 사용자 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
-        }
-
-        publishEnterOrExitChatMessage(MessageType.ENTER, member, chatRoom);
-    }
-
-    /**
-     * 채팅방 퇴장 메세지 발행 및 채팅방에 사용자 퇴장 메세지 전송
-     *
-     * @param chatRoomId 채팅방 Id
-     * @param username 퇴장하는 사용자 아이디
-     **/
-    @Transactional
-    public void publishExitChatMessage(Long chatRoomId, String username) {
+    public void publishEnterOrExitChatMessage(Long chatRoomId, MessageType messageType, String username) {
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ChatRoomNotFoundException("해당 채팅방이 존재하지 않습니다."));
@@ -115,20 +93,6 @@ public class ChatMessageService {
         if (!isMemberChatRoomExists) {
             throw new MemberChatRoomRetrievalException("서버 문제로 해당 채팅방의 사용자 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
         }
-
-        publishEnterOrExitChatMessage(MessageType.EXIT, member, chatRoom);
-    }
-
-    /**
-     * 채팅방 입장/퇴장 메세지 발행 및 채팅방에 사용자 입장/퇴장 메세지 전송
-     *
-     * @param messageType 메세지 유형 (입장/퇴장)
-     * @param member 사용자 정보
-     * @param chatRoom 채팅방 정보
-     **/
-    private void publishEnterOrExitChatMessage(MessageType messageType, Member member, ChatRoom chatRoom) {
-
-        Long chatRoomId = chatRoom.getId();
 
         String nickname = member.getNickname();
 

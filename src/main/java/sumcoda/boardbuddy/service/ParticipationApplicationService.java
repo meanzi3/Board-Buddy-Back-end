@@ -3,6 +3,7 @@ package sumcoda.boardbuddy.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.ParticipationApplicationResponse;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
@@ -13,6 +14,7 @@ import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleRetrievalException;
 import sumcoda.boardbuddy.exception.gatherArticle.NotAuthorOfGatherArticleException;
+import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.memberGatherArticle.*;
 import sumcoda.boardbuddy.exception.participationApplication.*;
@@ -120,7 +122,7 @@ public class ParticipationApplicationService {
      * @param username 참가신청을 승인하는 모집글 작성자 아이디
      **/
     @Transactional
-    public void approveParticipationApplication(Long gatherArticleId, Long participationApplicationId, String username) {
+    public String approveParticipationApplication(Long gatherArticleId, Long participationApplicationId, String username, String applicantNickname) {
 
         GatherArticle gatherArticle = gatherArticleRepository.findById(gatherArticleId)
                 .orElseThrow(() -> new GatherArticleRetrievalException("서버 문제로 해당 모집글 정보를 찾을 수 없습니다. 관리자에게 문의하세요"));
@@ -165,6 +167,15 @@ public class ParticipationApplicationService {
         participationApplication.assignParticipationApplicationStatus(ParticipationApplicationStatus.APPROVED);
 
         gatherArticle.assignCurrentParticipants(gatherArticle.getCurrentParticipants() + 1);
+
+        MemberResponse.UserNameDTO userNameDTO = memberRepository.findUsernameDTOByNickname(applicantNickname).orElseThrow(() -> new MemberNotFoundException("참가 승인할 사용자의 정보를 찾을 수 없습니다."));
+
+        String applicantUsername = userNameDTO.getUsername();
+        if (applicantUsername == null) {
+            throw new MemberRetrievalException("서버 문제로 참가 승인할 사용자의 정보를 찾을 수 없습니다.");
+        }
+
+        return applicantUsername;
     }
 
     /**

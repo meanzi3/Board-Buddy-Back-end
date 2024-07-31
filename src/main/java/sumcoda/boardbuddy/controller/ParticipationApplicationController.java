@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.ParticipationApplicationResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
+import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.service.ChatMessageService;
 import sumcoda.boardbuddy.service.ChatRoomService;
 import sumcoda.boardbuddy.service.ParticipationApplicationService;
@@ -49,13 +50,13 @@ public class ParticipationApplicationController {
     @PutMapping("/api/gather-articles/{gatherArticleId}/participation/{participationApplicationId}/approval")
     public ResponseEntity<ApiResponse<Void>> approveParticipationApplication(@PathVariable Long gatherArticleId, @PathVariable Long participationApplicationId, @RequestAttribute String username, @RequestParam String applicantNickname) {
 
-        participationApplicationService.approveParticipationApplication(gatherArticleId, participationApplicationId, username);
+        String applicantUsername = participationApplicationService.approveParticipationApplication(gatherArticleId, participationApplicationId, username, applicantNickname);
 
         // ChatRoom 입장 처리
-        Long chatRoomId = chatRoomService.enterChatRoom(gatherArticleId, applicantNickname);
+        Long chatRoomId = chatRoomService.enterChatRoom(gatherArticleId, applicantUsername);
 
         // 채팅방 입장 메세지 발행 및 전송
-        chatMessageService.publishEnterChatMessage(chatRoomId, applicantNickname);
+        chatMessageService.publishEnterOrExitChatMessage(chatRoomId, MessageType.ENTER, applicantUsername);
 
         return buildSuccessResponseWithoutData(applicantNickname + "님의 참가 신청을 승인 했습니다.", HttpStatus.OK);
     }
@@ -93,7 +94,7 @@ public class ParticipationApplicationController {
             Long chatRoomId = chatRoomService.leaveChatRoom(gatherArticleId, username);
 
             // 채팅방 퇴장 메세지 발행 및 전송
-            chatMessageService.publishExitChatMessage(chatRoomId, username);
+            chatMessageService.publishEnterOrExitChatMessage(chatRoomId, MessageType.EXIT, username);
         }
 
         return buildSuccessResponseWithoutData("해당 모집글의 참가 신청을 취소했습니다.", HttpStatus.OK);

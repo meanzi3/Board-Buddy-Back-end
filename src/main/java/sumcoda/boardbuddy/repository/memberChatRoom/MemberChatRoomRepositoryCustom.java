@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface MemberChatRoomRepositoryCustom {
 
-    Boolean existsByGatherArticleIdAndNickname(Long gatherArticleId, String nickname);
+    Boolean existsByGatherArticleIdAndUsername(Long gatherArticleId, String username);
 
     Optional<MemberChatRoomResponse.ValidateDTO> findByGatherArticleIdAndUsername(Long gatherArticleId, String username);
 }

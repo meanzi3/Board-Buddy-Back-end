@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.GatherArticleRequest;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
+import sumcoda.boardbuddy.enumerate.MessageType;
+import sumcoda.boardbuddy.service.ChatMessageService;
+import sumcoda.boardbuddy.service.ChatRoomService;
 import sumcoda.boardbuddy.service.GatherArticleService;
 
 import java.util.List;
@@ -23,18 +26,35 @@ public class GatherArticleController {
 
     private final GatherArticleService gatherArticleService;
 
+    private final ChatRoomService chatRoomService;
+
+    private final ChatMessageService chatMessageService;
+
     /**
      * 모집글 작성 컨트롤러
      *
-     * @param createRequest
-     * @param username
-     * @return
+     * @param createRequest 모집글 작성 요청 데이터
+     * @param username 모집글 작성자 아이디
+     * @return 생성된 모집글과 관련된 응답 데이터
      */
     @PostMapping(value = "/api/gather-articles")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.CreateDTO>>> createGatherArticle(
             @RequestBody GatherArticleRequest.CreateDTO createRequest,
             @RequestAttribute String username){
+
         GatherArticleResponse.CreateDTO createResponse = gatherArticleService.createGatherArticle(createRequest, username);
+
+        Long gatherArticleId = createResponse.getId();
+
+        // 채팅방 생성
+        chatRoomService.createChatRoom(gatherArticleId);
+
+        // 모집글 작성자 채팅방 입장
+        Long chatRoomId = chatRoomService.enterChatRoom(gatherArticleId, username);
+
+        // 채팅방 입장 메세지 전송
+        chatMessageService.publishEnterOrExitChatMessage(chatRoomId, MessageType.ENTER, username);
+
         return buildSuccessResponseWithPairKeyData("post", createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
     }
 

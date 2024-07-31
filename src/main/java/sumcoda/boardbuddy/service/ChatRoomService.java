@@ -6,13 +6,17 @@ import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.ChatRoomResponse;
 import sumcoda.boardbuddy.dto.MemberChatRoomResponse;
 import sumcoda.boardbuddy.entity.ChatRoom;
+import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberChatRoom;
 import sumcoda.boardbuddy.enumerate.MemberChatRoomRole;
 import sumcoda.boardbuddy.exception.*;
+import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
+import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleRetrievalException;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.repository.chatRoom.ChatRoomRepository;
+import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.memberChatRoom.MemberChatRoomRepository;
 import sumcoda.boardbuddy.repository.MemberRepository;
 
@@ -30,14 +34,41 @@ public class ChatRoomService {
 
     private final MemberRepository memberRepository;
 
+    private final GatherArticleRepository gatherArticleRepository;
+
+    /**
+     * 채팅방 생성
+     *
+     * @param gatherArticleId 채팅방과 연관된 모집글 Id
+     */
+    @Transactional
+    public void createChatRoom(Long gatherArticleId) {
+        GatherArticle gatherArticle = gatherArticleRepository.findById(gatherArticleId)
+                .orElseThrow(() -> new GatherArticleNotFoundException("모집글의 정보를 찾을 수 없습니다."));
+
+        Long gatherArticleValidateId = gatherArticle.getId();
+
+        if (gatherArticleValidateId == null) {
+            throw new GatherArticleRetrievalException("서버 문제로 해당 모집글의 정보를 찾을 수 없습니다.");
+        }
+
+        ChatRoom chatRoom = ChatRoom.buildChatRoom(gatherArticle);
+
+        Long chatRoomId = chatRoomRepository.save(chatRoom).getId();
+
+        if (chatRoomId == null) {
+            throw new ChatRoomSaveException("서버 문제로 채팅방의 정보를 저장하지 못했습니다.");
+        }
+    }
+
     /**
      * 사용자가 특정 모집글과 관련된 채팅방에 입장
      *
      * @param gatherArticleId 모집글 Id
-     * @param nickname 사용자 닉네임
+     * @param username 사용자 아이디
      **/
     @Transactional
-    public Long enterChatRoom(Long gatherArticleId, String nickname) {
+    public Long enterChatRoom(Long gatherArticleId, String username) {
         ChatRoom chatRoom = chatRoomRepository.findByGatherArticleId(gatherArticleId)
                 .orElseThrow(() -> new ChatRoomNotFoundException("해당 모집글에 대한 채팅방이 존재하지 않습니다."));
 
@@ -47,10 +78,10 @@ public class ChatRoomService {
             throw new ChatRoomRetrievalException("서버 문제로 해당 채팅방의 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
         }
 
-        Member member = memberRepository.findByNickname(nickname)
+        Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberNotFoundException("해당 사용자를 찾을 수 없습니다."));
 
-        Boolean isMemberChatRoomExists = memberChatRoomRepository.existsByGatherArticleIdAndNickname(gatherArticleId, nickname);
+        Boolean isMemberChatRoomExists = memberChatRoomRepository.existsByGatherArticleIdAndUsername(gatherArticleId, username);
         if (isMemberChatRoomExists) {
             throw new AlreadyEnteredChatRoomException("해당 채팅방은 이미 입장한 채팅방입니다.");
         }

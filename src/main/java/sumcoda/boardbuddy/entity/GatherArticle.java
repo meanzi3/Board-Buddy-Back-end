@@ -74,7 +74,7 @@ public class GatherArticle extends BaseTimeEntity {
     private Double y;
 
     // 양방향 연관관계
-    @OneToOne(mappedBy = "gatherArticle")
+    @OneToOne(mappedBy = "gatherArticle", cascade = CascadeType.ALL, orphanRemoval = true)
     private ChatRoom chatRoom;
 
     // 양방향 연관관계

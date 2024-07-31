@@ -32,7 +32,7 @@ public class PublicDistrictController {
             @RequestParam String emd
 //            @RequestAttribute String username
     ) {
-        log.info("searchLocations is working");
+        log.info("searchLocations is working: " + emd + "으로 검색하였습니다.");
 
         List<PublicDistrictResponse.InfoDTO> locations = publicDistrictService.searchLocations(emd);
 

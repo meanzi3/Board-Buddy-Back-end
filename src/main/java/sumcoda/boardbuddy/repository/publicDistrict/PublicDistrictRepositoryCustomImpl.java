@@ -16,6 +16,21 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
+    public List<PublicDistrictResponse.InfoWithIdDTO> findAllInfoWithIdDTOs() {
+
+        return jpaQueryFactory
+                .select(Projections.fields(PublicDistrictResponse.InfoWithIdDTO.class,
+                        publicDistrict.id,
+                        publicDistrict.sido,
+                        publicDistrict.sgg,
+                        publicDistrict.emd,
+                        publicDistrict.longitude,
+                        publicDistrict.latitude))
+                .from(publicDistrict)
+                .fetch();
+    }
+
+    @Override
     public List<PublicDistrictResponse.InfoDTO> findAllInfoDTOs() {
 
         return jpaQueryFactory

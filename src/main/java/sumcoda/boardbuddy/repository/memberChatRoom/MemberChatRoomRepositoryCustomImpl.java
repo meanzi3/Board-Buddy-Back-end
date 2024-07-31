@@ -21,11 +21,11 @@ public class MemberChatRoomRepositoryCustomImpl implements MemberChatRoomReposit
      * 특정 모집글 Id와 닉네임을 가진 사용자가 존재하는지 확인
      *
      * @param gatherArticleId 모집글 Id
-     * @param nickname 사용자 닉네임
+     * @param username 사용자 아이디
      * @return 사용자가 존재하면 true, 아니면 false
      **/
     @Override
-    public Boolean existsByGatherArticleIdAndNickname(Long gatherArticleId, String nickname) {
+    public Boolean existsByGatherArticleIdAndUsername(Long gatherArticleId, String username) {
         return jpaQueryFactory
                 .selectOne()
                 .from(memberChatRoom)
@@ -33,7 +33,7 @@ public class MemberChatRoomRepositoryCustomImpl implements MemberChatRoomReposit
                 .leftJoin(memberChatRoom.chatRoom, chatRoom)
                 .leftJoin(chatRoom.gatherArticle, gatherArticle)
                 .where(gatherArticle.id.eq(gatherArticleId)
-                        .and(member.nickname.eq(nickname)))
+                        .and(member.username.eq(username)))
                 .fetchOne() != null;
     }
 

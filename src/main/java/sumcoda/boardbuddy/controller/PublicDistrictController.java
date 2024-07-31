@@ -34,15 +34,10 @@ public class PublicDistrictController {
             @RequestParam String emd
 //            @RequestAttribute String username
     ) {
-        String decodedString = decodeUTF8(emd.getBytes());
-        log.info("searchLocations is working: " + decodedString + "으로 검색하였습니다.");
+        log.info("searchLocations is working: " + emd + "으로 검색하였습니다.");
 
-        List<PublicDistrictResponse.InfoDTO> locations = publicDistrictService.searchLocations(decodedString);
+        List<PublicDistrictResponse.InfoDTO> locations = publicDistrictService.searchLocations(emd);
 
         return buildSuccessResponseWithPairKeyData("locations", locations, "위치 검색을 성공하였습니다.", HttpStatus.OK);
-    }
-
-    public String decodeUTF8(byte[] encodedBytes) {
-        return new String(encodedBytes, StandardCharsets.UTF_8);
     }
 }

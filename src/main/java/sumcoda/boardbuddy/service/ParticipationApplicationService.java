@@ -228,7 +228,7 @@ public class ParticipationApplicationService {
      * @param username 참가신청을 취소하는 사용자 아이디
      **/
     @Transactional
-    public void cancelParticipationApplication(Long gatherArticleId, String username) {
+    public Boolean cancelParticipationApplication(Long gatherArticleId, String username) {
 
         GatherArticle gatherArticle = gatherArticleRepository.findById(gatherArticleId)
                 .orElseThrow(() -> new GatherArticleNotFoundException("해당 모집글이 존재하지 않습니다."));
@@ -258,12 +258,17 @@ public class ParticipationApplicationService {
         // 참가 신청 취소 처리
         participationApplication.assignParticipationApplicationStatus(ParticipationApplicationStatus.CANCELED);
 
+        boolean isMemberParticipant = false;
+
         if (memberGatherArticle.getMemberGatherArticleRole() == MemberGatherArticleRole.PARTICIPANT) {
+            isMemberParticipant = true;
             memberGatherArticle.assignMemberGatherArticleRole(MemberGatherArticleRole.NONE);
         }
 
         // 모집글의 현재 참가자 수 업데이트
         gatherArticle.assignCurrentParticipants(gatherArticle.getCurrentParticipants() - 1);
+
+        return isMemberParticipant;
     }
 
     /**

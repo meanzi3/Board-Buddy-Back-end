@@ -19,6 +19,7 @@ import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleAccessDeniedExcep
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.exception.gatherArticle.*;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
+import sumcoda.boardbuddy.exception.memberGatherArticle.MemberGatherArticleRetrievalException;
 import sumcoda.boardbuddy.exception.nearPublicDistrict.NearPublicDistrictRetrievalException;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
@@ -395,5 +396,32 @@ public class GatherArticleService {
                 .posts(readSliceDTO.getContent())
                 .last(readSliceDTO.isLast())
                 .build();
+    }
+
+    /**
+     * 채팅방 정보와 연관된 모집글 간단 정보 조회
+     *
+     * @param chatRoomId 채팅방 Id
+     * @param gatherArticleId 모집글 Id
+     * @param username 사용자 아이디
+     * @return 채팅방과 연관된 모집글 간단 정보
+     **/
+    public GatherArticleResponse.SummaryInfoDTO getChatRoomGatherArticleSimpleInfo(Long chatRoomId, Long gatherArticleId, String username) {
+
+        // 모집글 정보 조회
+        boolean isGatherArticleExists = gatherArticleRepository.existsByChatRoomIdAndId(chatRoomId, gatherArticleId);
+
+        if (isGatherArticleExists) {
+            throw new GatherArticleNotFoundException("모집글 정보를 찾을 수 없습니다.");
+        }
+
+        Boolean isMemberGatherArticleExists = memberGatherArticleRepository.existsByGatherArticleIdAndMemberUsername(gatherArticleId, username);
+
+        if (!isMemberGatherArticleExists) {
+            throw new MemberGatherArticleRetrievalException("서버 문제로 해당 모집글 관련 사용자의 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
+        }
+
+        return gatherArticleRepository.findSimpleInfoByGatherArticleId(gatherArticleId)
+                .orElseThrow(() -> new GatherArticleRetrievalException("서버 문제로 해당 모집글에 대한 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
     }
 }

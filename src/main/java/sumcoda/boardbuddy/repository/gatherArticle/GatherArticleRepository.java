@@ -12,4 +12,6 @@ public interface GatherArticleRepository extends JpaRepository<GatherArticle, Lo
     Optional<GatherArticle> findById(Long gatherArticleId);
 
     boolean existsById(Long gatherArticleId);
+
+    Boolean existsByChatRoomIdAndId(Long chatRoomId, Long gatherArticleId);
 }

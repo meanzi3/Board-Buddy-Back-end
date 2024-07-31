@@ -9,6 +9,7 @@ import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.PublicDistrictService;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -32,10 +33,16 @@ public class PublicDistrictController {
             @RequestParam String emd
 //            @RequestAttribute String username
     ) {
-        log.info("searchLocations is working: " + emd + "으로 검색하였습니다.");
+        String decodedString = decodeBase64(emd);
+        log.info("searchLocations is working: " + decodedString + "으로 검색하였습니다.");
 
-        List<PublicDistrictResponse.InfoDTO> locations = publicDistrictService.searchLocations(emd);
+        List<PublicDistrictResponse.InfoDTO> locations = publicDistrictService.searchLocations(decodedString);
 
         return buildSuccessResponseWithPairKeyData("locations", locations, "위치 검색을 성공하였습니다.", HttpStatus.OK);
+    }
+
+    public static String decodeBase64(String encodedString) {
+        byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
+        return new String(decodedBytes);
     }
 }

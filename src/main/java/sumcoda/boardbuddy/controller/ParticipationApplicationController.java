@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.ParticipationApplicationResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
+import sumcoda.boardbuddy.service.ChatMessageService;
+import sumcoda.boardbuddy.service.ChatRoomService;
 import sumcoda.boardbuddy.service.ParticipationApplicationService;
 
 import java.util.List;
@@ -18,6 +20,10 @@ import static sumcoda.boardbuddy.builder.ResponseBuilder.*;
 public class ParticipationApplicationController {
 
     private final ParticipationApplicationService participationApplicationService;
+
+    private final ChatRoomService chatRoomService;
+
+    private final ChatMessageService chatMessageService;
 
     /**
      * 모집글 참가 신청 요청
@@ -42,7 +48,14 @@ public class ParticipationApplicationController {
      **/
     @PutMapping("/api/gather-articles/{gatherArticleId}/participation/{participationApplicationId}/approval")
     public ResponseEntity<ApiResponse<Void>> approveParticipationApplication(@PathVariable Long gatherArticleId, @PathVariable Long participationApplicationId, @RequestAttribute String username, @RequestParam String applicantNickname) {
+
         participationApplicationService.approveParticipationApplication(gatherArticleId, participationApplicationId, username);
+
+        // ChatRoom 입장 처리
+        Long chatRoomId = chatRoomService.enterChatRoom(gatherArticleId, applicantNickname);
+
+        // 채팅방 입장 메세지 발행 및 전송
+        chatMessageService.publishEnterChatMessage(chatRoomId, applicantNickname);
 
         return buildSuccessResponseWithoutData(applicantNickname + "님의 참가 신청을 승인 했습니다.", HttpStatus.OK);
     }
@@ -57,6 +70,7 @@ public class ParticipationApplicationController {
      **/
     @PutMapping("/api/gather-articles/{gatherArticleId}/participation/{participationApplicationId}/rejection")
     public ResponseEntity<ApiResponse<Void>> rejectParticipationApplication(@PathVariable Long gatherArticleId, @PathVariable Long participationApplicationId, @RequestAttribute String username, @RequestParam String applicantNickname) {
+
         participationApplicationService.rejectParticipationApplication(gatherArticleId, participationApplicationId, username);
 
         return buildSuccessResponseWithoutData(applicantNickname + "님의 참가 신청을 거절 했습니다.", HttpStatus.OK);
@@ -70,7 +84,17 @@ public class ParticipationApplicationController {
      **/
     @PutMapping("/api/gather-articles/{gatherArticleId}/participation")
     public ResponseEntity<ApiResponse<Void>> cancelParticipationApplication(@PathVariable Long gatherArticleId, @RequestAttribute String username) {
-        participationApplicationService.cancelParticipationApplication(gatherArticleId, username);
+
+        Boolean isMemberParticipant = participationApplicationService.cancelParticipationApplication(gatherArticleId, username);
+
+        // 만약 참가 취소하는 사용자가 참가 승인으로 인하여, 모집글에 참여중인 사용자라면,
+        if (isMemberParticipant) {
+            // ChatRoom 퇴장 처리
+            Long chatRoomId = chatRoomService.leaveChatRoom(gatherArticleId, username);
+
+            // 채팅방 퇴장 메세지 발행 및 전송
+            chatMessageService.publishExitChatMessage(chatRoomId, username);
+        }
 
         return buildSuccessResponseWithoutData("해당 모집글의 참가 신청을 취소했습니다.", HttpStatus.OK);
     }
@@ -84,7 +108,9 @@ public class ParticipationApplicationController {
      **/
     @GetMapping("/api/gather-articles/{gatherArticleId}/participation")
     public ResponseEntity<ApiResponse<Map<String, List<ParticipationApplicationResponse.InfoDTO>>>> getParticipationAppliedMemberList(@PathVariable Long gatherArticleId, @RequestAttribute String username) {
+
         List<ParticipationApplicationResponse.InfoDTO> participationAppliedMemberList = participationApplicationService.getParticipationAppliedMemberList(gatherArticleId, username);
+
         return buildSuccessResponseWithPairKeyData("participationAppliedMemberList", participationAppliedMemberList, "해당 모집글의 참가 신청 목록을 성공적으로 조회했습니다.", HttpStatus.OK);
     }
 }

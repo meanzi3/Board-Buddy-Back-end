@@ -51,7 +51,7 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
                 .select(Projections.fields(ChatRoomResponse.ChatRoomDetailsDTO.class,
                         chatRoom.id.as("chatRoomId"),
                         Projections.fields(GatherArticleResponse.SimpleInfoDTO.class,
-                                gatherArticle.as("gatherArticleId"),
+                                gatherArticle.id.as("gatherArticleId"),
                                 gatherArticle.title,
                                 gatherArticle.meetingLocation,
                                 gatherArticle.currentParticipants

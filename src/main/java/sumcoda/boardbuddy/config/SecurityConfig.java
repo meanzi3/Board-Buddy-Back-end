@@ -74,6 +74,9 @@ public class SecurityConfig {
         configuration.addAllowedHeader("Authorization_Refresh");
         configuration.addAllowedHeader("Access-Control-Allow-Origin");
         configuration.addAllowedHeader("Access-Control-Allow-Credentials");
+        configuration.addAllowedHeader("Upgrade");
+        configuration.addAllowedHeader("Connection");
+
 
         // 노출할 헤더 설정
         configuration.addExposedHeader("Content-Type");

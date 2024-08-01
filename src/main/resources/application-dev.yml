@@ -8,6 +8,7 @@ spring:
     hibernate:
       ddl-auto: create
 
+
   datasource:
     url: ${DEV_DB_URL}
     username: ${DEV_DB_USERNAME}

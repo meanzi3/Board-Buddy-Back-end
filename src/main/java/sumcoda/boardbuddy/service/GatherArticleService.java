@@ -426,7 +426,7 @@ public class GatherArticleService {
         // 모집글 정보 조회
         boolean isGatherArticleExists = gatherArticleRepository.existsByChatRoomIdAndId(chatRoomId, gatherArticleId);
 
-        if (isGatherArticleExists) {
+        if (!isGatherArticleExists) {
             throw new GatherArticleNotFoundException("모집글 정보를 찾을 수 없습니다.");
         }
 

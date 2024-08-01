@@ -129,7 +129,7 @@ public class ChatMessageService {
         }
 
         Boolean isMemberChatRoomExists = memberChatRoomRepository.existsByChatRoomIdAndMemberUsername(chatRoomId, username);
-        if (isMemberChatRoomExists) {
+        if (!isMemberChatRoomExists) {
             throw new ChatRoomAccessDeniedException("해당 채팅방에 입장하지 않은 사용자입니다.");
         }
 

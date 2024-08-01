@@ -399,10 +399,12 @@ public class GatherArticleService {
 
         // 페이징 정보 생성
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        // AUTHOR 로 필터하기 위한 역할 선언
+        MemberGatherArticleRole role = MemberGatherArticleRole.AUTHOR;
 
         // 모집글 리스트 조회
         Slice<GatherArticleResponse.ReadSliceDTO> readSliceDTO = gatherArticleRepository.findReadSliceDTOByLocationAndStatusAndSort(
-                sidoList, sggList, emdList, status, sort, pageable);
+                sidoList, sggList, emdList, status, sort, role, pageable);
 
         // 모집글 리스트 DTO 생성 및 반환
         return GatherArticleResponse.ReadListDTO.builder()

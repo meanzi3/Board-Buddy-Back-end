@@ -33,7 +33,7 @@ public class GatherArticleStatusUpdateJob implements Job{
         // 상태 변경 -> completed
         gatherArticle.assignGatherArticleStatus(GatherArticleStatus.COMPLETED);
 
-        log.info("Status updated successfully for article ID: {} " + gatherArticleId);
+        log.info("Status updated to COMPLETED for gather article ID: {} ", gatherArticleId);
 
         // 해당 모집글의 모든 참가자들의 참가 횟수 1 증가
         gatherArticle.getMemberGatherArticles().stream()

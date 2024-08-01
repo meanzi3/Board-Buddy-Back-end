@@ -9,6 +9,7 @@ import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
 import sumcoda.boardbuddy.entity.ParticipationApplication;
+import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
@@ -168,6 +169,9 @@ public class ParticipationApplicationService {
 
         gatherArticle.assignCurrentParticipants(gatherArticle.getCurrentParticipants() + 1);
 
+        // 모집글 상태 확인, 업데이트
+        updateGatherArticleStatusBasedOnParticipants(gatherArticle);
+
         MemberResponse.UserNameDTO userNameDTO = memberRepository.findUsernameDTOByNickname(applicantNickname).orElseThrow(() -> new MemberNotFoundException("참가 승인할 사용자의 정보를 찾을 수 없습니다."));
 
         String applicantUsername = userNameDTO.getUsername();
@@ -279,6 +283,9 @@ public class ParticipationApplicationService {
         // 모집글의 현재 참가자 수 업데이트
         gatherArticle.assignCurrentParticipants(gatherArticle.getCurrentParticipants() - 1);
 
+        // 모집글 상태 확인, 업데이트
+        updateGatherArticleStatusBasedOnParticipants(gatherArticle);
+
         return isMemberParticipant;
     }
 
@@ -305,5 +312,24 @@ public class ParticipationApplicationService {
 
         // 참가 신청 현황 조회
         return participationApplicationRepository.findParticipationAppliedMemberByGatherArticleId(gatherArticleId);
+    }
+
+    /**
+     * 모집글 상태 확인, 업데이트
+     * @param gatherArticle
+     */
+    private void updateGatherArticleStatusBasedOnParticipants(GatherArticle gatherArticle) {
+        GatherArticleStatus newStatus;
+
+        if (gatherArticle.getCurrentParticipants() >= gatherArticle.getMaxParticipants()) {
+            newStatus = GatherArticleStatus.CLOSED;
+        } else {
+            newStatus = GatherArticleStatus.OPEN;
+        }
+
+        // 상태가 바뀌어야 하는 상황에만 업데이트 수행
+        if (gatherArticle.getGatherArticleStatus() != newStatus) {
+            gatherArticle.assignGatherArticleStatus(newStatus);
+        }
     }
 }

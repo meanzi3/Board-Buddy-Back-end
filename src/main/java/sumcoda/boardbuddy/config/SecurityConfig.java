@@ -55,7 +55,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 허용할 출처 설정
-        configuration.setAllowedOrigins(List.of("https://boardbuddyapp.vercel.app"));
+        configuration.setAllowedOrigins(List.of("https://boardbuddyapp.vercel.app", "wss://boardbuddyapp.com/api/chat/connection"));
 
         // 허용할 HTTP 메서드 설정
         configuration.addAllowedMethod("GET");

@@ -17,6 +17,7 @@ spring:
     hibernate:
       ddl-auto: create
 
+
   data:
     redis:
       host: ${PROD_REDIS_HOST}

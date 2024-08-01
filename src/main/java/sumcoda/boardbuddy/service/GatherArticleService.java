@@ -1,6 +1,7 @@
 package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -33,6 +34,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -52,6 +54,8 @@ public class GatherArticleService {
     private final ParticipationApplicationRepository participationApplicationRepository;
 
     private final GatherArticleStatusUpdateSchedulingService gatherArticleStatusUpdateSchedulingService;
+
+    private final PublicDistrictRedisService publicDistrictRedisService;
 
     /**
      * 모집글 작성
@@ -358,10 +362,19 @@ public class GatherArticleService {
         MemberResponse.LocationWithRadiusDTO locationWithRadiusDTO = memberRepository.findLocationWithRadiusDTOByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        // 기준 위치에 해당하는 행정 구역을 조회
-        PublicDistrictResponse.IdDTO idDTO = publicDistrictRepository.findIdDTOBySidoAndSggAndEmd(
-                        locationWithRadiusDTO.getSido(), locationWithRadiusDTO.getSgg(), locationWithRadiusDTO.getEmd())
-                .orElseThrow(() -> new PublicDistrictRetrievalException("유저의 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+        // 사용자의 위치 선언
+        String sido = locationWithRadiusDTO.getSido();
+        String sgg = locationWithRadiusDTO.getSgg();
+        String emd = locationWithRadiusDTO.getEmd();
+
+        // redis 에서 조회 - 기준 위치에 해당하는 IdDTO 를 조회
+        PublicDistrictResponse.IdDTO idDTO = publicDistrictRedisService.findIdDTOBySidoAndSggAndEmd(sido, sgg, emd)
+                .orElseGet(() -> {
+                    // mariadb 에서 조회 - 기준 위치에 해당하는 IdDTO 를 조회(redis 장애 발생 시 mariadb 에서 조회)
+                    log.error("[redis findIdDTOBySidoAndSggAndEmd() error]");
+                    return publicDistrictRepository.findIdDTOBySidoAndSggAndEmd(sido, sgg, emd)
+                            .orElseThrow(() -> new PublicDistrictRetrievalException("유저의 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                });
 
         // 사용자의 위치와 반경 정보로 주변 행정 구역 조회
         List<NearPublicDistrictResponse.LocationDTO> locationDTOs = nearPublicDistrictRepository.findLocationDTOsByPublicDistrictIdAndRadius(

@@ -1,6 +1,7 @@
 package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.PublicDistrictResponse;
@@ -11,6 +12,7 @@ import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -20,6 +22,8 @@ public class PublicDistrictService {
     private static final int MINIMUM_SEARCH_LENGTH = 2;
 
     private final PublicDistrictRepository publicDistrictRepository;
+
+    private final PublicDistrictRedisService publicDistrictRedisService;
 
     /**
      * 위치 검색
@@ -39,11 +43,16 @@ public class PublicDistrictService {
             throw new SearchLengthException("검색어는 두 글자 이상이어야 합니다.");
         }
 
-        // redis 를 사용해서 위치 검색
-        // 추후 로직 적용
+        // redis 에서 조회 - 위치 검색
+        List<PublicDistrictResponse.InfoDTO> infoDTOs = publicDistrictRedisService.findInfoDTOsByEmd(emd);
 
-        // mariadb 를 사용해서 위치 검색(redis 장애 시 mariadb 에서 검색)
-        List<PublicDistrictResponse.InfoDTO> infoDTOs = publicDistrictRepository.findInfoDTOsByEmd(emd);
+        // mariadb 에서 조회 - 위치 검색(redis 장애 발생 시 mariadb 에서 조회)
+        if (infoDTOs != null) {
+            log.info("[redis findInfoDTOsByEmd() success]");
+        } else {
+            log.error("[redis findInfoDTOsByEmd() error]");
+            infoDTOs = publicDistrictRepository.findInfoDTOsByEmd(emd);
+        }
 
         // 검색 결과가 없는 경우 예외 처리
         if (infoDTOs.isEmpty()) {

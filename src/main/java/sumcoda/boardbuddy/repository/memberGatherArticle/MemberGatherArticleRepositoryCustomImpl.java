@@ -4,6 +4,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
+import java.util.Optional;
+
 import static sumcoda.boardbuddy.entity.QGatherArticle.gatherArticle;
 import static sumcoda.boardbuddy.entity.QMember.member;
 import static sumcoda.boardbuddy.entity.QMemberGatherArticle.memberGatherArticle;
@@ -40,5 +42,19 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
             .fetchOne();
 
     return count != null && count > 0;
+  }
+
+  // 모집글의 작성자를 찾는 메서드
+  @Override
+  public Optional<String> findAuthorUsernameByGatherArticleId(Long gatherArticleId) {
+    String authorUsername = jpaQueryFactory
+            .select(member.username)
+            .from(memberGatherArticle)
+            .join(memberGatherArticle.member, member)
+            .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
+                    .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)))
+            .fetchOne();
+
+    return Optional.ofNullable(authorUsername);
   }
 }

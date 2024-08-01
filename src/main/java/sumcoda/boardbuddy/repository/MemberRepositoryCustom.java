@@ -26,4 +26,6 @@ public interface MemberRepositoryCustom {
     Optional<MemberResponse.IdDTO> findIdDTOByUsername(String username);
 
     Optional<MemberResponse.UserNameDTO> findUsernameDTOByNickname(String nickname);
+
+    Optional<MemberResponse.NicknameDTO> findNicknameDTOByUsername(String username);
 }

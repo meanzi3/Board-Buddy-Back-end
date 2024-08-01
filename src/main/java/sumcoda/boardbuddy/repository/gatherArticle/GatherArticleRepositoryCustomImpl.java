@@ -243,4 +243,14 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         .and(memberGatherArticle.member.eq(member)))
                 .fetchOne();
     }
+
+    @Override
+    public Optional<GatherArticleResponse.TitleDTO> findTitleDTOById(Long gatherArticleId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(GatherArticleResponse.TitleDTO.class,
+                        gatherArticle.title))
+                .from(gatherArticle)
+                .where(gatherArticle.id.eq(gatherArticleId))
+                .fetchOne());
+    }
 }

@@ -140,4 +140,14 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .where(member.nickname.eq(nickname))
                 .fetchOne());
     }
+
+    @Override
+    public Optional<MemberResponse.NicknameDTO> findNicknameDTOByUsername(String username) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(MemberResponse.NicknameDTO.class,
+                        member.nickname))
+                .from(member)
+                .where(member.username.eq(username))
+                .fetchOne());
+    }
 }

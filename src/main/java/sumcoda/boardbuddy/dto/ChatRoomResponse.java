@@ -3,29 +3,8 @@ package sumcoda.boardbuddy.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sumcoda.boardbuddy.enumerate.MemberChatRoomRole;
-
-import java.time.LocalDateTime;
 
 public class ChatRoomResponse {
-
-    @Getter
-    @NoArgsConstructor
-    public static class InfoDTO {
-
-        private Long id;
-
-        private LocalDateTime joinedAt;
-
-        private MemberChatRoomRole memberChatRoomRole;
-
-        @Builder
-        public InfoDTO(Long id, LocalDateTime joinedAt, MemberChatRoomRole memberChatRoomRole) {
-            this.id = id;
-            this.joinedAt = joinedAt;
-            this.memberChatRoomRole = memberChatRoomRole;
-        }
-    }
 
     @Getter
     @NoArgsConstructor
@@ -41,7 +20,7 @@ public class ChatRoomResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class ChatRoomDetailsDTO {
+    public static final class ChatRoomDetailsDTO {
 
         private Long chatRoomId;
 

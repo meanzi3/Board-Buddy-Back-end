@@ -65,17 +65,18 @@ public class SecurityConfig {
         configuration.addAllowedMethod("PUT");
 
         // 허용할 헤더 설정
-        configuration.addAllowedHeader("Origin");
-        configuration.addAllowedHeader("Content-Type");
-        configuration.addAllowedHeader("Accept");
-        configuration.addAllowedHeader("Cache-Control");
-        configuration.addAllowedHeader("Authorization");
-        configuration.addAllowedHeader("X-AUTH-TOKEN");
-        configuration.addAllowedHeader("Authorization_Refresh");
-        configuration.addAllowedHeader("Access-Control-Allow-Origin");
-        configuration.addAllowedHeader("Access-Control-Allow-Credentials");
-        configuration.addAllowedHeader("Upgrade");
-        configuration.addAllowedHeader("Connection");
+//        configuration.addAllowedHeader("Origin");
+//        configuration.addAllowedHeader("Content-Type");
+//        configuration.addAllowedHeader("Accept");
+//        configuration.addAllowedHeader("Cache-Control");
+//        configuration.addAllowedHeader("Authorization");
+//        configuration.addAllowedHeader("X-AUTH-TOKEN");
+//        configuration.addAllowedHeader("Authorization_Refresh");
+//        configuration.addAllowedHeader("Access-Control-Allow-Origin");
+//        configuration.addAllowedHeader("Access-Control-Allow-Credentials");
+//        configuration.addAllowedHeader("Upgrade");
+//        configuration.addAllowedHeader("Connection");
+        configuration.addAllowedHeader("*");
 
 
         // 노출할 헤더 설정

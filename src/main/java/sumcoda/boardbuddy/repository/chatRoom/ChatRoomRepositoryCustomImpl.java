@@ -50,7 +50,7 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
         return jpaQueryFactory
                 .select(Projections.fields(ChatRoomResponse.ChatRoomDetailsDTO.class,
                         chatRoom.id,
-                        Projections.constructor(GatherArticleResponse.SimpleInfoDTO.class,
+                        Projections.fields(GatherArticleResponse.SimpleInfoDTO.class,
                                 gatherArticle.id,
                                 gatherArticle.title,
                                 gatherArticle.meetingLocation,
@@ -59,7 +59,7 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
                         Projections.fields(ChatMessageResponse.LatestChatMessageInfoDTO.class,
                                 chatMessage.content,
                                 chatMessage.createdAt.as("sentAt")
-                        )
+                        ).as("latestChatMessageInfo")
                 ))
                 .from(chatRoom)
                 .leftJoin(chatRoom.chatMessages, chatMessage)

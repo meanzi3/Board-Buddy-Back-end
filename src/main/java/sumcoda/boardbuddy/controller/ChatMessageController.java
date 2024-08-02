@@ -33,7 +33,7 @@ public class ChatMessageController {
      * @param publishDTO 발행할 메세지 내용 DTO
      * @param username 메시지를 발행하는 사용자 이름
      **/
-    @MessageMapping("/publication/{chatRoomId}")
+    @MessageMapping("/{chatRoomId}")
     public void publishMessage(
             @DestinationVariable Long chatRoomId,
             @Payload ChatMessageRequest.PublishDTO publishDTO,

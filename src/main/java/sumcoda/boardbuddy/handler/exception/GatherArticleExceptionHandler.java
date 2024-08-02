@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.exception.gatherArticle.*;
-import sumcoda.boardbuddy.exception.gatherArticle.NotAuthorOfGatherArticleException;
 
 
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildErrorResponse;
@@ -36,17 +35,6 @@ public class GatherArticleExceptionHandler {
   // 작성자 확인 예외 처리 핸들러
   @ExceptionHandler(GatherArticleAccessDeniedException.class)
   public ResponseEntity<ApiResponse<Void>> handleGatherArticleAccessDeniedException(GatherArticleAccessDeniedException e) {
-    return buildFailureResponse(e.getMessage(), HttpStatus.FORBIDDEN);
-  }
-
-
-  @ExceptionHandler(GatherArticleClosedException.class)
-  public ResponseEntity<ApiResponse<Void>> handleArticleClosedException(GatherArticleClosedException e) {
-    return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler(NotAuthorOfGatherArticleException.class)
-  public ResponseEntity<ApiResponse<Void>> handleNotAuthorOfGatherArticleException(NotAuthorOfGatherArticleException e) {
     return buildFailureResponse(e.getMessage(), HttpStatus.FORBIDDEN);
   }
 

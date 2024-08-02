@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface ParticipationApplicationRepositoryCustom {
 
-    Boolean existsByGatherArticleInAndUsername(Long gatherArticleId, String username);
+    Boolean existsByGatherArticleIdAndUsername(Long gatherArticleId, String username);
 
     Optional<ParticipationApplication> findByGatherArticleIdAndMemberUsername(Long gatherArticleId, String username);
 

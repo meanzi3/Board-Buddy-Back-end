@@ -92,7 +92,7 @@ public class GatherArticleService {
         memberGatherArticleRepository.save(memberGatherArticle);
 
         // participationApplication 생성
-        ParticipationApplication participationApplication = ParticipationApplication.buildParticipationRequest(0, ParticipationApplicationStatus.APPROVED, memberGatherArticle);
+        ParticipationApplication participationApplication = ParticipationApplication.buildParticipationApplication(0, ParticipationApplicationStatus.APPROVED, memberGatherArticle);
 
         // 저장
         participationApplicationRepository.save(participationApplication);

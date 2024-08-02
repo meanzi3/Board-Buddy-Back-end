@@ -12,9 +12,9 @@ import sumcoda.boardbuddy.entity.ParticipationApplication;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
+import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleAccessDeniedException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleRetrievalException;
-import sumcoda.boardbuddy.exception.gatherArticle.NotAuthorOfGatherArticleException;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.memberGatherArticle.*;
@@ -54,7 +54,7 @@ public class ParticipationApplicationService {
 
         Boolean isMemberGatherArticleExists = memberGatherArticleRepository.existsByGatherArticleIdAndMemberUsername(gatherArticleId, username);
 
-        Boolean isParticipationApplicationExists = participationApplicationRepository.existsByGatherArticleInAndUsername(gatherArticleId, username);
+        Boolean isParticipationApplicationExists = participationApplicationRepository.existsByGatherArticleIdAndUsername(gatherArticleId, username);
         // 이미 해당 모집글에 참가신청한 이력이 있는지 확인
         if (isMemberGatherArticleExists && isParticipationApplicationExists) {
             ParticipationApplication participationApplication = participationApplicationRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, username)
@@ -102,11 +102,12 @@ public class ParticipationApplicationService {
             throw new MemberGatherArticleSaveException("서버 문제로 해당 모집글 관련한 사용자의 정보 저장을 실패하였습니다. 관리자에게 문의하세요.");
         }
 
-        ParticipationApplication participationApplication = ParticipationApplication.builder()
-                .rejectedParticipationCount(0)
-                .participationApplicationStatus(ParticipationApplicationStatus.PENDING)
-                .memberGatherArticle(memberGatherArticle)
-                .build();
+        ParticipationApplication participationApplication =
+                ParticipationApplication.buildParticipationApplication(
+                        0,
+                        ParticipationApplicationStatus.PENDING,
+                        memberGatherArticle);
+
 
         Long participationApplicationId = participationApplicationRepository.save(participationApplication).getId();
 
@@ -131,7 +132,7 @@ public class ParticipationApplicationService {
         Boolean isMemberAuthorOfGatherArticle = gatherArticleRepository.isMemberAuthorOfGatherArticle(gatherArticleId, username);
 
         if (!isMemberAuthorOfGatherArticle) {
-            throw new NotAuthorOfGatherArticleException("해당 모집글의 작성자가 아니므로 참가신청 수락 권한이 없습니다.");
+            throw new GatherArticleAccessDeniedException("해당 모집글의 작성자가 아니므로 참가신청 수락 권한이 없습니다.");
         }
 
         ParticipationApplication participationApplication = participationApplicationRepository.findById(participationApplicationId)
@@ -167,19 +168,15 @@ public class ParticipationApplicationService {
 
         participationApplication.assignParticipationApplicationStatus(ParticipationApplicationStatus.APPROVED);
 
-        gatherArticle.assignCurrentParticipants(gatherArticle.getCurrentParticipants() + 1);
+        Integer newParticipantsCount = gatherArticle.getCurrentParticipants() + 1;
+        gatherArticle.assignCurrentParticipants(newParticipantsCount);
 
         // 모집글 상태 확인, 업데이트
-        updateGatherArticleStatusBasedOnParticipants(gatherArticle);
+        updateGatherArticleStatusBasedOnParticipants(gatherArticle, newParticipantsCount);
 
         MemberResponse.UserNameDTO userNameDTO = memberRepository.findUsernameDTOByNickname(applicantNickname).orElseThrow(() -> new MemberNotFoundException("참가 승인할 사용자의 정보를 찾을 수 없습니다."));
 
-        String applicantUsername = userNameDTO.getUsername();
-        if (applicantUsername == null) {
-            throw new MemberRetrievalException("서버 문제로 참가 승인할 사용자의 정보를 찾을 수 없습니다.");
-        }
-
-        return applicantUsername;
+        return userNameDTO.getUsername();
     }
 
     /**
@@ -199,7 +196,7 @@ public class ParticipationApplicationService {
         Boolean isMemberAuthorOfGatherArticle = gatherArticleRepository.isMemberAuthorOfGatherArticle(gatherArticleId, username);
 
         if (!isMemberAuthorOfGatherArticle) {
-            throw new NotAuthorOfGatherArticleException("해당 모집글의 작성자가 아니므로 참가신청 거절 권한이 없습니다.");
+            throw new GatherArticleAccessDeniedException("해당 모집글의 작성자가 아니므로 참가신청 거절 권한이 없습니다.");
         }
 
         Boolean isMemberGatherArticleExists = memberGatherArticleRepository.existsByParticipationApplicationId(participationApplicationId);
@@ -277,14 +274,18 @@ public class ParticipationApplicationService {
 
         if (memberGatherArticle.getMemberGatherArticleRole() == MemberGatherArticleRole.PARTICIPANT) {
             isMemberParticipant = true;
+
             memberGatherArticle.assignMemberGatherArticleRole(MemberGatherArticleRole.NONE);
+
+            Integer newParticipantsCount = gatherArticle.getCurrentParticipants() - 1;
+            // 모집글의 현재 참가자 수 업데이트
+            gatherArticle.assignCurrentParticipants(newParticipantsCount);
+
+            // 모집글 상태 확인, 업데이트
+            updateGatherArticleStatusBasedOnParticipants(gatherArticle, newParticipantsCount);
         }
 
-        // 모집글의 현재 참가자 수 업데이트
-        gatherArticle.assignCurrentParticipants(gatherArticle.getCurrentParticipants() - 1);
 
-        // 모집글 상태 확인, 업데이트
-        updateGatherArticleStatusBasedOnParticipants(gatherArticle);
 
         return isMemberParticipant;
     }
@@ -307,7 +308,7 @@ public class ParticipationApplicationService {
         Boolean isMemberAuthorOfGatherArticle = gatherArticleRepository.isMemberAuthorOfGatherArticle(gatherArticleId, username);
 
         if (!isMemberAuthorOfGatherArticle) {
-            throw new NotAuthorOfGatherArticleException("해당 모집글의 작성자가 아니므로 참가신청 목록을 조회할 수 없습니다.");
+            throw new GatherArticleAccessDeniedException("해당 모집글의 작성자가 아니므로 참가신청 목록을 조회할 수 없습니다.");
         }
 
         // 참가 신청 현황 조회
@@ -318,10 +319,10 @@ public class ParticipationApplicationService {
      * 모집글 상태 확인, 업데이트
      * @param gatherArticle
      */
-    private void updateGatherArticleStatusBasedOnParticipants(GatherArticle gatherArticle) {
+    private void updateGatherArticleStatusBasedOnParticipants(GatherArticle gatherArticle, Integer newParticipantsCount) {
         GatherArticleStatus newStatus;
 
-        if (gatherArticle.getCurrentParticipants() >= gatherArticle.getMaxParticipants()) {
+        if (newParticipantsCount >= gatherArticle.getMaxParticipants()) {
             newStatus = GatherArticleStatus.CLOSED;
         } else {
             newStatus = GatherArticleStatus.OPEN;

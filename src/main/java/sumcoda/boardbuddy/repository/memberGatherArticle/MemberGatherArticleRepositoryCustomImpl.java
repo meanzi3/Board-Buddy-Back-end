@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
+import java.util.List;
 import java.util.Optional;
 
 import static sumcoda.boardbuddy.entity.QGatherArticle.gatherArticle;
@@ -57,5 +58,20 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
             .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
                     .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)))
             .fetchOne());
+  }
+
+  //모집글의 모든 참가자를 찾는 메서드
+  @Override
+  public List<MemberResponse.UserNameDTO> findParticipantsByGatherArticleId(Long gatherArticleId) {
+    return jpaQueryFactory
+            .select(Projections.fields(MemberResponse.UserNameDTO.class,
+                    member.username))
+            .from(memberGatherArticle)
+            .join(memberGatherArticle.member, member)
+            .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
+                    .and(memberGatherArticle.memberGatherArticleRole.in(
+                            MemberGatherArticleRole.PARTICIPANT,
+                            MemberGatherArticleRole.AUTHOR)))
+            .fetch();
   }
 }

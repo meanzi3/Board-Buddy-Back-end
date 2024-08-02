@@ -10,6 +10,7 @@ import sumcoda.boardbuddy.entity.MemberGatherArticle;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.exception.gatherArticle.job.GatherArticleScheduleExecuteException;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
+import sumcoda.boardbuddy.service.NotificationService;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -17,6 +18,8 @@ import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 public class GatherArticleStatusUpdateJob implements Job{
 
     private final GatherArticleRepository gatherArticleRepository;
+
+    private final NotificationService notificationService;
 
     // 지정된 시간에 실행되는 메서드
     @Override
@@ -39,5 +42,9 @@ public class GatherArticleStatusUpdateJob implements Job{
         gatherArticle.getMemberGatherArticles().stream()
                 .map(MemberGatherArticle::getMember)
                 .forEach(member -> member.assignJoinCount(member.getJoinCount() + 1));
+
+        // 리뷰 요청 알림 보내기
+        notificationService.notifyReviewRequest(gatherArticleId);
+
     }
 }

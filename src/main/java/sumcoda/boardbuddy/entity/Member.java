@@ -142,6 +142,10 @@ public class Member {
     @JoinColumn(name = "profile_image_id")
     private ProfileImage profileImage;
 
+    // 단방향 연관관계
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Notification> notifications = new ArrayList<>();
+
     // 양방향 연관관계
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<MemberGatherArticle> memberGatherArticles = new ArrayList<>();

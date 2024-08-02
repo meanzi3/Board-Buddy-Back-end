@@ -125,4 +125,15 @@ public class MemberResponse {
             this.id = id;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class NicknameDTO {
+        private String nickname;
+
+        @Builder
+        public NicknameDTO(String nickname) {
+            this.nickname = nickname;
+        }
+    }
 }

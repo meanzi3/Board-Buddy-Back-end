@@ -55,7 +55,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 허용할 출처 설정
-        configuration.setAllowedOrigins(List.of("https://boardbuddyapp.vercel.app"));
+        configuration.setAllowedOrigins(List.of("https://boardbuddyapp.vercel.app", "wss://boardbuddyapp.com/api/chat/connection"));
 
         // 허용할 HTTP 메서드 설정
         configuration.addAllowedMethod("GET");
@@ -65,15 +65,19 @@ public class SecurityConfig {
         configuration.addAllowedMethod("PUT");
 
         // 허용할 헤더 설정
-        configuration.addAllowedHeader("Origin");
-        configuration.addAllowedHeader("Content-Type");
-        configuration.addAllowedHeader("Accept");
-        configuration.addAllowedHeader("Cache-Control");
-        configuration.addAllowedHeader("Authorization");
-        configuration.addAllowedHeader("X-AUTH-TOKEN");
-        configuration.addAllowedHeader("Authorization_Refresh");
-        configuration.addAllowedHeader("Access-Control-Allow-Origin");
-        configuration.addAllowedHeader("Access-Control-Allow-Credentials");
+//        configuration.addAllowedHeader("Origin");
+//        configuration.addAllowedHeader("Content-Type");
+//        configuration.addAllowedHeader("Accept");
+//        configuration.addAllowedHeader("Cache-Control");
+//        configuration.addAllowedHeader("Authorization");
+//        configuration.addAllowedHeader("X-AUTH-TOKEN");
+//        configuration.addAllowedHeader("Authorization_Refresh");
+//        configuration.addAllowedHeader("Access-Control-Allow-Origin");
+//        configuration.addAllowedHeader("Access-Control-Allow-Credentials");
+//        configuration.addAllowedHeader("Upgrade");
+//        configuration.addAllowedHeader("Connection");
+        configuration.addAllowedHeader("*");
+
 
         // 노출할 헤더 설정
         configuration.addExposedHeader("Content-Type");
@@ -128,16 +132,16 @@ public class SecurityConfig {
                 .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(config -> config
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .accessDeniedHandler(customAccessDeniedHandler))
-                // HTTP 응답 헤더를 설정한다.
-                // frameOptions 설정을 sameOrigin 으로 설정하여,
-                // 현재 페이지가 동일한 출처의 페이지에서만 포함될 수 있도록 한다.
-                .headers(
-                        headersConfigurer -> headersConfigurer
-                                .frameOptions(
-                                        HeadersConfigurer.FrameOptionsConfig::sameOrigin
-                                )
-                );
+                        .accessDeniedHandler(customAccessDeniedHandler));
+//                // HTTP 응답 헤더를 설정한다.
+//                // frameOptions 설정을 sameOrigin 으로 설정하여,
+//                // 현재 페이지가 동일한 출처의 페이지에서만 포함될 수 있도록 한다.
+//                .headers(
+//                        headersConfigurer -> headersConfigurer
+//                                .frameOptions(
+//                                        HeadersConfigurer.FrameOptionsConfig::sameOrigin
+//                                )
+//                );
 
         // oauth2 소셜 로그인 구현 코드
         http

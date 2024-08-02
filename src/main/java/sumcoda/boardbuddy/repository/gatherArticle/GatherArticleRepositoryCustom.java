@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.entity.Member;
+import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,10 +22,11 @@ public interface GatherArticleRepositoryCustom {
     Optional<GatherArticleResponse.IdDTO> findIdDTOById(Long gatherArticleId);
 
     Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
-
-    List<String> sidoList, List<String> siguList, List<String> dongList, String status, String sort, Pageable pageable);
+            List<String> sidoList, List<String> siguList, List<String> dongList, String status, String sort, MemberGatherArticleRole role, Pageable pageable);
 
     Optional<GatherArticleResponse.SummaryInfoDTO> findSimpleInfoByGatherArticleId(Long gatherArticleId);
 
     GatherArticleResponse.ReadDTO findGatherArticleReadDTOByGatherArticleId(Long gatherArticleId, Long memberId);
+
+    Optional<GatherArticleResponse.TitleDTO> findTitleDTOById(Long gatherArticleId);
 }

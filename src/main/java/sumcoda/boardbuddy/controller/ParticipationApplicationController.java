@@ -9,6 +9,7 @@ import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.service.ChatMessageService;
 import sumcoda.boardbuddy.service.ChatRoomService;
+import sumcoda.boardbuddy.service.NotificationService;
 import sumcoda.boardbuddy.service.ParticipationApplicationService;
 
 import java.util.List;
@@ -26,6 +27,8 @@ public class ParticipationApplicationController {
 
     private final ChatMessageService chatMessageService;
 
+    private final NotificationService notificationService;
+
     /**
      * 모집글 참가 신청 요청
      *
@@ -35,6 +38,8 @@ public class ParticipationApplicationController {
     @PostMapping("/api/gather-articles/{gatherArticleId}/participation")
     public ResponseEntity<ApiResponse<Void>> applyParticipation(@PathVariable Long gatherArticleId, @RequestAttribute String username) {
         participationApplicationService.applyParticipation(gatherArticleId, username);
+
+        notificationService.notifyApplyParticipation(gatherArticleId, username);
 
         return buildSuccessResponseWithoutData("해당 모집글에 참가 신청이 완료되었습니다.", HttpStatus.OK);
     }
@@ -58,6 +63,8 @@ public class ParticipationApplicationController {
         // 채팅방 입장 메세지 발행 및 전송
         chatMessageService.publishEnterOrExitChatMessage(chatRoomId, MessageType.ENTER, applicantUsername);
 
+        notificationService.notifyApproveParticipation(applicantNickname, gatherArticleId);
+
         return buildSuccessResponseWithoutData(applicantNickname + "님의 참가 신청을 승인 했습니다.", HttpStatus.OK);
     }
 
@@ -73,6 +80,8 @@ public class ParticipationApplicationController {
     public ResponseEntity<ApiResponse<Void>> rejectParticipationApplication(@PathVariable Long gatherArticleId, @PathVariable Long participationApplicationId, @RequestAttribute String username, @RequestParam String applicantNickname) {
 
         participationApplicationService.rejectParticipationApplication(gatherArticleId, participationApplicationId, username);
+
+        notificationService.notifyRejectParticipation(applicantNickname, gatherArticleId);
 
         return buildSuccessResponseWithoutData(applicantNickname + "님의 참가 신청을 거절 했습니다.", HttpStatus.OK);
     }
@@ -96,6 +105,8 @@ public class ParticipationApplicationController {
             // 채팅방 퇴장 메세지 발행 및 전송
             chatMessageService.publishEnterOrExitChatMessage(chatRoomId, MessageType.EXIT, username);
         }
+
+        notificationService.notifyCancelParticipation(gatherArticleId, username);
 
         return buildSuccessResponseWithoutData("해당 모집글의 참가 신청을 취소했습니다.", HttpStatus.OK);
     }

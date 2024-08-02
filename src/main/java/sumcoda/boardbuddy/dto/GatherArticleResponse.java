@@ -281,4 +281,15 @@ public class GatherArticleResponse {
 
 
 
+
+    @Getter
+    @NoArgsConstructor
+    public static class TitleDTO {
+        private String title;
+
+        @Builder
+        public TitleDTO(String title) {
+            this.title = title;
+        }
+    }
 }

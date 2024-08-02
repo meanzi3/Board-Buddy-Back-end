@@ -1,8 +1,6 @@
 package sumcoda.boardbuddy.repository.memberGatherArticle;
 
-import sumcoda.boardbuddy.entity.GatherArticle;
-import sumcoda.boardbuddy.entity.Member;
-import sumcoda.boardbuddy.entity.MemberGatherArticle;
+import java.util.Optional;
 
 
 public interface MemberGatherArticleRepositoryCustom {
@@ -10,4 +8,6 @@ public interface MemberGatherArticleRepositoryCustom {
   boolean isAuthor(Long gatherArticleId, Long memberId);
 
   boolean isHasRole(Long gatherArticleId, String username);
+
+  Optional<String> findAuthorUsernameByGatherArticleId(Long gatherArticleId);
 }

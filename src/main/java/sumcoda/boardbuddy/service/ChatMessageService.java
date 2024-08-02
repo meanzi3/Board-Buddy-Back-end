@@ -70,7 +70,7 @@ public class ChatMessageService {
         ChatMessageResponse.ChatMessageInfoDTO responseChatMessage = chatMessageRepository.findTalkMessageById(chatMessageId)
                 .orElseThrow(() -> new ChatMessageRetrievalException("서버 문제로 해당 메세지를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        messagingTemplate.convertAndSend("/api/chat/reception/" + chatRoomId, responseChatMessage);
+        messagingTemplate.convertAndSend("/api/ws-stomp/reception/" + chatRoomId, responseChatMessage);
     }
 
     /**
@@ -110,7 +110,7 @@ public class ChatMessageService {
                 .orElseThrow(() -> new ChatMessageRetrievalException("서버 문제로 해당 메세지를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 채팅방 구독자들에게 메시지 전송
-        messagingTemplate.convertAndSend("/api/chat/reception/" + chatRoomId, responseChatMessage);
+        messagingTemplate.convertAndSend("/api/ws-stomp/reception/" + chatRoomId, responseChatMessage);
     }
 
     /**
@@ -129,7 +129,7 @@ public class ChatMessageService {
         }
 
         Boolean isMemberChatRoomExists = memberChatRoomRepository.existsByChatRoomIdAndMemberUsername(chatRoomId, username);
-        if (isMemberChatRoomExists) {
+        if (!isMemberChatRoomExists) {
             throw new ChatRoomAccessDeniedException("해당 채팅방에 입장하지 않은 사용자입니다.");
         }
 

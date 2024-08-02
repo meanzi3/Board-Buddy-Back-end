@@ -113,7 +113,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
 
     @Override
     public Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
-            List<String> sidoList, List<String> sggList, List<String> emdList, String status, String sort, Pageable pageable) {
+            List<String> sidoList, List<String> sggList, List<String> emdList, String status, String sort, MemberGatherArticleRole role, Pageable pageable) {
 
         List<GatherArticleResponse.ReadSliceDTO> results = jpaQueryFactory.select(Projections.fields(
                         GatherArticleResponse.ReadSliceDTO.class,
@@ -135,7 +135,8 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .join(memberGatherArticle.member, member)
                 .where(
                         inLocation(sidoList, sggList, emdList),
-                        eqStatus(status)
+                        eqStatus(status),
+                        eqMemberGatherArticleRole(role)
                 )
                 .orderBy(getOrderSpecifier(sort))
                 .offset(pageable.getOffset())
@@ -172,6 +173,10 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .from(gatherArticle)
                 .where(gatherArticle.id.eq(gatherArticleId))
                 .fetchOne());
+    }
+
+    private BooleanExpression eqMemberGatherArticleRole(MemberGatherArticleRole role) {
+        return memberGatherArticle.memberGatherArticleRole.eq(role);
     }
 
     private BooleanExpression eqStatus(String status) {
@@ -237,5 +242,15 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
                         .and(memberGatherArticle.member.eq(member)))
                 .fetchOne();
+    }
+
+    @Override
+    public Optional<GatherArticleResponse.TitleDTO> findTitleDTOById(Long gatherArticleId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(GatherArticleResponse.TitleDTO.class,
+                        gatherArticle.title))
+                .from(gatherArticle)
+                .where(gatherArticle.id.eq(gatherArticleId))
+                .fetchOne());
     }
 }

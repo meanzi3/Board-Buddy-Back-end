@@ -36,7 +36,6 @@ public class ChatMessageResponse {
             this.messageType = messageType;
             this.sentAt = sentAt;
         }
-
     }
 
     @Getter

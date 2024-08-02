@@ -15,10 +15,13 @@ public class MemberChatRoomResponse {
 
         private MemberChatRoomRole memberChatRoomRole;
 
+        private String nickname;
+
         @Builder
-        public ValidateDTO(Long id, MemberChatRoomRole memberChatRoomRole) {
+        public ValidateDTO(Long id, MemberChatRoomRole memberChatRoomRole, String nickname) {
             this.id = id;
             this.memberChatRoomRole = memberChatRoomRole;
+            this.nickname = nickname;
         }
     }
 }

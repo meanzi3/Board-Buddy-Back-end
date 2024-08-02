@@ -49,7 +49,8 @@ public class MemberChatRoomRepositoryCustomImpl implements MemberChatRoomReposit
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(MemberChatRoomResponse.ValidateDTO.class,
                         memberChatRoom.id,
-                        memberChatRoom.memberChatRoomRole
+                        memberChatRoom.memberChatRoomRole,
+                        member.nickname
                 ))
                 .from(memberChatRoom)
                 .leftJoin(memberChatRoom.chatRoom, chatRoom)

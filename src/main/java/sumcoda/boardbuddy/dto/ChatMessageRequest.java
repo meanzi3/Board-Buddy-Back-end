@@ -12,9 +12,12 @@ public class ChatMessageRequest {
     public static class PublishDTO {
         private String content;
 
+        private String nickname;
+
         @Builder
-        public PublishDTO(String content) {
+        public PublishDTO(String content, String nickname) {
             this.content = content;
+            this.nickname = nickname;
         }
     }
 }

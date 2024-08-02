@@ -1,6 +1,7 @@
 package sumcoda.boardbuddy.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,10 +59,10 @@ public class ParticipationApplicationController {
         String applicantUsername = participationApplicationService.approveParticipationApplication(gatherArticleId, participationApplicationId, username, applicantNickname);
 
         // ChatRoom 입장 처리
-        Long chatRoomId = chatRoomService.enterChatRoom(gatherArticleId, applicantUsername);
+        Pair<Long, String> chatRoomIdAndNicknamePair = chatRoomService.enterChatRoom(gatherArticleId, applicantUsername);
 
         // 채팅방 입장 메세지 발행 및 전송
-        chatMessageService.publishEnterOrExitChatMessage(chatRoomId, MessageType.ENTER, applicantUsername);
+        chatMessageService.publishEnterOrExitChatMessage(chatRoomIdAndNicknamePair, MessageType.ENTER);
 
         notificationService.notifyApproveParticipation(applicantNickname, gatherArticleId);
 
@@ -100,10 +101,10 @@ public class ParticipationApplicationController {
         // 만약 참가 취소하는 사용자가 참가 승인으로 인하여, 모집글에 참여중인 사용자라면,
         if (isMemberParticipant) {
             // ChatRoom 퇴장 처리
-            Long chatRoomId = chatRoomService.leaveChatRoom(gatherArticleId, username);
+            Pair<Long, String> chatRoomIdAndNicknamePair = chatRoomService.leaveChatRoom(gatherArticleId, username);
 
             // 채팅방 퇴장 메세지 발행 및 전송
-            chatMessageService.publishEnterOrExitChatMessage(chatRoomId, MessageType.EXIT, username);
+            chatMessageService.publishEnterOrExitChatMessage(chatRoomIdAndNicknamePair, MessageType.EXIT);
         }
 
         notificationService.notifyCancelParticipation(gatherArticleId, username);

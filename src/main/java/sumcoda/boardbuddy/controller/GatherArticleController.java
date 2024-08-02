@@ -2,6 +2,7 @@ package sumcoda.boardbuddy.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,10 +51,10 @@ public class GatherArticleController {
         chatRoomService.createChatRoom(gatherArticleId);
 
         // 모집글 작성자 채팅방 입장
-        Long chatRoomId = chatRoomService.enterChatRoom(gatherArticleId, username);
+        Pair<Long, String> chatRoomAndNicknamePair = chatRoomService.enterChatRoom(gatherArticleId, username);
 
         // 채팅방 입장 메세지 전송
-        chatMessageService.publishEnterOrExitChatMessage(chatRoomId, MessageType.ENTER, username);
+        chatMessageService.publishEnterOrExitChatMessage(chatRoomAndNicknamePair, MessageType.ENTER);
 
         return buildSuccessResponseWithPairKeyData("post", createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
     }

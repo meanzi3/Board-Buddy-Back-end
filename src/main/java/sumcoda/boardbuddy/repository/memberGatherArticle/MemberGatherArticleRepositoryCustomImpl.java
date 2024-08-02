@@ -1,7 +1,9 @@
 package sumcoda.boardbuddy.repository.memberGatherArticle;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
 import java.util.Optional;
@@ -46,15 +48,14 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
 
   // 모집글의 작성자를 찾는 메서드
   @Override
-  public Optional<String> findAuthorUsernameByGatherArticleId(Long gatherArticleId) {
-    String authorUsername = jpaQueryFactory
-            .select(member.username)
+  public Optional<MemberResponse.UserNameDTO> findAuthorUsernameByGatherArticleId(Long gatherArticleId) {
+    return Optional.ofNullable(jpaQueryFactory
+            .select(Projections.fields(MemberResponse.UserNameDTO.class,
+                    member.username))
             .from(memberGatherArticle)
             .join(memberGatherArticle.member, member)
             .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
                     .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)))
-            .fetchOne();
-
-    return Optional.ofNullable(authorUsername);
+            .fetchOne());
   }
 }

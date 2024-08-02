@@ -24,7 +24,7 @@ import sumcoda.boardbuddy.exception.memberGatherArticle.MemberGatherArticleRetri
 import sumcoda.boardbuddy.exception.nearPublicDistrict.NearPublicDistrictRetrievalException;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
 import sumcoda.boardbuddy.repository.nearPublicDistric.NearPublicDistrictRepository;
 import sumcoda.boardbuddy.repository.participationApplication.ParticipationApplicationRepository;
@@ -92,7 +92,7 @@ public class GatherArticleService {
         memberGatherArticleRepository.save(memberGatherArticle);
 
         // participationApplication 생성
-        ParticipationApplication participationApplication = ParticipationApplication.buildParticipationRequest(0, ParticipationApplicationStatus.APPROVED, memberGatherArticle);
+        ParticipationApplication participationApplication = ParticipationApplication.buildParticipationApplication(0, ParticipationApplicationStatus.APPROVED, memberGatherArticle);
 
         // 저장
         participationApplicationRepository.save(participationApplication);

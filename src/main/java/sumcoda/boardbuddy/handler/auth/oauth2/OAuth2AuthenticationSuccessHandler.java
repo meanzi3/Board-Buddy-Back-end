@@ -1,6 +1,5 @@
 package sumcoda.boardbuddy.handler.auth.oauth2;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.dto.auth.oauth2.CustomOAuth2User;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 
 import java.io.IOException;
 

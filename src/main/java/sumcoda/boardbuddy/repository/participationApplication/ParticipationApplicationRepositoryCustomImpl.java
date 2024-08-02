@@ -22,7 +22,7 @@ public class ParticipationApplicationRepositoryCustomImpl implements Participati
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Boolean existsByGatherArticleInAndUsername(Long gatherArticleId, String username) {
+    public Boolean existsByGatherArticleIdAndUsername(Long gatherArticleId, String username) {
         return jpaQueryFactory
                 .selectOne()
                 .from(participationApplication)

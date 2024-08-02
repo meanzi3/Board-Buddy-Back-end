@@ -1,4 +1,4 @@
-package sumcoda.boardbuddy.repository;
+package sumcoda.boardbuddy.repository.chatMessage;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -37,9 +37,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
                         .and(memberChatRoom.member.username.eq(username)))
                 .fetchOne();
 
-        if (joinedAt == null) {
-            throw new MemberChatRoomRetrievalException("서버 문제로 사용자가 해당 채팅방에 입장한 시간을 찾을 수 없습니다. 관리자에게 문의하세요.");
-        }
+        isJoinedAtExists(joinedAt);
 
         return jpaQueryFactory.select(Projections.fields(ChatMessageResponse.ChatMessageInfoDTO.class,
                         chatMessage.content,
@@ -55,6 +53,12 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
                 .where(chatRoom.id.eq(chatRoomId).and(chatMessage.createdAt.after(joinedAt)))
                 .orderBy(chatMessage.createdAt.asc())
                 .fetch();
+    }
+
+    private static void isJoinedAtExists(LocalDateTime joinedAt) {
+        if (joinedAt == null) {
+            throw new MemberChatRoomRetrievalException("서버 문제로 사용자가 해당 채팅방에 입장한 시간을 찾을 수 없습니다. 관리자에게 문의하세요.");
+        }
     }
 
     /**

@@ -24,7 +24,7 @@ public class MemberGatherArticleExceptionHandler {
     }
 
     @ExceptionHandler(MemberGatherArticleNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleMemberGatherArticleAlreadyExistsException(MemberGatherArticleNotFoundException e) {
+    public ResponseEntity<ApiResponse<Void>> handleMemberGatherArticleNotFoundException(MemberGatherArticleNotFoundException e) {
         return buildFailureResponse(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 

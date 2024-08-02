@@ -21,7 +21,7 @@ public class ParticipationApplication {
     private Integer rejectedParticipationCount;
 
     // 모집글에 참가 신청하는 사용자의 상태를 나타내기위한 role
-    // ex) NONE, PENDING, APPROVED, CANCELED
+    // ex) NONE, PENDING, APPROVED, REJECTED, CANCELED
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ParticipationApplicationStatus participationApplicationStatus;
@@ -41,7 +41,7 @@ public class ParticipationApplication {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static ParticipationApplication buildParticipationRequest(Integer rejectedParticipationCount, ParticipationApplicationStatus participationApplicationStatus, MemberGatherArticle memberGatherArticle) {
+    public static ParticipationApplication buildParticipationApplication(Integer rejectedParticipationCount, ParticipationApplicationStatus participationApplicationStatus, MemberGatherArticle memberGatherArticle) {
         return ParticipationApplication.builder()
                 .rejectedParticipationCount(rejectedParticipationCount)
                 .participationApplicationStatus(participationApplicationStatus)

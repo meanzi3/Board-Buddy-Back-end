@@ -8,7 +8,7 @@ import sumcoda.boardbuddy.dto.PublicDistrictResponse;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.publicDistrict.NoSearchResultException;
 import sumcoda.boardbuddy.exception.publicDistrict.SearchLengthException;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 
 import java.util.List;

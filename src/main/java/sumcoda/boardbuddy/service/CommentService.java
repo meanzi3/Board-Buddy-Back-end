@@ -13,7 +13,7 @@ import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.exception.comment.*;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.comment.CommentRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 

@@ -1,6 +1,7 @@
 package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,9 +14,9 @@ import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.exception.*;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
-import sumcoda.boardbuddy.repository.ChatMessageRepository;
+import sumcoda.boardbuddy.repository.chatMessage.ChatMessageRepository;
 import sumcoda.boardbuddy.repository.chatRoom.ChatRoomRepository;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.memberChatRoom.MemberChatRoomRepository;
 import sumcoda.boardbuddy.util.ChatMessageUtil;
 
@@ -41,18 +42,19 @@ public class ChatMessageService {
      * 메세지 발행 및 채팅방에 메세지 전송
      *
      * @param chatRoomId 채팅방 Id
-     * @param publishDTO 전송할 메시지 내용
-     * @param username 메세지를 전송하는 사용자 아이디
+     * @param publishDTO 발행 및 전송할 메시지 내용, 메시지 발행 및 전송 사용자 닉네임
      **/
     @Transactional
-    public void publishMessage(Long chatRoomId, ChatMessageRequest.PublishDTO publishDTO, String username) {
+    public void publishMessage(Long chatRoomId, ChatMessageRequest.PublishDTO publishDTO) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ChatRoomNotFoundException("해당 채팅방이 존재하지 않습니다."));
 
-        Member member = memberRepository.findByUsername(username)
+        String nickname = publishDTO.getNickname();
+
+        Member member = memberRepository.findByNickname(nickname)
                 .orElseThrow(() -> new MemberNotFoundException("해당 사용자를 찾을 수 없습니다."));
 
-        Boolean isMemberChatRoomExists = memberChatRoomRepository.existsByChatRoomIdAndMemberUsername(chatRoomId, username);
+        Boolean isMemberChatRoomExists = memberChatRoomRepository.existsByChatRoomIdAndMemberNickname(chatRoomId, nickname);
         if (!isMemberChatRoomExists) {
             throw new MemberChatRoomRetrievalException("서버 문제로 해당 채팅방의 사용자 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
         }
@@ -76,25 +78,26 @@ public class ChatMessageService {
     /**
      * 채팅방 입장/퇴장 메세지 발행 및 채팅방에 사용자 입장/퇴장 메세지 전송
      *
-     * @param chatRoomId 채팅방 Id
+     * @param chatRoomIdAndNicknamePair 메세지 발행 및 전송할 채팅방 Id, 메세지 발행 및 전송 사용자 닉네임
      * @param messageType 메세지 유형 (입장/퇴장)
-     * @param username 입장하는 사용자 아이디
      **/
     @Transactional
-    public void publishEnterOrExitChatMessage(Long chatRoomId, MessageType messageType, String username) {
+    public void publishEnterOrExitChatMessage(Pair<Long, String> chatRoomIdAndNicknamePair, MessageType messageType) {
+
+        Long chatRoomId = chatRoomIdAndNicknamePair.getFirst();
+
+        String nickname = chatRoomIdAndNicknamePair.getSecond();
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ChatRoomNotFoundException("해당 채팅방이 존재하지 않습니다."));
 
-        Member member = memberRepository.findByUsername(username)
+        Member member = memberRepository.findByNickname(nickname)
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        Boolean isMemberChatRoomExists = memberChatRoomRepository.existsByChatRoomIdAndMemberUsername(chatRoomId, username);
+        Boolean isMemberChatRoomExists = memberChatRoomRepository.existsByChatRoomIdAndMemberNickname(chatRoomId, nickname);
         if (!isMemberChatRoomExists) {
             throw new MemberChatRoomRetrievalException("서버 문제로 해당 채팅방의 사용자 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
         }
-
-        String nickname = member.getNickname();
 
         String content = ChatMessageUtil.buildChatMessageContent(nickname, messageType);
 

@@ -9,7 +9,7 @@ import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.RankScorePoints;
 import sumcoda.boardbuddy.repository.MemberJdbcRepository;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.comment.CommentRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 

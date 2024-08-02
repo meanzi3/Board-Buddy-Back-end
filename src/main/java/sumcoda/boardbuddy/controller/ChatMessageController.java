@@ -31,15 +31,16 @@ public class ChatMessageController {
      *
      * @param chatRoomId 채팅방 Id
      * @param publishDTO 발행할 메세지 내용 DTO
-     * @param username 메시지를 발행하는 사용자 이름
+//     * @param username 메시지를 발행하는 사용자 이름
      **/
     @MessageMapping("/{chatRoomId}")
     public void publishMessage(
             @DestinationVariable Long chatRoomId,
-            @Payload ChatMessageRequest.PublishDTO publishDTO,
-            @RequestAttribute String username) {
+            @Payload ChatMessageRequest.PublishDTO publishDTO
+//            @RequestAttribute String username
+    ) {
 
-        chatMessageService.publishMessage(chatRoomId, publishDTO, username);
+        chatMessageService.publishMessage(chatRoomId, publishDTO, "usernamekong");
     }
 
     /**

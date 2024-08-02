@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.auth.CustomUserDetails;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 
 @Service
 @RequiredArgsConstructor

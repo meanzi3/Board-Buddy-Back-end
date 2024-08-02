@@ -1,4 +1,4 @@
-package sumcoda.boardbuddy.repository;
+package sumcoda.boardbuddy.repository.chatMessage;
 
 import sumcoda.boardbuddy.dto.ChatMessageResponse;
 

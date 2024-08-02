@@ -1,4 +1,4 @@
-package sumcoda.boardbuddy.repository;
+package sumcoda.boardbuddy.repository.member;
 
 import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;

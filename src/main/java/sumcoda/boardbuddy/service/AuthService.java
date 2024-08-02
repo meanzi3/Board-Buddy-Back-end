@@ -13,7 +13,7 @@ import sumcoda.boardbuddy.exception.auth.SMSCertificationAttemptExceededExceptio
 import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.SmsCertificationRepository;
 import sumcoda.boardbuddy.util.SmsCertificationUtil;
 

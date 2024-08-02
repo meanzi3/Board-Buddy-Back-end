@@ -1,6 +1,5 @@
 package sumcoda.boardbuddy.service;
 
-import kotlin.contracts.ReturnsNotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,7 @@ import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.repository.chatRoom.ChatRoomRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.memberChatRoom.MemberChatRoomRepository;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;

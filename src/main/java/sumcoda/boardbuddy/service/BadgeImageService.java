@@ -7,7 +7,7 @@ import sumcoda.boardbuddy.dto.BadgeImageResponse;
 import sumcoda.boardbuddy.entity.BadgeImage;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.badgeImage.BadgeImageRepository;
 import sumcoda.boardbuddy.util.FileStorageUtil;
 

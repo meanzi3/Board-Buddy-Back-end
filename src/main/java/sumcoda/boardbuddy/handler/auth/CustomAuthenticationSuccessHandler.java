@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 
 import java.io.IOException;
 import java.util.HashMap;

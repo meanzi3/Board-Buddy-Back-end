@@ -24,7 +24,7 @@ import sumcoda.boardbuddy.exception.memberGatherArticle.MemberGatherArticleRetri
 import sumcoda.boardbuddy.exception.nearPublicDistrict.NearPublicDistrictRetrievalException;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
 import sumcoda.boardbuddy.repository.nearPublicDistric.NearPublicDistrictRepository;
 import sumcoda.boardbuddy.repository.participationApplication.ParticipationApplicationRepository;

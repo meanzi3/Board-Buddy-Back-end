@@ -1,4 +1,4 @@
-package sumcoda.boardbuddy.repository;
+package sumcoda.boardbuddy.repository.member;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;

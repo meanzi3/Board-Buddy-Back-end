@@ -13,7 +13,7 @@ import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.exception.auth.ClientRegistrationRetrievalException;
 import sumcoda.boardbuddy.exception.auth.SocialUserInfoRetrievalException;
-import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.member.MemberRepository;
 
 import java.security.SecureRandom;
 

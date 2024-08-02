@@ -159,6 +159,23 @@ public class NotificationService {
     }
 
     /**
+     * 모집글 상태가 completed로 변경되면 모든 참가자에게 리뷰 요청 알림 보내기
+     *
+     * @param gatherArticleId 해당 모집글 Id
+     **/
+    @Transactional
+    public void notifyReviewRequest(Long gatherArticleId) {
+        // 리뷰 요청 메시지를 포맷하여 생성
+        String message = String.format("모집글 '%s'에 대한 리뷰를 남겨주세요!", formattingTitle(gatherArticleId));
+
+        // 모든 참가자들의 아이디 조회
+        List<MemberResponse.UserNameDTO> participants = memberGatherArticleRepository.findParticipantsByGatherArticleId(gatherArticleId);
+
+        // 모든 참가자에게 알림 전송
+        participants.forEach(userNameDTO -> saveNotification(userNameDTO.getUsername(), message, "reviewRequest"));
+    }
+
+    /**
      * 유저의 알림을 조회하여 최신순으로 반환하는 메서드
      *
      * @param username 알림을 조회할 유저의 아이디

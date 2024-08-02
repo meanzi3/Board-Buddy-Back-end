@@ -1,15 +1,14 @@
 package sumcoda.boardbuddy.repository.sseEmitter;
 
 import org.springframework.stereotype.Repository;
-
-import java.util.Map;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Repository
 public interface SseEmitterRepository {
 
-    void saveEventCache(String eventCacheId, Object event);
+    SseEmitter save(String emitterId, SseEmitter sseEmitter);
 
-    Map<String, Object> findAllEventCacheStartsWithUsername(String username);
+    void saveEventCache(String eventCacheId, Object event);
 
     void deleteEmitterById(String emitterId);
 }

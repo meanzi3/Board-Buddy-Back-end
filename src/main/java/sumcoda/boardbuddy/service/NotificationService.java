@@ -8,17 +8,21 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NotificationResponse;
+import sumcoda.boardbuddy.entity.Member;
+import sumcoda.boardbuddy.entity.Notification;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.sseEmitter.SseEmitterSendErrorException;
 import sumcoda.boardbuddy.exception.sseEmitter.SseEmitterSubscribeErrorException;
 import sumcoda.boardbuddy.repository.MemberRepository;
+import sumcoda.boardbuddy.repository.notification.NotificationRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
 import sumcoda.boardbuddy.repository.sseEmitter.SseEmitterRepository;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +40,8 @@ public class NotificationService {
     private final GatherArticleRepository gatherArticleRepository;
 
     private final MemberGatherArticleRepository memberGatherArticleRepository;
+
+    private final NotificationRepository notificationRepository;
 
     // SSE Emitter와 이벤트 캐시를 위한 저장소
     private static final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
@@ -56,10 +62,6 @@ public class NotificationService {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
         // 유저 검증 로직
-        if (username == null || username.isEmpty()) {
-            throw new MemberRetrievalException("서버 문제로 해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요.");
-        }
-
         boolean memberExist = memberRepository.existsByUsername(username);
         if (!memberExist) {
             throw new MemberNotFoundException("존재하지 않는 유저입니다.");
@@ -90,15 +92,16 @@ public class NotificationService {
      **/
     @Transactional
     public void notifyApplyParticipation(Long gatherArticleId, String appliedUsername) {
-
         // 모집글 작성자의 유저 아이디를 조회
-        String authorUsername = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
+        MemberResponse.UserNameDTO authorUsernameDTO = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
                 .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 모집글의 작성자를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        String authorUsername = authorUsernameDTO.getUsername();
 
         // 참가 신청 메시지를 포맷하여 생성
         String message = String.format("%s 님이 '%s'에 참가 신청을 했습니다.", getNickname(appliedUsername), formattingTitle(gatherArticleId));
 
-        send(authorUsername, message, "applyParticipationApplication");
+        saveNotification(authorUsername, message, "applyParticipationApplication");
     }
 
     /**
@@ -115,7 +118,7 @@ public class NotificationService {
         // 참가 신청 승인 메시지를 포맷하여 생성
         String message = String.format("'%s'의 참가 신청이 승인되었습니다.", formattingTitle(gatherArticleId));
 
-        send(receiverUsername, message, "approveParticipationApplication");
+        saveNotification(receiverUsername, message, "approveParticipationApplication");
     }
 
     /**
@@ -132,7 +135,7 @@ public class NotificationService {
         // 참가 신청 거절 메시지를 포맷하여 생성
         String message = String.format("'%s'의 참가 신청이 거절되었습니다.", formattingTitle(gatherArticleId));
 
-        send(receiverUsername, message, "rejectParticipationApplication");
+        saveNotification(receiverUsername, message, "rejectParticipationApplication");
     }
 
     /**
@@ -144,13 +147,15 @@ public class NotificationService {
     @Transactional
     public void notifyCancelParticipation(Long gatherArticleId, String canceledUsername) {
         // 모집글 작성자의 유저 아이디를 조회
-        String authorUsername = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
-                .orElseThrow(() -> new MemberRetrievalException("해당 모집글의 작성자를 찾을 수 없습니다."));
+        MemberResponse.UserNameDTO authorUsernameDTO = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
+                .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 모집글의 작성자를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        String authorUsername = authorUsernameDTO.getUsername();
 
         // 참가 신청 취소 메시지를 포맷하여 생성
         String message = String.format("%s 님이 '%s'의 참가 신청을 취소했습니다.", getNickname(canceledUsername), formattingTitle(gatherArticleId));
 
-        send(authorUsername, message, "cancelParticipationApplication");
+        saveNotification(authorUsername, message, "cancelParticipationApplication");
     }
 
     /**
@@ -161,26 +166,65 @@ public class NotificationService {
      **/
     public List<NotificationResponse.NotificationDTO> getNotifications(String username) {
         // 유저 검증
-        if (username == null) {
-            throw new MemberRetrievalException("알림 조회 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
-        }
-
         if (Boolean.FALSE.equals(memberRepository.existsByUsername(username))) {
             throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
         }
 
-        // 해당 유저의 SSE Emitter에서 이벤트 캐시 조회
-        return sseEmitterRepository.findAllEventCacheStartsWithUsername(username).entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith(username)) // 해당 유저의 이벤트 캐시만 필터링
-                .sorted((entry1, entry2) -> {
-                    long timestamp1 = Long.parseLong(entry1.getKey().split("_")[1]);
-                    long timestamp2 = Long.parseLong(entry2.getKey().split("_")[1]);
-                    return Long.compare(timestamp2, timestamp1); // 최신순 정렬
-                })
-                .map(entry -> NotificationResponse.NotificationDTO.builder()
-                        .content(entry.getValue().toString()) // 이벤트 내용을 NotificationDTO로 변환
+        //DB에서 해당 유저의 알림을 최신순으로 조회
+        return notificationRepository.findNotificationByMemberUsername(username).stream()
+                .map(notification -> NotificationResponse.NotificationDTO.builder()
+                        .message(notification.getMessage())
+                        .createdAt(notification.getCreatedAt())
                         .build())
                 .toList();
+    }
+
+    /**
+     * 알림 생성 시 DB에 저장하는 메서드
+     *
+     * @param username 알림을 받는 유저의 아이디
+     * @param message 알림 메세지
+     * @param eventName 알림 이벤트 이름
+     **/
+    @Transactional
+    public void saveNotification(String username, String message, String eventName) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberRetrievalException("유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        Notification notification = Notification.buildNotification(message, LocalDateTime.now(), member);
+        notificationRepository.save(notification);
+
+        sendNotification(username, message, eventName);
+    }
+
+    /**
+     * 유저가 SSE Emitter에 등록되어 있는지 확인하고 DB에 저장 후 알림을 보내는 메서드
+     *
+     * @param username 알림을 받는 유저의 아이디
+     * @param message 알림 메세지
+     * @param eventName 알림 이벤트 이름
+     **/
+    private void sendNotification(String username, String message, String eventName) {
+        // 작성자가 SSE 이벤트 수신을 위해 등록되어 있는지 확인
+        if (emitters.containsKey(username)) {
+
+            // 작성자의 SSE Emitter 객체를 가져옴
+            SseEmitter sseEmitterReceiver = emitters.get(username);
+
+            try {
+                // 알림 메세지를 SSE Emitter를 통해 전송
+                sseEmitterReceiver.send(SseEmitter.event().name(eventName).data(message));
+
+                // 이벤트 캐시에 알림 메세지를 저장
+                String eventCacheId = username + "_" + System.currentTimeMillis();
+                sseEmitterRepository.saveEventCache(eventCacheId, message);
+
+            } catch (SseEmitterSendErrorException | IOException e) {
+                // 전송 중 오류 발생 시, 작성자의 SSE Emitter를 제거
+                emitters.remove(username);
+                log.error("알림 전송 에러: {}. emitter 제거.", e.getMessage());
+            }
+        }
     }
 
     /**
@@ -210,10 +254,10 @@ public class NotificationService {
     private String getNickname(String username) {
 
         // 유저 아이디로 유저 닉네임 조회
-        MemberResponse.NicknameDTO member = memberRepository.findNicknameDTOByUsername(username)
+        MemberResponse.NicknameDTO nicknameDTO = memberRepository.findNicknameDTOByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        return member.getNickname();
+        return nicknameDTO.getNickname();
     }
 
     /**
@@ -225,39 +269,9 @@ public class NotificationService {
     private String getUsername(String nickname) {
 
         // 유저 닉네임으로 유저 아이디 조회
-        MemberResponse.UserNameDTO member = memberRepository.findUsernameDTOByNickname(nickname)
+        MemberResponse.UserNameDTO userNameDTO = memberRepository.findUsernameDTOByNickname(nickname)
                 .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        return member.getUsername();
-    }
-
-    /**
-     * 유저가 SSE Emitter에 등록되어 있는지 확인하고 알림을 보내는 메서드
-     *
-     * @param username 알림을 받는 유저의 아이디
-     * @param message 알림 메세지
-     * @param eventName 알림 이벤트 이름
-     **/
-    private void send(String username, String message, String eventName) {
-
-        // 작성자가 SSE 이벤트 수신을 위해 등록되어 있는지 확인
-        if (emitters.containsKey(username)) {
-
-            // 작성자의 SSE Emitter 객체를 가져옴
-            SseEmitter sseEmitterReceiver = emitters.get(username);
-
-            try {
-                // 알림 메세지를 SSE Emitter를 통해 전송
-                sseEmitterReceiver.send(SseEmitter.event().name(eventName).data(message));
-
-                // 이벤트 캐시에 알림 메세지를 저장
-                String eventCacheId = username + "_" + System.currentTimeMillis();
-                sseEmitterRepository.saveEventCache(eventCacheId, message);
-            } catch (SseEmitterSendErrorException | IOException e) {
-                // 전송 중 오류 발생 시, 작성자의 SSE Emitter를 제거
-                emitters.remove(username);
-                log.error("알림 전송 에러: {}. emitter 제거.", e.getMessage());
-            }
-        }
+        return userNameDTO.getUsername();
     }
 }

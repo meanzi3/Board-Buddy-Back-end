@@ -32,7 +32,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/auth/locations/search",
 //                        "/api/ws-stomp/connection",
 //                        "/api/ws-stomp/reception"
-                        "/api/ws-stomp/**"
+                        "/api/ws-stomp/**",
+                        "/api/subscribe",
+                        "/api/notifications"
                        ));
         WebMvcConfigurer.super.addInterceptors(registry);
     }

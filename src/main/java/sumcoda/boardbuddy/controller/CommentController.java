@@ -9,6 +9,7 @@ import sumcoda.boardbuddy.dto.CommentRequest;
 import sumcoda.boardbuddy.dto.CommentResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.CommentService;
+import sumcoda.boardbuddy.service.NotificationService;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWit
 public class CommentController {
 
     private final CommentService commentService;
+
+    private final NotificationService notificationService;
 
     /**
      * 댓글 작성 요청
@@ -41,6 +44,8 @@ public class CommentController {
         log.info("createComment is working");
 
         commentService.createComment(gatherArticleId, parentId, createDTO, username);
+
+        notificationService.notifyWriteComment(gatherArticleId, parentId, username);
 
         return buildSuccessResponseWithoutData("댓글 작성을 성공하였습니다.", HttpStatus.CREATED);
     }

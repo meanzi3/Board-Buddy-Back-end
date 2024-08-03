@@ -55,7 +55,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 허용할 출처 설정
-        configuration.setAllowedOrigins(List.of("https://boardbuddyapp.vercel.app", "https://boardbuddyapp.vercel.app/**", "wss://boardbuddyapp.com/api/ws-stomp/**", "https://boardbuddyapp.com/api/ws-stomp/**"));
+        configuration.setAllowedOrigins(List.of("https://boardbuddyapp.vercel.app", "wss://boardbuddyapp.com/api/ws-stomp/**"));
 
         // 허용할 HTTP 메서드 설정
         configuration.addAllowedMethod("GET");
@@ -65,18 +65,17 @@ public class SecurityConfig {
         configuration.addAllowedMethod("PUT");
 
         // 허용할 헤더 설정
-//        configuration.addAllowedHeader("Origin");
-//        configuration.addAllowedHeader("Content-Type");
-//        configuration.addAllowedHeader("Accept");
-//        configuration.addAllowedHeader("Cache-Control");
-//        configuration.addAllowedHeader("Authorization");
-//        configuration.addAllowedHeader("X-AUTH-TOKEN");
-//        configuration.addAllowedHeader("Authorization_Refresh");
-//        configuration.addAllowedHeader("Access-Control-Allow-Origin");
-//        configuration.addAllowedHeader("Access-Control-Allow-Credentials");
-//        configuration.addAllowedHeader("Upgrade");
-//        configuration.addAllowedHeader("Connection");
-        configuration.addAllowedHeader("*");
+        configuration.addAllowedHeader("Origin");
+        configuration.addAllowedHeader("Content-Type");
+        configuration.addAllowedHeader("Accept");
+        configuration.addAllowedHeader("Cache-Control");
+        configuration.addAllowedHeader("Authorization");
+        configuration.addAllowedHeader("X-AUTH-TOKEN");
+        configuration.addAllowedHeader("Authorization_Refresh");
+        configuration.addAllowedHeader("Access-Control-Allow-Origin");
+        configuration.addAllowedHeader("Access-Control-Allow-Credentials");
+        configuration.addAllowedHeader("Upgrade");
+        configuration.addAllowedHeader("Connection");
 
 
         // 노출할 헤더 설정

@@ -36,11 +36,9 @@ public class ChatMessageController {
     @MessageMapping("/{chatRoomId}")
     public void publishMessage(
             @DestinationVariable Long chatRoomId,
-            @Payload ChatMessageRequest.PublishDTO publishDTO
-//            @RequestAttribute String username
-    ) {
+            @Payload ChatMessageRequest.PublishDTO publishDTO) {
 
-        chatMessageService.publishMessage(chatRoomId, publishDTO, "usernamekong");
+        chatMessageService.publishMessage(chatRoomId, publishDTO);
     }
 
     /**

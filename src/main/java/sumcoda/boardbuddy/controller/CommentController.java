@@ -42,7 +42,7 @@ public class CommentController {
 
         commentService.createComment(gatherArticleId, parentId, createDTO, username);
 
-        return buildSuccessResponseWithoutData("댓글이 작성에 성공하였습니다.", HttpStatus.CREATED);
+        return buildSuccessResponseWithoutData("댓글 작성을 성공하였습니다.", HttpStatus.CREATED);
     }
 
     /**
@@ -53,12 +53,12 @@ public class CommentController {
      * @return 댓글 리스트 응답
      */
     @GetMapping("/api/gather-articles/{gatherArticleId}/comments")
-    public ResponseEntity<ApiResponse<Map<String, List<CommentResponse.CommentDTO>>>> getComments(
+    public ResponseEntity<ApiResponse<Map<String, List<CommentResponse.InfoDTO>>>> getComments(
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username) {
         log.info("getComments is working");
 
-        List<CommentResponse.CommentDTO> comments = commentService.getComments(gatherArticleId, username);
+        List<CommentResponse.InfoDTO> comments = commentService.getComments(gatherArticleId, username);
 
         return buildSuccessResponseWithPairKeyData("comments", comments, "댓글 조회를 성공하였습니다.", HttpStatus.OK);
     }

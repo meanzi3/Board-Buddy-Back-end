@@ -17,17 +17,17 @@ public class CommentResponse {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class CommentDTO {
+    public static class InfoDTO {
         private Long id;
         private AuthorDTO author;
         private String content;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
         private LocalDateTime createdAt;
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private List<CommentDTO> children;
+        private List<InfoDTO> children;
 
         @Builder
-        public CommentDTO(Long id, AuthorDTO author, String content, LocalDateTime createdAt, List<CommentDTO> children) {
+        public InfoDTO(Long id, AuthorDTO author, String content, LocalDateTime createdAt, List<InfoDTO> children) {
             this.id = id;
             this.author = author;
             this.content = content;
@@ -35,14 +35,14 @@ public class CommentResponse {
             this.children = children;
         }
 
-        public static CommentDTO from(Comment comment) {
-            return CommentDTO.builder()
+        public static InfoDTO from(Comment comment) {
+            return InfoDTO.builder()
                     .id(comment.getId())
                     .author(AuthorDTO.from(comment.getMember()))
                     .content(comment.getContent())
                     .createdAt(comment.getCreatedAt())
                     .children(comment.getChildren().stream()
-                            .map(CommentDTO::from)
+                            .map(InfoDTO::from)
                             .collect(Collectors.toList()))
                     .build();
         }

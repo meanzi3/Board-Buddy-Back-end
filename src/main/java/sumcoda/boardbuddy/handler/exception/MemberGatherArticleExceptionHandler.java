@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
+import sumcoda.boardbuddy.exception.memberGatherArticle.MemberNotJoinedGatherArticleException;
 import sumcoda.boardbuddy.exception.memberGatherArticle.*;
 
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildErrorResponse;
@@ -31,5 +32,10 @@ public class MemberGatherArticleExceptionHandler {
     @ExceptionHandler(MemberGatherArticleRetrievalException.class)
     public ResponseEntity<ApiResponse<Void>> handleMemberGatherArticleRetrievalException(MemberGatherArticleRetrievalException e) {
         return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MemberNotJoinedGatherArticleException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMemberNotJoinedGatherArticleException(MemberNotJoinedGatherArticleException e) {
+        return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

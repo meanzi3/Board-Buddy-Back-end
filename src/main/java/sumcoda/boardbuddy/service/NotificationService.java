@@ -16,6 +16,7 @@ import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.sseEmitter.SseEmitterSendErrorException;
 import sumcoda.boardbuddy.exception.sseEmitter.SseEmitterSubscribeErrorException;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
+import sumcoda.boardbuddy.repository.comment.CommentRepository;
 import sumcoda.boardbuddy.repository.notification.NotificationRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
@@ -42,6 +43,8 @@ public class NotificationService {
     private final MemberGatherArticleRepository memberGatherArticleRepository;
 
     private final NotificationRepository notificationRepository;
+
+    private final CommentRepository commentRepository;
 
     // SSE Emitter와 이벤트 캐시를 위한 저장소
     private static final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
@@ -174,6 +177,39 @@ public class NotificationService {
         // 모든 참가자에게 알림 전송
         participants.forEach(userNameDTO -> saveNotification(userNameDTO.getUsername(), message, "reviewRequest"));
     }
+
+    /**
+     * 모집글에 댓글이 달리면 모집글 작성자에게, 대댓글이 달리면 원댓글 작성자에게 알림 보내기
+     *
+     * @param gatherArticleId 해당 모집글 Id
+     **/
+    @Transactional
+    public void notifyWriteComment(Long gatherArticleId, Long parentId, String writtenUsername) {
+
+        if (parentId == null) {
+            // 모집글 작성자의 유저 아이디를 조회
+            MemberResponse.UserNameDTO authorUsernameDTO = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
+                    .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 모집글의 작성자를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+            String authorUsername = authorUsernameDTO.getUsername();
+
+            // 리뷰 요청 메시지를 포맷하여 생성
+            String message = String.format("%s 님이 '%s'에 댓글을 달았습니다.", getNickname(writtenUsername), formattingTitle(gatherArticleId));
+
+            saveNotification(authorUsername, message, "writeComment");
+        } else {
+            // 원댓글 작성자의 유저 아이디를 조회
+            MemberResponse.UserNameDTO authorUsernameDTO = commentRepository.findCommentAuthorByCommentId(parentId);
+
+            String authorUsername = authorUsernameDTO.getUsername();
+
+            // 리뷰 요청 메시지를 포맷하여 생성
+            String message = String.format("%s 님이 '%s'에 대댓글을 달았습니다.", getNickname(writtenUsername), formattingTitle(gatherArticleId));
+
+            saveNotification(authorUsername, message, "writeComment");
+        }
+    }
+
 
     /**
      * 유저의 알림을 조회하여 최신순으로 반환하는 메서드

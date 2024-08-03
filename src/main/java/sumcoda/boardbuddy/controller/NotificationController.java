@@ -25,29 +25,29 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    /**
-     * SSE Emitter 구독 요청
-     *
-     * @param username 유저 아이디
-     **/
-    @GetMapping(value = "/api/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(@RequestAttribute String username) {
-        log.info("User {} subscribed for notifications", username);
-
-        return notificationService.subscribe(username);
-    }
-
-    /**
-     * 알림 목록 조회 요청
-     *
-     * @param username 유저 아이디
-     * @return 알림 목록 조회 성공 시 약속된 SuccessResponse 반환
-     **/
-    @GetMapping(value = "/api/notifications")
-    public ResponseEntity<ApiResponse<Map<String, List<NotificationResponse.NotificationDTO>>>> getNotifications(@RequestAttribute String username) {
-
-        List<NotificationResponse.NotificationDTO> notificationDTOs = notificationService.getNotifications(username);
-
-        return buildSuccessResponseWithPairKeyData("notifications", notificationDTOs, "알림이 조회되었습니다.", HttpStatus.OK);
-    }
+//    /**
+//     * SSE Emitter 구독 요청
+//     *
+//     * @param username 유저 아이디
+//     **/
+//    @GetMapping(value = "/api/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//    public SseEmitter subscribe(@RequestAttribute String username) {
+//        log.info("User {} subscribed for notifications", username);
+//
+//        return notificationService.subscribe(username);
+//    }
+//
+//    /**
+//     * 알림 목록 조회 요청
+//     *
+//     * @param username 유저 아이디
+//     * @return 알림 목록 조회 성공 시 약속된 SuccessResponse 반환
+//     **/
+//    @GetMapping(value = "/api/notifications")
+//    public ResponseEntity<ApiResponse<Map<String, List<NotificationResponse.NotificationDTO>>>> getNotifications(@RequestAttribute String username) {
+//
+//        List<NotificationResponse.NotificationDTO> notificationDTOs = notificationService.getNotifications(username);
+//
+//        return buildSuccessResponseWithPairKeyData("notifications", notificationDTOs, "알림이 조회되었습니다.", HttpStatus.OK);
+//    }
 }

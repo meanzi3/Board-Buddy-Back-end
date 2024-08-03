@@ -8,15 +8,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sumcoda.boardbuddy.dto.MemberRequest;
 import sumcoda.boardbuddy.dto.MemberResponse;
-import sumcoda.boardbuddy.dto.NearPublicDistrictResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.MemberService;
 
 import java.util.List;
 import java.util.Map;
 
-import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithPairKeyData;
-import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithoutData;
+import static sumcoda.boardbuddy.builder.ResponseBuilder.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -105,29 +103,45 @@ public class MemberController {
     }
 
     /**
-     * 멤버 위치 설정 요청 캐치
+     * 내 동네 조회 요청 캐치
      *
-     * @param locationDTO 사용자가 입력한 위치 정보
-     **/
-    @PostMapping("/api/locations")
-    public ResponseEntity<ApiResponse<Map<String, Map<Integer, List<NearPublicDistrictResponse.LocationDTO>>>>> updateMemberLocation(
-            @RequestBody MemberRequest.LocationDTO locationDTO,
-            @RequestAttribute String username) {
-        log.info("updateMemberLocation is working");
+     * @param username 로그인 사용자 아이디
+     * @return 내 동네 조회를 성공했다면 약속된 SuccessResponse 반환
+     */
+    @GetMapping("/api/my/neighbourhoods")
+    public ResponseEntity<ApiResponse<MemberResponse.MyLocationsDTO>> getMemberNeighbourhoods(@RequestAttribute String username) {
+        log.info("getMemberNeighbourhoods is working");
 
-        Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> locations = memberService.updateMemberLocation(locationDTO, username);
+        MemberResponse.MyLocationsDTO myLocationsDTO = memberService.getMemberNeighbourhoods(username);
 
-        return buildSuccessResponseWithPairKeyData("locations", locations, "위치 정보 설정을 성공하였습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithMultiplePairKeyData(myLocationsDTO, "내 동네 조회를 성공하였습니다.", HttpStatus.OK);
     }
 
     /**
-     * 멤버 반경 설정 요청 캐치
+     * 내 동네 설정 요청 캐치
+     *
+     * @param locationDTO 사용자가 입력한 위치 정보
+     * @return 내 동네 설정을 성공했다면 약속된 SuccessResponse 반환
+     **/
+    @PutMapping("/api/my/neighbourhoods")
+    public ResponseEntity<ApiResponse<Map<String, Map<Integer, List<MemberResponse.LocationDTO>>>>> updateMemberNeighbourhood(
+            @RequestBody MemberRequest.LocationDTO locationDTO,
+            @RequestAttribute String username) {
+        log.info("updateMemberNeighbourhood is working");
+
+        Map<Integer, List<MemberResponse.LocationDTO>> locations = memberService.updateMemberNeighbourhood(locationDTO, username);
+
+        return buildSuccessResponseWithPairKeyData("locations", locations, "내 동네 설정을 성공하였습니다.", HttpStatus.OK);
+    }
+
+    /**
+     * 내 반경 설정 요청 캐치
      *
      * @param radiusDTO 사용자가 입력한 반경 정보
      * @param username 로그인 사용자 아이디
-     * @return 반경 설정이 성공했다면 약속된 SuccessResponse 반환
+     * @return 내 반경 설정을 성공했다면 약속된 SuccessResponse 반환
      **/
-    @PostMapping("/api/radius")
+    @PutMapping("/api/my/radius")
     public ResponseEntity<ApiResponse<Void>> updateMemberRadius(
             @RequestBody MemberRequest.RadiusDTO radiusDTO,
             @RequestAttribute String username) {
@@ -135,7 +149,7 @@ public class MemberController {
 
         memberService.updateMemberRadius(radiusDTO, username);
 
-        return buildSuccessResponseWithoutData("반경 설정을 성공하였습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithoutData("내 반경 설정을 성공하였습니다.", HttpStatus.OK);
     }
 
     /**

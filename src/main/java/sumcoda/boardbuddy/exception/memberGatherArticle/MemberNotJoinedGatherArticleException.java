@@ -1,4 +1,4 @@
-package sumcoda.boardbuddy.exception.member;
+package sumcoda.boardbuddy.exception.memberGatherArticle;
 
 public class MemberNotJoinedGatherArticleException extends RuntimeException {
     public MemberNotJoinedGatherArticleException(String message) {

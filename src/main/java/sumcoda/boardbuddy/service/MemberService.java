@@ -1,6 +1,7 @@
 package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import sumcoda.boardbuddy.enumerate.ReviewType;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotCompletedException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.member.*;
+import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.ProfileImageRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
@@ -28,7 +30,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -38,13 +40,15 @@ public class MemberService {
 
     private final PublicDistrictRepository publicDistrictRepository;
 
-    private final NearPublicDistrictService nearPublicDistrictService;
-
     private final MemberGatherArticleRepository memberGatherArticleRepository;
 
     private final ProfileImageRepository profileImageRepository;
 
     private final GatherArticleRepository gatherArticleRepository;
+
+    private final NearPublicDistrictService nearPublicDistrictService;
+
+    private final PublicDistrictRedisService publicDistrictRedisService;
 
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -217,13 +221,57 @@ public class MemberService {
     }
 
     /**
-     * 멤버 위치 설정 요청 캐치
+     * 내 동네 조회 요청 캐치
+     *
+     * @param username 사용자 아이디
+     * @return 사용자의 좌표, 반경, 주변 동네 정보가 포함된 DTO
+     */
+    public MemberResponse.MyLocationsDTO getMemberNeighbourhoods(String username) {
+
+        // 사용자 위치 및 반경 정보 조회
+        MemberResponse.LocationWithRadiusDTO locationWithRadiusDTO = memberRepository.findLocationWithRadiusDTOByUsername(username)
+                .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        // 사용자의 위치 선언
+        String sido = locationWithRadiusDTO.getSido();
+        String sgg = locationWithRadiusDTO.getSgg();
+        String emd = locationWithRadiusDTO.getEmd();
+
+        // redis 에서 조회 - 기준 위치에 해당하는 CoordinateDTO 를 조회
+        PublicDistrictResponse.CoordinateDTO coordinateDTO = publicDistrictRedisService.findCoordinateDTOBySidoAndSggAndEmd(sido, sgg, emd)
+                .orElseGet(() -> {
+                    // mariadb 에서 조회 - 기준 위치에 해당하는 CoordinateDTO 를 조회(redis 장애 발생 시 mariadb 에서 조회)
+                    log.error("[redis findCoordinateDTOBySidoAndSggAndEmd() error]");
+                    return publicDistrictRepository.findCoordinateDTOBySidoAndSggAndEmd(sido, sgg, emd)
+                            .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                });
+
+        // 주변 동네 정보를 조회
+        Map<Integer, List<MemberResponse.LocationDTO>> locations = nearPublicDistrictService.getNearbyLocations(
+                NearPublicDistrictRequest.LocationDTO.builder()
+                        .sido(sido)
+                        .sgg(sgg)
+                        .emd(emd)
+                        .build());
+
+        // 사용자의 좌표, 반경, 주변 동네 정보가 포함된 DTO 반환
+        return MemberResponse.MyLocationsDTO.builder()
+                .locations(locations)
+                .longitude(coordinateDTO.getLongitude())
+                .latitude(coordinateDTO.getLatitude())
+                .radius(locationWithRadiusDTO.getRadius())
+                .build();
+    }
+
+    /**
+     * 내 동네 설정 요청 캐치
      *
      * @param locationDTO 사용자가 입력한 위치 정보
      * @param username 로그인 사용자 아이디
+     * @return 주변 동네 정보가 포함된 DTO
      **/
     @Transactional
-    public Map<Integer, List<NearPublicDistrictResponse.LocationDTO>> updateMemberLocation(MemberRequest.LocationDTO locationDTO, String username) {
+    public Map<Integer, List<MemberResponse.LocationDTO>> updateMemberNeighbourhood(MemberRequest.LocationDTO locationDTO, String username) {
 
         // 사용자가 입력한 시도, 시구, 동
         String sido = locationDTO.getSido();
@@ -247,7 +295,7 @@ public class MemberService {
     }
 
     /**
-     * 멤버 반경 설정
+     * 내 반경 설정 요청 캐치
      *
      * @param radiusDTO 사용자가 입력한 반경 정보
      * @param username 로그인 사용자 아이디

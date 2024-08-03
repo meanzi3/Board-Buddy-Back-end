@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 public class MemberResponse {
 
@@ -134,6 +135,38 @@ public class MemberResponse {
         @Builder
         public NicknameDTO(String nickname) {
             this.nickname = nickname;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class MyLocationsDTO {
+        private Map<Integer, List<LocationDTO>> locations;
+        private Double longitude;
+        private Double latitude;
+        private Integer radius;
+
+        @Builder
+        public MyLocationsDTO(Map<Integer, List<LocationDTO>> locations, Double longitude, Double latitude, Integer radius) {
+            this.locations = locations;
+            this.longitude = longitude;
+            this.latitude = latitude;
+            this.radius = radius;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class LocationDTO {
+        private String sido;
+        private String sgg;
+        private String emd;
+
+        @Builder
+        public LocationDTO(String sido, String sgg, String emd) {
+            this.sido = sido;
+            this.sgg = sgg;
+            this.emd = emd;
         }
     }
 }

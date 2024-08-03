@@ -2,11 +2,11 @@ package sumcoda.boardbuddy.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import sumcoda.boardbuddy.dto.NotificationResponse;
@@ -30,13 +30,16 @@ public class NotificationController {
      *
 //     * @param username 유저 아이디
      **/
-    @GetMapping(value = "/api/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(
+    @GetMapping(value = "/api/notifications/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<SseEmitter> subscribe(
 //            @RequestAttribute String username
     ) {
         log.info("User {} subscribed for notifications", "test");
-
-        return notificationService.subscribe("test");
+        SseEmitter sseEmitter = notificationService.subscribe("test");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache");
+        headers.add("X-Accel-Buffering", "no");
+        return new ResponseEntity<>(sseEmitter, headers, HttpStatus.OK);
     }
 
     /**

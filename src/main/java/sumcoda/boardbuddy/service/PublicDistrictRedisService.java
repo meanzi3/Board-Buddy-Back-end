@@ -149,6 +149,36 @@ public class PublicDistrictRedisService {
     }
 
     /**
+     * 행정구역 CoordinateDTO 정보를 레디스에서 조회
+     * querydsl 쿼리 대체
+     *
+     * @param sido 시도
+     * @param sgg 시군구
+     * @param emd 읍면동
+     * @return 행정구역 CoordinateDTO 정보 DTO
+     */
+    public Optional<PublicDistrictResponse.CoordinateDTO> findCoordinateDTOBySidoAndSggAndEmd(String sido, String sgg, String emd) {
+        // 모든 엔트리를 조회하고, JSON 문자열을 DTO 객체로 역직렬화한 후 시도, 시군구, 읍면동으로 필터링하여 IdDTO 반환
+        return hashOperations.entries(CACHE_KEY).values().stream()
+                .map(value -> {
+                    try {
+                        PublicDistrictResponse.InfoWithIdDTO infoWithIdDTO = deserializeInfoWithIdDTO(value);
+                        if (infoWithIdDTO.getSido().equals(sido) && infoWithIdDTO.getSgg().equals(sgg) && infoWithIdDTO.getEmd().equals(emd)) {
+                            return PublicDistrictResponse.CoordinateDTO.builder()
+                                    .longitude(infoWithIdDTO.getLongitude())
+                                    .latitude(infoWithIdDTO.getLatitude())
+                                    .build();
+                        }
+                    } catch (JsonProcessingException e) {
+                        log.error("[PublicDistrictRedisService findCoordinateDTOBySidoAndSggAndEmd() error]: {}", e.getMessage());
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .findFirst();
+    }
+
+    /**
      * 행정구역 엔티티를 레디스에서 조회
      * spring data jpa 쿼리 대체
      *

@@ -139,26 +139,6 @@ public class MemberController {
     }
 
     /**
-     * 리뷰 보내기 요청 캐치
-     *
-     * @param gatherArticleId 모집글 Id
-     * @param reviewDTO 리뷰를 받는 유저 닉네임과 리뷰 타입을 담은 dto
-     * @param username 로그인 사용자 아이디
-     * @return 리뷰 보내기가 성공했다면 약속된 SuccessResponse 반환
-     **/
-    @PostMapping("/api/reviews/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<Void>> sendReview (
-            @PathVariable Long gatherArticleId,
-            @RequestBody MemberRequest.ReviewDTO reviewDTO,
-            @RequestAttribute String username) {
-        log.info("send Review is working");
-
-        memberService.sendReview(gatherArticleId, reviewDTO, username);
-
-        return buildSuccessResponseWithoutData("후기가 전송되었습니다.", HttpStatus.OK);
-    }
-
-    /**
      * 프로필 조회 요청 캐치
      *
      * @param nickname 유저 닉네임

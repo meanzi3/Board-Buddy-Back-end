@@ -70,4 +70,18 @@ public class PublicDistrictRepositoryCustomImpl implements PublicDistrictReposit
                         .and(publicDistrict.emd.eq(emd)))
                 .fetchOne());
     }
+
+    @Override
+    public Optional<PublicDistrictResponse.CoordinateDTO> findCoordinateDTOBySidoAndSggAndEmd(String sido, String sgg, String emd) {
+
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(PublicDistrictResponse.CoordinateDTO.class,
+                        publicDistrict.longitude,
+                        publicDistrict.latitude))
+                .from(publicDistrict)
+                .where(publicDistrict.sido.eq(sido)
+                        .and(publicDistrict.sgg.eq(sgg))
+                        .and(publicDistrict.emd.eq(emd)))
+                .fetchOne());
+    }
 }

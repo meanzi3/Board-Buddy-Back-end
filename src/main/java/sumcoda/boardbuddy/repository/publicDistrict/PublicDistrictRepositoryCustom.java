@@ -18,4 +18,7 @@ public interface PublicDistrictRepositoryCustom {
 
     // 레디스 장애 발생 시 데이터베이스에서 sido, sgg, emd 로 IdDTO 를 조회하기 위한 쿼리
     Optional<PublicDistrictResponse.IdDTO> findIdDTOBySidoAndSggAndEmd(String sido, String sgg, String emd);
+
+    // 레디스 장애 발생 시 데이터베이스에서 sido, sgg, emd 로 CoordinateDTO 를 조회하기 위한 쿼리
+    Optional<PublicDistrictResponse.CoordinateDTO> findCoordinateDTOBySidoAndSggAndEmd(String sido, String sgg, String emd);
 }

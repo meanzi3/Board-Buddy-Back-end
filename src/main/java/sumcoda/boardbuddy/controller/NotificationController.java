@@ -30,7 +30,7 @@ public class NotificationController {
      *
 //     * @param username 유저 아이디
      **/
-    @GetMapping(value = "/api/notifications/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/api/notifications/subscribe", produces = "text/event-stream")
     public ResponseEntity<SseEmitter> subscribe(
 //            @RequestAttribute String username
     ) {

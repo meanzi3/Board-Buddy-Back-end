@@ -1,8 +1,10 @@
 package sumcoda.boardbuddy.repository.comment;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.CommentResponse;
+import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.entity.Comment;
 import sumcoda.boardbuddy.entity.Member;
 
@@ -15,7 +17,7 @@ import static sumcoda.boardbuddy.entity.QComment.*;
 import static sumcoda.boardbuddy.entity.QMember.member;
 
 @RequiredArgsConstructor
-public class CommentRepositoryCustomImpl implements CommentRepositoryCustom{
+public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -56,4 +58,15 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom{
                 .where(comment.id.eq(commentId))
                 .fetchOne());
     }
+
+  @Override
+  public MemberResponse.UserNameDTO findCommentAuthorByCommentId(Long commentId) {
+    return jpaQueryFactory.
+            select(Projections.fields(MemberResponse.UserNameDTO.class,
+                    member.username))
+            .from(comment)
+            .join(comment.member, member)
+            .where(comment.id.eq(commentId))
+            .fetchOne();
+  }
 }

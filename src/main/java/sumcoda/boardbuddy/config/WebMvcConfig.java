@@ -31,7 +31,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/rankings",
                         "/api/auth/locations/search",
                         "/api/ws-stomp/**",
-                        "/api/notifications/**"
+                        "/api/notifications/subscribe"
                 ));
         WebMvcConfigurer.super.addInterceptors(registry);
     }

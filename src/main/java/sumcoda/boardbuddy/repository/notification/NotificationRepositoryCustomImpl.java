@@ -1,8 +1,9 @@
 package sumcoda.boardbuddy.repository.notification;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import sumcoda.boardbuddy.entity.Notification;
+import sumcoda.boardbuddy.dto.NotificationResponse;
 
 import java.util.List;
 
@@ -22,8 +23,10 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
      * @return 최신순으로 정렬된 알림 내역
      **/
     @Override
-    public List<Notification> findNotificationByMemberUsername(String username) {
-        return jpaQueryFactory.selectFrom(notification)
+    public List< NotificationResponse.NotificationDTO> findNotificationByMemberUsername(String username) {
+        return jpaQueryFactory.select(Projections.fields(NotificationResponse.NotificationDTO.class,
+                        notification.message,
+                        notification.createdAt))
                 .join(notification.member, member)
                 .where(member.username.eq(username))
                 .orderBy(notification.createdAt.desc())

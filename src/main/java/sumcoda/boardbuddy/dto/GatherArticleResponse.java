@@ -279,9 +279,6 @@ public class GatherArticleResponse {
         }
     }
 
-
-
-
     @Getter
     @NoArgsConstructor
     public static class TitleDTO {
@@ -292,4 +289,23 @@ public class GatherArticleResponse {
             this.title = title;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class LocationInfoDTO {
+        private String sido;
+
+        private String sgg;
+
+        private String emd;
+
+        @Builder
+        public LocationInfoDTO(String sido, String sgg, String emd) {
+            this.sido = sido;
+            this.sgg = sgg;
+            this.emd = emd;
+        }
+    }
+
+
 }

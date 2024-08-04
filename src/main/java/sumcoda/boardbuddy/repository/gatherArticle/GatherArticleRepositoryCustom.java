@@ -29,4 +29,6 @@ public interface GatherArticleRepositoryCustom {
     GatherArticleResponse.ReadDTO findGatherArticleReadDTOByGatherArticleId(Long gatherArticleId, Long memberId);
 
     Optional<GatherArticleResponse.TitleDTO> findTitleDTOById(Long gatherArticleId);
+
+    Optional<GatherArticleResponse.LocationInfoDTO> findLocationInfoDTOById(Long gatherArticleId);
 }

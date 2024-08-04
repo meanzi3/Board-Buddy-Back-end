@@ -21,11 +21,15 @@ public interface MemberRepositoryCustom {
 
     Optional<MemberResponse.LocationWithRadiusDTO> findLocationWithRadiusDTOByUsername(String username);
 
-    Optional<MemberResponse.UserNameDTO> findUserNameDTOByUsername(String username);
+    Optional<MemberResponse.UsernameDTO> findUserNameDTOByUsername(String username);
 
     Optional<MemberResponse.IdDTO> findIdDTOByUsername(String username);
 
-    Optional<MemberResponse.UserNameDTO> findUsernameDTOByNickname(String nickname);
+    Optional<MemberResponse.UsernameDTO> findUsernameDTOByNickname(String nickname);
 
     Optional<MemberResponse.NicknameDTO> findNicknameDTOByUsername(String username);
+
+    List<String> findUsernamesWithGatherArticleInRange(String username, String sido, String sgg, String emd);
+
+
 }

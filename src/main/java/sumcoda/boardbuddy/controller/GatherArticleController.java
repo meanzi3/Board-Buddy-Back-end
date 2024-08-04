@@ -13,6 +13,7 @@ import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.service.ChatMessageService;
 import sumcoda.boardbuddy.service.ChatRoomService;
 import sumcoda.boardbuddy.service.GatherArticleService;
+import sumcoda.boardbuddy.service.NotificationService;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,8 @@ public class GatherArticleController {
     private final ChatRoomService chatRoomService;
 
     private final ChatMessageService chatMessageService;
+
+    private final NotificationService notificationService;
 
     /**
      * 모집글 작성 컨트롤러
@@ -55,6 +58,8 @@ public class GatherArticleController {
 
         // 채팅방 입장 메세지 전송
         chatMessageService.publishEnterOrExitChatMessage(chatRoomAndNicknamePair, MessageType.ENTER);
+
+        notificationService.notifyGatherArticle(gatherArticleId, username);
 
         return buildSuccessResponseWithPairKeyData("post", createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
     }

@@ -1,6 +1,7 @@
 package sumcoda.boardbuddy.repository.member;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.AuthResponse;
@@ -12,7 +13,9 @@ import java.util.Optional;
 
 import static sumcoda.boardbuddy.entity.QBadgeImage.badgeImage;
 import static sumcoda.boardbuddy.entity.QMember.*;
+import static sumcoda.boardbuddy.entity.QNearPublicDistrict.*;
 import static sumcoda.boardbuddy.entity.QProfileImage.*;
+import static sumcoda.boardbuddy.entity.QPublicDistrict.*;
 
 @RequiredArgsConstructor
 public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
@@ -112,9 +115,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Optional<MemberResponse.UserNameDTO> findUserNameDTOByUsername(String username) {
+    public Optional<MemberResponse.UsernameDTO> findUserNameDTOByUsername(String username) {
         return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.fields(MemberResponse.UserNameDTO.class,
+                .select(Projections.fields(MemberResponse.UsernameDTO.class,
                         member.username))
                 .from(member)
                 .where(member.username.eq(username))
@@ -132,9 +135,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Optional<MemberResponse.UserNameDTO> findUsernameDTOByNickname(String nickname) {
+    public Optional<MemberResponse.UsernameDTO> findUsernameDTOByNickname(String nickname) {
         return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.fields(MemberResponse.UserNameDTO.class,
+                .select(Projections.fields(MemberResponse.UsernameDTO.class,
                         member.username))
                 .from(member)
                 .where(member.nickname.eq(nickname))
@@ -150,4 +153,29 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .where(member.username.eq(username))
                 .fetchOne());
     }
+
+    @Override
+    public List<String> findUsernamesWithGatherArticleInRange(String username, String sido, String sgg, String emd) {
+        return jpaQueryFactory
+                .select(member.username)
+                .from(member)
+                .where(
+                        member.username.ne(username)
+                                .and(
+                                        JPAExpressions
+                                                .selectOne()
+                                                .from(publicDistrict)
+                                                .join(nearPublicDistrict).on(publicDistrict.id.eq(nearPublicDistrict.publicDistrict.id))
+                                                .where(
+                                                        nearPublicDistrict.sido.eq(sido)
+                                                                .and(nearPublicDistrict.sgg.eq(sgg))
+                                                                .and(nearPublicDistrict.emd.eq(emd))
+                                                                .and(member.radius.goe(nearPublicDistrict.radius)) // 반경 조건
+                                                )
+                                                .exists()
+                                )
+                )
+                .fetch();
+    }
+
 }

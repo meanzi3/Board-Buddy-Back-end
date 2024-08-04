@@ -29,6 +29,7 @@ import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepo
 import sumcoda.boardbuddy.repository.nearPublicDistric.NearPublicDistrictRepository;
 import sumcoda.boardbuddy.repository.participationApplication.ParticipationApplicationRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
+import sumcoda.boardbuddy.util.GatherArticleValidationUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class GatherArticleService {
                 .orElseThrow(() -> new MemberRetrievalException("유효하지 않은 사용자입니다."));
 
         // 작성 요청 예외 검증, 처리
-        validateCreateRequest(createRequest);
+        GatherArticleValidationUtil.validateCreateRequest(createRequest);
 
         // 엔티티로 변환
         GatherArticle gatherArticle = createRequest.toEntity();
@@ -144,8 +145,8 @@ public class GatherArticleService {
             throw new GatherArticleAccessDeniedException("작성자만 수정할 수 있습니다.");
         }
 
-        // 예외 검증, 처리
-        validateUpdateRequest(updateRequest, gatherArticle.getCurrentParticipants());
+        // 수정 요청 예외 검증, 처리
+        GatherArticleValidationUtil.validateUpdateRequest(updateRequest, gatherArticle.getCurrentParticipants());
 
         // 기존 endDateTime
         LocalDateTime originalEndDateTime = gatherArticle.getEndDateTime();
@@ -203,90 +204,6 @@ public class GatherArticleService {
         gatherArticleStatusUpdateSchedulingService.unscheduleStatusUpdateJob(GatherArticleIdDTO.getId());
 
         return GatherArticleResponse.DeleteDTO.builder().id(GatherArticleIdDTO.getId()).build();
-    }
-
-    /**
-     * 작성 요청 검증
-     * @param createRequest
-     */
-    private void validateCreateRequest(GatherArticleRequest.CreateDTO createRequest) {
-        if (createRequest.getTitle() == null || createRequest.getTitle().isEmpty()) {
-            throw new GatherArticleSaveException("제목이 입력되지 않았습니다.");
-        }
-        if (createRequest.getDescription() == null || createRequest.getDescription().isEmpty()) {
-            throw new GatherArticleSaveException("설명이 입력되지 않았습니다.");
-        }
-        if (createRequest.getMeetingLocation() == null || createRequest.getMeetingLocation().isEmpty()) {
-            throw new GatherArticleSaveException("장소가 입력되지 않았습니다.");
-        }
-        if (createRequest.getSido() == null || createRequest.getSido().isEmpty()) {
-            throw new GatherArticleSaveException("시, 도가 입력되지 않았습니다.");
-        }
-        if (createRequest.getSgg() == null || createRequest.getSgg().isEmpty()) {
-            throw new GatherArticleSaveException("시, 군, 구가 입력되지 않았습니다.");
-        }
-        if (createRequest.getEmd() == null || createRequest.getEmd().isEmpty()) {
-            throw new GatherArticleSaveException("읍, 면, 동이 입력되지 않았습니다.");
-        }
-        if (createRequest.getX() == null) {
-            throw new GatherArticleSaveException("경도가 입력되지 않았습니다.");
-        }
-        if (createRequest.getY() == null) {
-            throw new GatherArticleSaveException("위도가 입력되지 않았습니다.");
-        }
-        if (createRequest.getStartDateTime() == null) {
-            throw new GatherArticleSaveException("시작 시간이 입력되지 않았습니다.");
-        }
-        if (createRequest.getEndDateTime() == null) {
-            throw new GatherArticleSaveException("종료 시간이 입력되지 않았습니다.");
-        }
-        if (createRequest.getMaxParticipants() == null || createRequest.getMaxParticipants() <= 0) {
-            throw new GatherArticleSaveException("최대 참가 인원이 유효하지 않습니다.");
-        }
-    }
-
-    /** 수정 요청 검증
-     * @param updateRequest
-     * @param currentParticipants
-     */
-    private void validateUpdateRequest(GatherArticleRequest.UpdateDTO updateRequest, int currentParticipants) {
-        if (updateRequest.getTitle() == null || updateRequest.getTitle().isEmpty()) {
-            throw new GatherArticleUpdateException("제목이 입력되지 않았습니다.");
-        }
-        if (updateRequest.getDescription() == null || updateRequest.getDescription().isEmpty()) {
-            throw new GatherArticleUpdateException("설명이 입력되지 않았습니다.");
-        }
-        if (updateRequest.getMeetingLocation() == null || updateRequest.getMeetingLocation().isEmpty()) {
-            throw new GatherArticleUpdateException("장소가 입력되지 않았습니다.");
-        }
-        if (updateRequest.getSido() == null || updateRequest.getSido().isEmpty()) {
-            throw new GatherArticleUpdateException("시, 도가 입력되지 않았습니다.");
-        }
-        if (updateRequest.getSgg() == null || updateRequest.getSgg().isEmpty()) {
-            throw new GatherArticleUpdateException("시, 군, 구가 입력되지 않았습니다.");
-        }
-        if (updateRequest.getEmd() == null || updateRequest.getEmd().isEmpty()) {
-            throw new GatherArticleUpdateException("읍, 면, 동이 입력되지 않았습니다.");
-        }
-        if (updateRequest.getX() == null) {
-            throw new GatherArticleUpdateException("경도가 입력되지 않았습니다.");
-        }
-        if (updateRequest.getY() == null) {
-            throw new GatherArticleUpdateException("위도가 입력되지 않았습니다.");
-        }
-        if (updateRequest.getStartDateTime() == null) {
-            throw new GatherArticleUpdateException("시작 시간이 입력되지 않았습니다.");
-        }
-        if (updateRequest.getEndDateTime() == null) {
-            throw new GatherArticleUpdateException("종료 시간이 입력되지 않았습니다.");
-        }
-        if (updateRequest.getMaxParticipants() == null || updateRequest.getMaxParticipants() <= 0) {
-            throw new GatherArticleUpdateException("최대 참가 인원이 유효하지 않습니다.");
-        }
-        if (updateRequest.getMaxParticipants() < currentParticipants) {
-            throw new GatherArticleUpdateException("최대 참가 인원은 현재 참가 인원보다 적을 수 없습니다.\n 현재 참가 인원 : "
-                    + currentParticipants + "명");
-        }
     }
 
     // 수정된 maxParticipants 에 따라 모집글 상태 변경

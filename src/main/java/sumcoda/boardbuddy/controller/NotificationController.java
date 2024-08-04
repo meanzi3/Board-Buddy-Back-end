@@ -48,7 +48,7 @@ public class NotificationController {
     /**
      * 알림 목록 조회 요청
      *
-//     * @param username 유저 아이디
+     * @param nickname 알람 구독 요청 사용자 닉네임
      * @return 알림 목록 조회 성공 시 약속된 SuccessResponse 반환
      **/
     @GetMapping(value = "/api/notifications")

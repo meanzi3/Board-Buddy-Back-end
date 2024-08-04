@@ -2,11 +2,12 @@ package sumcoda.boardbuddy.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import sumcoda.boardbuddy.dto.NotificationResponse;
@@ -28,15 +29,20 @@ public class NotificationController {
     /**
      * SSE Emitter 구독 요청
      *
-//     * @param username 유저 아이디
+     * @param nickname 알람 구독 요청 사용자 닉네임
      **/
-    @GetMapping(value = "/api/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(
-//            @RequestAttribute String username
+    @GetMapping(value = "/api/notifications/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<SseEmitter> subscribe(
+            @RequestParam String nickname
     ) {
-        log.info("User {} subscribed for notifications", "test");
+        log.info("User {} subscribed for notifications", nickname);
+        SseEmitter sseEmitter = notificationService.subscribe(nickname);
 
-        return notificationService.subscribe("test");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache");
+        headers.add("X-Accel-Buffering", "no");
+
+        return new ResponseEntity<>(sseEmitter, headers, HttpStatus.OK);
     }
 
     /**
@@ -47,10 +53,10 @@ public class NotificationController {
      **/
     @GetMapping(value = "/api/notifications")
     public ResponseEntity<ApiResponse<Map<String, List<NotificationResponse.NotificationDTO>>>> getNotifications(
-//            @RequestAttribute String username
+            @RequestParam String nickname
     ) {
 
-        List<NotificationResponse.NotificationDTO> notificationDTOs = notificationService.getNotifications("test");
+        List<NotificationResponse.NotificationDTO> notificationDTOs = notificationService.getNotifications(nickname);
 
         return buildSuccessResponseWithPairKeyData("notifications", notificationDTOs, "알림이 조회되었습니다.", HttpStatus.OK);
     }

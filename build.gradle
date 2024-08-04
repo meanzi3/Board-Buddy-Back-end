@@ -37,6 +37,9 @@ dependencies {
     // CoolSMS 의존성 추가
     implementation 'net.nurigo:sdk:4.3.0'
 
+    // AWS S3 의존성 추가
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'

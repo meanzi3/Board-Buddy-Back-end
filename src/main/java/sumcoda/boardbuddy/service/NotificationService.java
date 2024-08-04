@@ -11,6 +11,7 @@ import sumcoda.boardbuddy.dto.NotificationResponse;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.Notification;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
+import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleRetrievalException;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.sseEmitter.SseEmitterSendErrorException;
@@ -20,6 +21,7 @@ import sumcoda.boardbuddy.repository.comment.CommentRepository;
 import sumcoda.boardbuddy.repository.notification.NotificationRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
+import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 import sumcoda.boardbuddy.repository.sseEmitter.SseEmitterRepository;
 
 import java.io.IOException;
@@ -46,6 +48,8 @@ public class NotificationService {
 
     private final CommentRepository commentRepository;
 
+    private final PublicDistrictRepository publicDistrictRepository;
+
     // SSE Emitter와 이벤트 캐시를 위한 저장소
     private static final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
@@ -54,21 +58,22 @@ public class NotificationService {
     /**
      * 유저 로그인 시 SSE Emitter 구독 요청 캐치
      *
-     * @param username 로그인 사용자 아이디
+     * @param nickname 알람 구독 요청 사용자 닉네임
      **/
     @Transactional
-    public SseEmitter subscribe(String username) {
+    public SseEmitter subscribe(String nickname) {
+
+        MemberResponse.UsernameDTO usernameDTO = memberRepository.findUsernameDTOByNickname(nickname)
+                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 유저입니다."));
+
+        String username = usernameDTO.getUsername();
+
         // 매 연결마다 고유 Id 부여
         String emitterId = username + "_" + System.currentTimeMillis();
 
         // SseEmitter 인스턴스 생성
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
-        // 유저 검증 로직
-        boolean memberExist = memberRepository.existsByUsername(username);
-        if (!memberExist) {
-            throw new MemberNotFoundException("존재하지 않는 유저입니다.");
-        }
 
         // 503 Service Unavailable 방지용 dummy 이벤트 전송
         try {
@@ -96,7 +101,7 @@ public class NotificationService {
     @Transactional
     public void notifyApplyParticipation(Long gatherArticleId, String appliedUsername) {
         // 모집글 작성자의 유저 아이디를 조회
-        MemberResponse.UserNameDTO authorUsernameDTO = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
+        MemberResponse.UsernameDTO authorUsernameDTO = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
                 .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 모집글의 작성자를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         String authorUsername = authorUsernameDTO.getUsername();
@@ -150,7 +155,7 @@ public class NotificationService {
     @Transactional
     public void notifyCancelParticipation(Long gatherArticleId, String canceledUsername) {
         // 모집글 작성자의 유저 아이디를 조회
-        MemberResponse.UserNameDTO authorUsernameDTO = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
+        MemberResponse.UsernameDTO authorUsernameDTO = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
                 .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 모집글의 작성자를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         String authorUsername = authorUsernameDTO.getUsername();
@@ -172,7 +177,7 @@ public class NotificationService {
         String message = String.format("모집글 '%s'에 대한 리뷰를 남겨주세요!", formattingTitle(gatherArticleId));
 
         // 모든 참가자들의 아이디 조회
-        List<MemberResponse.UserNameDTO> participants = memberGatherArticleRepository.findParticipantsByGatherArticleId(gatherArticleId);
+        List<MemberResponse.UsernameDTO> participants = memberGatherArticleRepository.findParticipantsByGatherArticleId(gatherArticleId);
 
         // 모든 참가자에게 알림 전송
         participants.forEach(userNameDTO -> saveNotification(userNameDTO.getUsername(), message, "reviewRequest"));
@@ -188,7 +193,7 @@ public class NotificationService {
 
         if (parentId == null) {
             // 모집글 작성자의 유저 아이디를 조회
-            MemberResponse.UserNameDTO authorUsernameDTO = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
+            MemberResponse.UsernameDTO authorUsernameDTO = memberGatherArticleRepository.findAuthorUsernameByGatherArticleId(gatherArticleId)
                     .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 모집글의 작성자를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
             String authorUsername = authorUsernameDTO.getUsername();
@@ -199,7 +204,7 @@ public class NotificationService {
             saveNotification(authorUsername, message, "writeComment");
         } else {
             // 원댓글 작성자의 유저 아이디를 조회
-            MemberResponse.UserNameDTO authorUsernameDTO = commentRepository.findCommentAuthorByCommentId(parentId);
+            MemberResponse.UsernameDTO authorUsernameDTO = commentRepository.findCommentAuthorByCommentId(parentId);
 
             String authorUsername = authorUsernameDTO.getUsername();
 
@@ -210,26 +215,50 @@ public class NotificationService {
         }
     }
 
+    /**
+     * 모집글이 작성되면 해당 모집글 주변에 위치한 사용자에게 알림
+     *
+     * @param gatherArticleId 해당 모집글 Id
+     **/
+    @Transactional
+    public void notifyGatherArticle(Long gatherArticleId, String writtenUsername) {
+
+        GatherArticleResponse.LocationInfoDTO locationInfoDTO = gatherArticleRepository.findLocationInfoDTOById(gatherArticleId)
+                .orElseThrow(() -> new GatherArticleRetrievalException("서버 문제로 해당 모집글의 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        String sido = locationInfoDTO.getSido();
+        String sgg = locationInfoDTO.getSgg();
+        String emd = locationInfoDTO.getEmd();
+
+        List<String> usernamesWithGatherArticleInRange = memberRepository.findUsernamesWithGatherArticleInRange(writtenUsername, sido, sgg, emd);
+
+        for (String username : usernamesWithGatherArticleInRange) {
+            // 리뷰 요청 메시지를 포맷하여 생성
+            String message = String.format("%s님의 주변에 '%s' 모집글이 작성되었습니다.", getNickname(username), formattingTitle(gatherArticleId));
+
+            log.info(message);
+
+            saveNotification(username, message, "writeComment");
+        }
+
+    }
+
 
     /**
      * 유저의 알림을 조회하여 최신순으로 반환하는 메서드
      *
-     * @param username 알림을 조회할 유저의 아이디
+     * @param nickname 알람 구독 요청 사용자 닉네임
      * @return NotificationResponse 알림 응답 DTO
      **/
-    public List<NotificationResponse.NotificationDTO> getNotifications(String username) {
-        // 유저 검증
-        if (Boolean.FALSE.equals(memberRepository.existsByUsername(username))) {
-            throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
-        }
+    public List<NotificationResponse.NotificationDTO> getNotifications(String nickname) {
+
+        MemberResponse.UsernameDTO usernameDTO = memberRepository.findUsernameDTOByNickname(nickname)
+                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 유저입니다."));
+
+        String username = usernameDTO.getUsername();
 
         //DB에서 해당 유저의 알림을 최신순으로 조회
-        return notificationRepository.findNotificationByMemberUsername(username).stream()
-                .map(notification -> NotificationResponse.NotificationDTO.builder()
-                        .message(notification.getMessage())
-                        .createdAt(notification.getCreatedAt())
-                        .build())
-                .toList();
+        return notificationRepository.findNotificationByMemberUsername(username);
     }
 
     /**
@@ -239,7 +268,6 @@ public class NotificationService {
      * @param message 알림 메세지
      * @param eventName 알림 이벤트 이름
      **/
-    @Transactional
     public void saveNotification(String username, String message, String eventName) {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
@@ -322,7 +350,7 @@ public class NotificationService {
     private String getUsername(String nickname) {
 
         // 유저 닉네임으로 유저 아이디 조회
-        MemberResponse.UserNameDTO userNameDTO = memberRepository.findUsernameDTOByNickname(nickname)
+        MemberResponse.UsernameDTO userNameDTO = memberRepository.findUsernameDTOByNickname(nickname)
                 .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         return userNameDTO.getUsername();

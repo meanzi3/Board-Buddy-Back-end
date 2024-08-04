@@ -12,7 +12,7 @@ public interface MemberGatherArticleRepositoryCustom {
 
   boolean isHasRole(Long gatherArticleId, String username);
 
-  Optional<MemberResponse.UserNameDTO> findAuthorUsernameByGatherArticleId(Long gatherArticleId);
+  Optional<MemberResponse.UsernameDTO> findAuthorUsernameByGatherArticleId(Long gatherArticleId);
 
-  List<MemberResponse.UserNameDTO> findParticipantsByGatherArticleId(Long gatherArticleId);
+  List<MemberResponse.UsernameDTO> findParticipantsByGatherArticleId(Long gatherArticleId);
 }

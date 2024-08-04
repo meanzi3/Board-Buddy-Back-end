@@ -253,4 +253,17 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .where(gatherArticle.id.eq(gatherArticleId))
                 .fetchOne());
     }
+
+    @Override
+    public Optional<GatherArticleResponse.LocationInfoDTO> findLocationInfoDTOById(Long gatherArticleId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(GatherArticleResponse.LocationInfoDTO.class,
+                        gatherArticle.sido,
+                        gatherArticle.sgg,
+                        gatherArticle.emd
+                ))
+                .from(gatherArticle)
+                .where(gatherArticle.id.eq(gatherArticleId))
+                .fetchOne());
+    }
 }

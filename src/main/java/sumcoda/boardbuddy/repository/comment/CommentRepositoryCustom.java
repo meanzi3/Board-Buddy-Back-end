@@ -17,5 +17,5 @@ public interface CommentRepositoryCustom {
 
   Optional<Comment> findCommentByCommentId(Long commentId);
 
-  MemberResponse.UserNameDTO findCommentAuthorByCommentId(Long commentId);
+  MemberResponse.UsernameDTO findCommentAuthorByCommentId(Long commentId);
 }

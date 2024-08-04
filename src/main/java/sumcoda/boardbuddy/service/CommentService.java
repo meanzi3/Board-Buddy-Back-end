@@ -114,7 +114,7 @@ public class CommentService {
     public void updateComment(Long gatherArticleId, Long commentId, CommentRequest.UpdateDTO updateDTO, String username) {
 
         // 사용자 검증
-        MemberResponse.UserNameDTO userNameDTO = memberRepository.findUserNameDTOByUsername(username)
+        MemberResponse.UsernameDTO userNameDTO = memberRepository.findUserNameDTOByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("유효하지 않은 사용자입니다."));
 
         // 모집글 검증
@@ -158,7 +158,7 @@ public class CommentService {
     public void deleteComment(Long gatherArticleId, Long commentId, String username) {
 
         // 사용자 검증
-        MemberResponse.UserNameDTO userNameDTO = memberRepository.findUserNameDTOByUsername(username)
+        MemberResponse.UsernameDTO userNameDTO = memberRepository.findUserNameDTOByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("유효하지 않은 사용자입니다."));
 
         // 모집글 검증

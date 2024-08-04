@@ -1,10 +1,10 @@
 package sumcoda.boardbuddy.repository.notification;
 
-import sumcoda.boardbuddy.entity.Notification;
+import sumcoda.boardbuddy.dto.NotificationResponse;
 
 import java.util.List;
 
 public interface NotificationRepositoryCustom {
 
-    List<Notification> findNotificationByMemberUsername(String username);
+    List< NotificationResponse.NotificationDTO> findNotificationByMemberUsername(String username);
 }

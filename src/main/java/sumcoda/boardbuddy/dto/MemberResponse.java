@@ -106,11 +106,11 @@ public class MemberResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class UserNameDTO {
+    public static class UsernameDTO {
         private String username;
 
         @Builder
-        public UserNameDTO(String username) {
+        public UsernameDTO(String username) {
             this.username = username;
         }
     }

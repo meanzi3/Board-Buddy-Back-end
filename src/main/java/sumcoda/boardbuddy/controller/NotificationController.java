@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -36,7 +37,7 @@ public class NotificationController {
             @RequestParam String nickname
     ) {
         log.info("User {} subscribed for notifications", nickname);
-        SseEmitter sseEmitter = notificationService.subscribe(nickname);
+        SseEmitter sseEmitter = notificationService.subscribe("test");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache");
@@ -48,15 +49,15 @@ public class NotificationController {
     /**
      * 알림 목록 조회 요청
      *
-     * @param nickname 알람 구독 요청 사용자 닉네임
+     * @param username 얼람 목록 조회 사용자 아이디
      * @return 알림 목록 조회 성공 시 약속된 SuccessResponse 반환
      **/
     @GetMapping(value = "/api/notifications")
     public ResponseEntity<ApiResponse<Map<String, List<NotificationResponse.NotificationDTO>>>> getNotifications(
-            @RequestParam String nickname
+            @RequestAttribute String username
     ) {
 
-        List<NotificationResponse.NotificationDTO> notificationDTOs = notificationService.getNotifications(nickname);
+        List<NotificationResponse.NotificationDTO> notificationDTOs = notificationService.getNotifications(username);
 
         return buildSuccessResponseWithPairKeyData("notifications", notificationDTOs, "알림이 조회되었습니다.", HttpStatus.OK);
     }

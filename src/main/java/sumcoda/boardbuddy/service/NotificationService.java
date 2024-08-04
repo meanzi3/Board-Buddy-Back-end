@@ -247,15 +247,15 @@ public class NotificationService {
     /**
      * 유저의 알림을 조회하여 최신순으로 반환하는 메서드
      *
-     * @param nickname 알람 구독 요청 사용자 닉네임
+     * @param username 알림 목록 조회 사용자 아이디
      * @return NotificationResponse 알림 응답 DTO
      **/
-    public List<NotificationResponse.NotificationDTO> getNotifications(String nickname) {
+    public List<NotificationResponse.NotificationDTO> getNotifications(String username) {
+        Boolean isMemberExists = memberRepository.existsByUsername(username);
 
-        MemberResponse.UsernameDTO usernameDTO = memberRepository.findUsernameDTOByNickname(nickname)
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 유저입니다."));
-
-        String username = usernameDTO.getUsername();
+        if (!isMemberExists) {
+            throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
+        }
 
         //DB에서 해당 유저의 알림을 최신순으로 조회
         return notificationRepository.findNotificationByMemberUsername(username);

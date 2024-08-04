@@ -60,9 +60,9 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
     }
 
   @Override
-  public MemberResponse.UserNameDTO findCommentAuthorByCommentId(Long commentId) {
+  public MemberResponse.UsernameDTO findCommentAuthorByCommentId(Long commentId) {
     return jpaQueryFactory.
-            select(Projections.fields(MemberResponse.UserNameDTO.class,
+            select(Projections.fields(MemberResponse.UsernameDTO.class,
                     member.username))
             .from(comment)
             .join(comment.member, member)

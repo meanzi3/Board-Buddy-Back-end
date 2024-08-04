@@ -49,9 +49,9 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
 
   // 모집글의 작성자를 찾는 메서드
   @Override
-  public Optional<MemberResponse.UserNameDTO> findAuthorUsernameByGatherArticleId(Long gatherArticleId) {
+  public Optional<MemberResponse.UsernameDTO> findAuthorUsernameByGatherArticleId(Long gatherArticleId) {
     return Optional.ofNullable(jpaQueryFactory
-            .select(Projections.fields(MemberResponse.UserNameDTO.class,
+            .select(Projections.fields(MemberResponse.UsernameDTO.class,
                     member.username))
             .from(memberGatherArticle)
             .join(memberGatherArticle.member, member)
@@ -62,9 +62,9 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
 
   //모집글의 모든 참가자를 찾는 메서드
   @Override
-  public List<MemberResponse.UserNameDTO> findParticipantsByGatherArticleId(Long gatherArticleId) {
+  public List<MemberResponse.UsernameDTO> findParticipantsByGatherArticleId(Long gatherArticleId) {
     return jpaQueryFactory
-            .select(Projections.fields(MemberResponse.UserNameDTO.class,
+            .select(Projections.fields(MemberResponse.UsernameDTO.class,
                     member.username))
             .from(memberGatherArticle)
             .join(memberGatherArticle.member, member)

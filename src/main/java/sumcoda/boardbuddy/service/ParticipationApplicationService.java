@@ -174,7 +174,7 @@ public class ParticipationApplicationService {
         // 모집글 상태 확인, 업데이트
         updateGatherArticleStatusBasedOnParticipants(gatherArticle, newParticipantsCount);
 
-        MemberResponse.UserNameDTO userNameDTO = memberRepository.findUsernameDTOByNickname(applicantNickname).orElseThrow(() -> new MemberNotFoundException("참가 승인할 사용자의 정보를 찾을 수 없습니다."));
+        MemberResponse.UsernameDTO userNameDTO = memberRepository.findUsernameDTOByNickname(applicantNickname).orElseThrow(() -> new MemberNotFoundException("참가 승인할 사용자의 정보를 찾을 수 없습니다."));
 
         return userNameDTO.getUsername();
     }

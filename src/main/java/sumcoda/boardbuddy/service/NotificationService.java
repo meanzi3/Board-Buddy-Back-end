@@ -238,9 +238,8 @@ public class NotificationService {
 
             log.info(message);
 
-            saveNotification(username, message, "writeComment");
+            saveNotification(username, message, "writeGatherArticle");
         }
-
     }
 
 

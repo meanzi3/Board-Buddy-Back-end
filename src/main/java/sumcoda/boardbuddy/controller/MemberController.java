@@ -108,11 +108,11 @@ public class MemberController {
      * @param username 로그인 사용자 아이디
      * @return 내 동네 조회를 성공했다면 약속된 SuccessResponse 반환
      */
-    @GetMapping("/api/my/neighbourhoods")
-    public ResponseEntity<ApiResponse<MemberResponse.MyLocationsDTO>> getMemberNeighbourhoods(@RequestAttribute String username) {
-        log.info("getMemberNeighbourhoods is working");
+    @GetMapping("/api/my/neighborhoods")
+    public ResponseEntity<ApiResponse<MemberResponse.MyLocationsDTO>> getMemberNeighborhoods(@RequestAttribute String username) {
+        log.info("getMemberNeighborhoods is working");
 
-        MemberResponse.MyLocationsDTO myLocationsDTO = memberService.getMemberNeighbourhoods(username);
+        MemberResponse.MyLocationsDTO myLocationsDTO = memberService.getMemberNeighborhoods(username);
 
         return buildSuccessResponseWithMultiplePairKeyData(myLocationsDTO, "내 동네 조회를 성공하였습니다.", HttpStatus.OK);
     }
@@ -123,13 +123,13 @@ public class MemberController {
      * @param locationDTO 사용자가 입력한 위치 정보
      * @return 내 동네 설정을 성공했다면 약속된 SuccessResponse 반환
      **/
-    @PutMapping("/api/my/neighbourhoods")
-    public ResponseEntity<ApiResponse<Map<String, Map<Integer, List<MemberResponse.LocationDTO>>>>> updateMemberNeighbourhood(
+    @PutMapping("/api/my/neighborhoods")
+    public ResponseEntity<ApiResponse<Map<String, Map<Integer, List<MemberResponse.LocationDTO>>>>> updateMemberNeighborhood(
             @RequestBody MemberRequest.LocationDTO locationDTO,
             @RequestAttribute String username) {
-        log.info("updateMemberNeighbourhood is working");
+        log.info("updateMemberNeighborhood is working");
 
-        Map<Integer, List<MemberResponse.LocationDTO>> locations = memberService.updateMemberNeighbourhood(locationDTO, username);
+        Map<Integer, List<MemberResponse.LocationDTO>> locations = memberService.updateMemberNeighborhood(locationDTO, username);
 
         return buildSuccessResponseWithPairKeyData("locations", locations, "내 동네 설정을 성공하였습니다.", HttpStatus.OK);
     }

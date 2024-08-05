@@ -75,4 +75,17 @@ public class PublicDistrictResponse {
             this.id = id;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class CoordinateDTO {
+        private Double longitude;
+        private Double latitude;
+
+        @Builder
+        public CoordinateDTO(Double longitude, Double latitude) {
+            this.longitude = longitude;
+            this.latitude = latitude;
+        }
+    }
 }

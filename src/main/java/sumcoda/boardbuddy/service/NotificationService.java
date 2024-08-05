@@ -58,15 +58,15 @@ public class NotificationService {
     /**
      * 유저 로그인 시 SSE Emitter 구독 요청 캐치
      *
-     * @param nickname 알람 구독 요청 사용자 닉네임
+//     * @param nickname 알람 구독 요청 사용자 닉네임
      **/
     @Transactional
-    public SseEmitter subscribe(String nickname) {
+    public SseEmitter subscribe(String username) {
 
-        MemberResponse.UsernameDTO usernameDTO = memberRepository.findUsernameDTOByNickname(nickname)
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 유저입니다."));
-
-        String username = usernameDTO.getUsername();
+//        MemberResponse.UsernameDTO usernameDTO = memberRepository.findUsernameDTOByNickname(nickname)
+//                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 유저입니다."));
+//
+//        String username = usernameDTO.getUsername();
 
         // 매 연결마다 고유 Id 부여
         String emitterId = username + "_" + System.currentTimeMillis();

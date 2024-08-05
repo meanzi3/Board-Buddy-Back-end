@@ -29,15 +29,16 @@ public class NotificationController {
 
     /**
      * SSE Emitter 구독 요청
-     *
-//     * @param nickname 알람 구독 요청 사용자 닉네임
+     * <p>
+     * //     * @param nickname 알람 구독 요청 사용자 닉네임
      **/
     @GetMapping(value = "/api/notifications/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribe(
-//            @RequestParam String nickname
+            @RequestAttribute String username
     ) {
+
         log.info("User {} subscribed for notifications", "test");
-        SseEmitter sseEmitter = notificationService.subscribe("test");
+        SseEmitter sseEmitter = notificationService.subscribe(username);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache");

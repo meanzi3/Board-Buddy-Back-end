@@ -214,7 +214,7 @@ public class MemberService {
      * @param username 사용자 아이디
      * @return 사용자의 좌표, 반경, 주변 동네 정보가 포함된 DTO
      */
-    public MemberResponse.MyLocationsDTO getMemberNeighbourhoods(String username) {
+    public MemberResponse.MyLocationsDTO getMemberNeighborhoods(String username) {
 
         // 사용자 위치 및 반경 정보 조회
         MemberResponse.LocationWithRadiusDTO locationWithRadiusDTO = memberRepository.findLocationWithRadiusDTOByUsername(username)
@@ -259,7 +259,7 @@ public class MemberService {
      * @return 주변 동네 정보가 포함된 DTO
      **/
     @Transactional
-    public Map<Integer, List<MemberResponse.LocationDTO>> updateMemberNeighbourhood(MemberRequest.LocationDTO locationDTO, String username) {
+    public Map<Integer, List<MemberResponse.LocationDTO>> updateMemberNeighborhood(MemberRequest.LocationDTO locationDTO, String username) {
 
         // 사용자가 입력한 시도, 시구, 동
         String sido = locationDTO.getSido();

@@ -35,11 +35,11 @@ public class GatherArticleController {
     private final NotificationService notificationService;
 
     /**
-     * 모집글 작성 컨트롤러
+     * 모집글 작성 요청
      *
-     * @param createRequest 모집글 작성 요청 데이터
-     * @param username 모집글 작성자 아이디
-     * @return 생성된 모집글과 관련된 응답 데이터
+     * @param createRequest     모집글 작성 요청 데이터
+     * @param username          모집글 작성자 아이디
+     * @return                  생성된 모집글과 관련된 응답 데이터
      */
     @PostMapping(value = "/api/gather-articles")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.CreateDTO>>> createGatherArticle(
@@ -65,11 +65,11 @@ public class GatherArticleController {
     }
 
     /**
-     * 모집글 조회 컨트롤러
+     * 모집글 조회 요청
      *
-     * @param gatherArticleId
-     * @param username
-     * @return
+     * @param gatherArticleId   조회 요청 모집글 id
+     * @param username          사용자 username
+     * @return                  조회된 모집글과 관련된 응답 데이터
      */
     @GetMapping(value = "/api/gather-articles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.ReadDTO>>> getGatherArticle(
@@ -80,12 +80,12 @@ public class GatherArticleController {
     }
 
     /**
-     * 모집글 수정 컨트롤러
+     * 모집글 수정 요청
      *
-     * @param gatherArticleId
-     * @param updateRequest
-     * @param username
-     * @return
+     * @param gatherArticleId   수정 요청 모집글 id
+     * @param updateRequest     모집글 수정 요청 데이터
+     * @param username          사용자 username
+     * @return                  수정된 모집글과 관련된 응답 데이터
      */
     @PutMapping(value = "/api/gather-articles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.UpdateDTO>>> updateGatherArticle(
@@ -97,11 +97,11 @@ public class GatherArticleController {
     }
 
     /**
-     * 모집글 삭제 컨트롤러
+     * 모집글 삭제 요청
      *
-     * @param gatherArticleId
-     * @param username
-     * @return
+     * @param gatherArticleId   삭제 요청 모집글 id
+     * @param username          사용자 username
+     * @return                  삭제된 모집글과 관련된 응답 데이터
      */
     @DeleteMapping(value = "/api/gather-articles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.DeleteDTO>>> deleteGatherArticle(
@@ -163,6 +163,23 @@ public class GatherArticleController {
         GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(page, status, sort, username);
 
         return buildSuccessResponseWithMultiplePairKeyData(posts, "모집글 리스트 조회를 성공하였습니다.", HttpStatus.OK);
+    }
+
+    /**
+     * 모집글 검색 요청
+     *
+     * @param query     검색어
+     * @param username  사용자 username
+     * @return          검색 결과 리스트
+     */
+    @GetMapping("/api/gather-articles/search")
+    public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.SearchResultDTO>>>> searchArticles(
+            @RequestParam String query,
+            @RequestAttribute String username) {
+
+        List<GatherArticleResponse.SearchResultDTO> posts = gatherArticleService.searchArticles(query, username);
+
+        return buildSuccessResponseWithPairKeyData("posts", posts, "모집글 검색에 성공하였습니다.", HttpStatus.OK);
     }
 }
 

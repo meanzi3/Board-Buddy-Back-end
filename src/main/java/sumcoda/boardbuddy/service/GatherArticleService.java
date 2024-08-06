@@ -58,6 +58,8 @@ public class GatherArticleService {
 
     private final PublicDistrictRedisService publicDistrictRedisService;
 
+    private static final int GATHER_ARTICLE_MINIMUM_SEARCH_LENGTH = 2;
+
     /**
      * 모집글 작성
      * @param createRequest
@@ -275,32 +277,8 @@ public class GatherArticleService {
             throw new GatherArticleStatusException("유효하지 않은 모집글 상태입니다.");
         }
 
-        // 사용자 위치 및 반경 정보 조회
-        MemberResponse.LocationWithRadiusDTO locationWithRadiusDTO = memberRepository.findLocationWithRadiusDTOByUsername(username)
-                .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
-
-        // 사용자의 위치 선언
-        String sido = locationWithRadiusDTO.getSido();
-        String sgg = locationWithRadiusDTO.getSgg();
-        String emd = locationWithRadiusDTO.getEmd();
-
-        // redis 에서 조회 - 기준 위치에 해당하는 IdDTO 를 조회
-        PublicDistrictResponse.IdDTO idDTO = publicDistrictRedisService.findIdDTOBySidoAndSggAndEmd(sido, sgg, emd)
-                .orElseGet(() -> {
-                    // mariadb 에서 조회 - 기준 위치에 해당하는 IdDTO 를 조회(redis 장애 발생 시 mariadb 에서 조회)
-                    log.error("[redis findIdDTOBySidoAndSggAndEmd() error]");
-                    return publicDistrictRepository.findIdDTOBySidoAndSggAndEmd(sido, sgg, emd)
-                            .orElseThrow(() -> new PublicDistrictRetrievalException("유저의 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
-                });
-
-        // 사용자의 위치와 반경 정보로 주변 행정 구역 조회
-        List<NearPublicDistrictResponse.LocationDTO> locationDTOs = nearPublicDistrictRepository.findLocationDTOsByPublicDistrictIdAndRadius(
-                idDTO.getId(), locationWithRadiusDTO.getRadius());
-
-        // 주변 행정 구역이 없는 경우 예외 처리
-        if (locationDTOs.isEmpty()) {
-            throw new NearPublicDistrictRetrievalException("유저의 주변 행정 구역을 찾을 수 없습니다. 관리자에게 문의하세요.");
-        }
+        // 사용자의 주변 행정 구역 얻어오기
+        List<NearPublicDistrictResponse.LocationDTO> locationDTOs = getLocationDTOsByUsername(username);
 
         // 주변 행정 구역 리스트 생성
         List<String> sidoList = new ArrayList<>();
@@ -355,5 +333,78 @@ public class GatherArticleService {
 
         return gatherArticleRepository.findSimpleInfoByGatherArticleId(gatherArticleId)
                 .orElseThrow(() -> new GatherArticleRetrievalException("서버 문제로 해당 모집글에 대한 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+    }
+
+    /**
+     * 모집글 검색
+     * @param keyword   검색어
+     * @param username  사용자 username
+     * @return          검색 결과 리스트
+     */
+    public List<GatherArticleResponse.SearchResultDTO> searchArticles(String keyword, String username) {
+
+        // 검색어 길이 검증
+        if (keyword.length() < GATHER_ARTICLE_MINIMUM_SEARCH_LENGTH) {
+            throw new GatherArticleSearchLengthException("검색어는 두 글자 이상이어야 합니다.");
+        }
+
+        // 사용자의 주변 행정 구역 얻어오기
+        List<NearPublicDistrictResponse.LocationDTO> locationDTOs = getLocationDTOsByUsername(username);
+
+        // 주변 행정 구역 리스트 생성
+        List<String> sidoList = new ArrayList<>();
+        List<String> sggList = new ArrayList<>();
+        List<String> emdList = new ArrayList<>();
+
+        locationDTOs.forEach(district -> {
+            sidoList.add(district.getSido());
+            sggList.add(district.getSgg());
+            emdList.add(district.getEmd());
+        });
+
+        // AUTHOR 로 필터하기 위한 역할 선언
+        MemberGatherArticleRole role = MemberGatherArticleRole.AUTHOR;
+
+        // 검색어를 이용한 모집글 조회
+        List<GatherArticleResponse.SearchResultDTO> searchResultDTOs = gatherArticleRepository.findSearchResultDTOByKeyword(
+                sidoList, sggList, emdList, role, keyword);
+
+        if(searchResultDTOs.isEmpty()){
+            throw new GatherArticleNoSearchResultException("검색 결과가 없습니다.");
+        }
+
+        return searchResultDTOs;
+    }
+
+    // 사용자의 위치와 설정한 반경을 기반으로 주변 행정 구역을 얻음
+    private List<NearPublicDistrictResponse.LocationDTO> getLocationDTOsByUsername(String username) {
+        // 사용자 위치 및 반경 정보 조회
+        MemberResponse.LocationWithRadiusDTO locationWithRadiusDTO = memberRepository.findLocationWithRadiusDTOByUsername(username)
+                .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        // 사용자의 위치 선언
+        String sido = locationWithRadiusDTO.getSido();
+        String sgg = locationWithRadiusDTO.getSgg();
+        String emd = locationWithRadiusDTO.getEmd();
+
+        // redis 에서 조회 - 기준 위치에 해당하는 IdDTO 를 조회
+        PublicDistrictResponse.IdDTO idDTO = publicDistrictRedisService.findIdDTOBySidoAndSggAndEmd(sido, sgg, emd)
+                .orElseGet(() -> {
+                    // mariadb 에서 조회 - 기준 위치에 해당하는 IdDTO 를 조회(redis 장애 발생 시 mariadb 에서 조회)
+                    log.error("[redis findIdDTOBySidoAndSggAndEmd() error]");
+                    return publicDistrictRepository.findIdDTOBySidoAndSggAndEmd(sido, sgg, emd)
+                            .orElseThrow(() -> new PublicDistrictRetrievalException("유저의 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                });
+
+        // 사용자의 위치와 반경 정보로 주변 행정 구역 조회
+        List<NearPublicDistrictResponse.LocationDTO> locationDTOs = nearPublicDistrictRepository.findLocationDTOsByPublicDistrictIdAndRadius(
+                idDTO.getId(), locationWithRadiusDTO.getRadius());
+
+        // 주변 행정 구역이 없는 경우 예외 처리
+        if (locationDTOs.isEmpty()) {
+            throw new NearPublicDistrictRetrievalException("유저의 주변 행정 구역을 찾을 수 없습니다. 관리자에게 문의하세요.");
+        }
+
+        return locationDTOs;
     }
 }

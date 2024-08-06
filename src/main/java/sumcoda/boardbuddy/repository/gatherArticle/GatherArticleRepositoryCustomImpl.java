@@ -5,6 +5,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -266,4 +267,53 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .where(gatherArticle.id.eq(gatherArticleId))
                 .fetchOne());
     }
+
+    @Override
+    public List<GatherArticleResponse.SearchResultDTO> findSearchResultDTOByKeyword(List<String> sidoList, List<String> sggList, List<String> emdList, MemberGatherArticleRole role, String keyword) {
+
+        return jpaQueryFactory
+                .select(Projections.fields(
+                        GatherArticleResponse.SearchResultDTO.class,
+                        gatherArticle.id,
+                        gatherArticle.title,
+                        gatherArticle.description,
+                        Projections.fields(GatherArticleResponse.AuthorSimpleDTO.class,
+                                member.nickname.as("nickname"),
+                                member.rank.as("rank")).as("author"),
+                        gatherArticle.meetingLocation,
+                        gatherArticle.maxParticipants,
+                        gatherArticle.currentParticipants,
+                        gatherArticle.startDateTime,
+                        gatherArticle.endDateTime,
+                        gatherArticle.createdAt,
+                        gatherArticle.gatherArticleStatus.as("status")))
+                .from(gatherArticle)
+                .join(gatherArticle.memberGatherArticles, memberGatherArticle)
+                .join(memberGatherArticle.member, member)
+                .where(
+                        inLocation(sidoList, sggList, emdList),
+                        eqMemberGatherArticleRole(role),
+                        titleOrDescriptionContains(keyword)
+                )
+                .orderBy(gatherArticle.createdAt.desc())
+                .fetch();
+
+    }
+
+    private BooleanExpression titleOrDescriptionContains(String keyword) {
+        if (keyword == null || keyword.isEmpty()) {
+            return null;
+        }
+
+        // 키워드 공백 제거
+        String keywordWithoutWhiteSpace = keyword.replaceAll("\\s", "");
+
+        // SQL 함수를 사용하여 공백 제거
+        StringTemplate titleTemplate = Expressions.stringTemplate("replace({0}, ' ', '')", gatherArticle.title);
+        StringTemplate descriptionTemplate = Expressions.stringTemplate("replace({0}, ' ', '')", gatherArticle.description);
+
+        return titleTemplate.containsIgnoreCase(keywordWithoutWhiteSpace)
+                .or(descriptionTemplate.containsIgnoreCase(keywordWithoutWhiteSpace));
+    }
+
 }

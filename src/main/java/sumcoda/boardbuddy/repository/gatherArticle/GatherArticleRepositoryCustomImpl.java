@@ -19,6 +19,7 @@ import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -113,7 +114,8 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
 
     @Override
     public Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
-            List<String> sidoList, List<String> sggList, List<String> emdList, String status, String sort, MemberGatherArticleRole role, Pageable pageable) {
+            List<String> sidoList, List<String> sggList, List<String> emdList,
+            String status, String sort, MemberGatherArticleRole role, Pageable pageable) {
 
         List<GatherArticleResponse.ReadSliceDTO> results = jpaQueryFactory.select(Projections.fields(
                         GatherArticleResponse.ReadSliceDTO.class,
@@ -138,7 +140,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         eqStatus(status),
                         eqMemberGatherArticleRole(role)
                 )
-                .orderBy(getOrderSpecifier(sort))
+                .orderBy(getOrderSpecifiers(sort))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -175,26 +177,30 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .fetchOne());
     }
 
-    private BooleanExpression eqMemberGatherArticleRole(MemberGatherArticleRole role) {
-        return memberGatherArticle.memberGatherArticleRole.eq(role);
-    }
-
-    private BooleanExpression eqStatus(String status) {
-        return status != null ? gatherArticle.gatherArticleStatus.eq(GatherArticleStatus.valueOf(status.toUpperCase())) : null;
-    }
-
     private BooleanExpression inLocation(List<String> sidoList, List<String> sggList, List<String> emdList) {
         return gatherArticle.sido.in(sidoList)
                 .and(gatherArticle.sgg.in(sggList))
                 .and(gatherArticle.emd.in(emdList));
     }
 
-    private OrderSpecifier<?> getOrderSpecifier(String sort) {
+    private BooleanExpression eqStatus(String status) {
+        return status != null ? gatherArticle.gatherArticleStatus.eq(GatherArticleStatus.valueOf(status.toUpperCase())) : null;
+    }
+
+    private BooleanExpression eqMemberGatherArticleRole(MemberGatherArticleRole role) {
+        return memberGatherArticle.memberGatherArticleRole.eq(role);
+    }
+
+    private OrderSpecifier<?>[] getOrderSpecifiers(String sort) {
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+
         if (GatherArticleStatus.SOON.getValue().equals(sort)) {
-            return gatherArticle.startDateTime.asc();
-        } else {
-            return gatherArticle.id.desc();
+            orderSpecifiers.add(gatherArticle.startDateTime.asc());
         }
+
+        orderSpecifiers.add(gatherArticle.id.desc());
+
+        return orderSpecifiers.toArray(new OrderSpecifier<?>[0]);
     }
 
     @Override

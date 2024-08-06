@@ -32,4 +32,7 @@ public interface GatherArticleRepositoryCustom {
     Optional<GatherArticleResponse.TitleDTO> findTitleDTOById(Long gatherArticleId);
 
     Optional<GatherArticleResponse.LocationInfoDTO> findLocationInfoDTOById(Long gatherArticleId);
+
+    List<GatherArticleResponse.SearchResultDTO> findSearchResultDTOByKeyword(
+            List<String> sidoList, List<String> sggList, List<String> emdList, MemberGatherArticleRole role, String keyword);
 }

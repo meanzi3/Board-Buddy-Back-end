@@ -60,4 +60,16 @@ public class GatherArticleExceptionHandler {
   public ResponseEntity<ApiResponse<Void>> handleGatherArticleNotCompletedException(GatherArticleNotCompletedException e) {
     return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
   }
+
+  // 모집글 검색어 길이 예외 처리 핸들러
+  @ExceptionHandler(GatherArticleSearchLengthException.class)
+  public ResponseEntity<ApiResponse<Void>> handleGatherArticleSearchLengthException(GatherArticleSearchLengthException e) {
+    return buildFailureResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+  }
+
+  // 모집글 검색 결과 없음 예외 처리 핸들러
+  @ExceptionHandler(GatherArticleNoSearchResultException.class)
+  public ResponseEntity<ApiResponse<Void>> handleGatherArticleNoSearchResultException(GatherArticleNoSearchResultException e) {
+    return buildFailureResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+  }
 }

@@ -87,6 +87,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
         return Optional.ofNullable(jpaQueryFactory
                         .select(Projections.fields(MemberResponse.ProfileInfosDTO.class,
+                                profileImage.profileImageS3SavedURL,
                                 member.description,
                                 member.rank,
                                 member.buddyScore,
@@ -95,6 +96,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                                 member.totalGoodCount,
                                 member.totalBadCount))
                         .from(member)
+                        .leftJoin(member.profileImage, profileImage)
                         .where(member.nickname.eq(nickname))
                         .fetchOne())
                 .map(profileInfosDTO -> profileInfosDTO.toBuilder().badges(badges).build());

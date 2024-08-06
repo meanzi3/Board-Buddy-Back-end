@@ -30,10 +30,10 @@ public class BadgeImageController {
      * @return 뱃지 리스트
      **/
     @GetMapping(value = "/api/badges/{nickname}")
-    public ResponseEntity<ApiResponse<Map<String, List<BadgeImageResponse.BadgeImageUrlDTO>>>> getBadges (@PathVariable String nickname) {
+    public ResponseEntity<ApiResponse<Map<String, List<BadgeImageResponse.BadgeImageInfosDTO>>>> getBadges (@PathVariable String nickname) {
         log.info("get badges is working");
 
-        List<BadgeImageResponse.BadgeImageUrlDTO> badgeImageListDTOs = badgeImageService.getBadges(nickname);
+        List<BadgeImageResponse.BadgeImageInfosDTO> badgeImageListDTOs = badgeImageService.getBadges(nickname);
 
         return buildSuccessResponseWithPairKeyData("badges", badgeImageListDTOs,"뱃지가 조회되었습니다.", HttpStatus.OK);
     }

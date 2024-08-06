@@ -5,5 +5,5 @@ import sumcoda.boardbuddy.dto.BadgeImageResponse;
 import java.util.List;
 
 public interface BadgeImageRepositoryCustom {
-    List<BadgeImageResponse.BadgeImageUrlDTO> findBadgeImagesByNickname(String nickname);
+    List<BadgeImageResponse.BadgeImageInfosDTO> findBadgeImagesByNickname(String nickname);
 }

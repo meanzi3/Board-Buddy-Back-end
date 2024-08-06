@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import sumcoda.boardbuddy.dto.NotificationResponse;
@@ -50,7 +49,7 @@ public class NotificationController {
     /**
      * 알림 목록 조회 요청
      *
-     * @param username 얼람 목록 조회 사용자 아이디
+     * @param username 알림 목록 조회 사용자 아이디
      * @return 알림 목록 조회 성공 시 약속된 SuccessResponse 반환
      **/
     @GetMapping(value = "/api/notifications")

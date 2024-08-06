@@ -23,6 +23,10 @@ public class BadgeImage {
     @Column(nullable = false)
     private String badgeImageS3SavedURL;
 
+    // 뱃지 발급 연월 정보
+    @Column(nullable = false)
+    private String badgeYearMonth;
+
     // 연관관계 주인
     // 양방향 연관관계
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,17 +34,19 @@ public class BadgeImage {
     private Member member;
 
     @Builder
-    public BadgeImage(String originalFilename, String badgeImageS3SavedURL, Member member) {
+    public BadgeImage(String originalFilename, String badgeImageS3SavedURL, String badgeYearMonth, Member member) {
         this.originalFilename = originalFilename;
         this.badgeImageS3SavedURL = badgeImageS3SavedURL;
+        this.badgeYearMonth = badgeYearMonth;
         this.assignMember(member);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 않고 해당 메서드를 활용하여 엔티티 생성
-    public static BadgeImage buildBadgeImage(String originalFilename, String badgeImageS3SavedURL, Member member) {
+    public static BadgeImage buildBadgeImage(String originalFilename, String badgeImageS3SavedURL, String badgeYearMonth, Member member) {
         return BadgeImage.builder()
                 .originalFilename(originalFilename)
                 .badgeImageS3SavedURL(badgeImageS3SavedURL)
+                .badgeYearMonth(badgeYearMonth)
                 .member(member)
                 .build();
     }

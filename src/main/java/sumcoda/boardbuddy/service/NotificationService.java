@@ -299,7 +299,7 @@ public class NotificationService {
                 String eventCacheId = username + "_" + System.currentTimeMillis();
                 sseEmitterRepository.saveEventCache(eventCacheId, message);
 
-            } catch (SseEmitterSendErrorException | IOException e) {
+            } catch (IllegalStateException | SseEmitterSendErrorException | IOException e) {
                 // 전송 중 오류 발생 시, 작성자의 SSE Emitter를 제거
                 emitters.remove(username);
                 log.error("알림 전송 에러: {}. emitter 제거.", e.getMessage());

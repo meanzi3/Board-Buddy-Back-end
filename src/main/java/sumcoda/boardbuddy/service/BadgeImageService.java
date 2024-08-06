@@ -51,11 +51,13 @@ public class BadgeImageService {
             throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
         }
 
+        // 로컬 환경용 코드
         return badgeImageRepository.findBadgeImagesByNickname(nickname)
                 .stream()
                 .map(dto -> new BadgeImageResponse.BadgeImageInfosDTO(buildBadgeUrl(dto.getBadgeImageS3SavedURL()), dto.getBadgeYearMonth()))
                 .collect(Collectors.toList());
 
+        // S3 환경에서 이용할 코드 주석
 //        return badgeImageRepository.findBadgeImagesByNickname(nickname);
     }
 
@@ -86,11 +88,12 @@ public class BadgeImageService {
         // 뱃지 이미지 파일 이름 예: "202407_badge.png"
         String badgeImageName = lastMonthStr + BADGE_IMAGE_SUFFIX;
 
-        // 임시로 로컬에 저장된 뱃지 이미지 경로로 만듦.
-        String badgeImageURL = FileStorageUtil.getLocalStoreDir(badgeImageName);
-
         // DB에 저장할 뱃지 발급 연월 정보 예: 2024.07
         String badgeYearMonth = lastMonth.format(DateTimeFormatter.ofPattern("yyyy.MM"));
+
+        // 로컬 환경용 코드
+        // 임시로 로컬에 저장된 뱃지 이미지 경로로 만듦.
+        String badgeImageURL = FileStorageUtil.getLocalStoreDir(badgeImageName);
 
         // TOP3에 뱃지 이미지 부여, 저장
         top3MemberIds.stream()

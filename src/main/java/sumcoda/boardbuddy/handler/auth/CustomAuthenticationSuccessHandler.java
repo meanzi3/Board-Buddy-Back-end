@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.enumerate.MemberType;
 import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 
@@ -53,6 +54,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 .sgg(profileDTO.getSgg())
                 .emd(profileDTO.getEmd())
                 .isPhoneNumberVerified(profileDTO.getPhoneNumber() != null)
+                .memberType(profileDTO.getMemberType())
                 .profileImageS3SavedURL(profileDTO.getProfileImageS3SavedURL())
                 .build();
 

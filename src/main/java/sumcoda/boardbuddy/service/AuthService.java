@@ -135,6 +135,7 @@ public class AuthService {
                 .sgg(profileDTO.getSgg())
                 .emd(profileDTO.getEmd())
                 .isPhoneNumberVerified(profileDTO.getPhoneNumber() != null)
+                .memberType(profileDTO.getMemberType())
                 .profileImageS3SavedURL(profileDTO.getProfileImageS3SavedURL())
                 .build();
     }

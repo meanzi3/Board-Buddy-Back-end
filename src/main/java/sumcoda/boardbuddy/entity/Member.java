@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.boardbuddy.enumerate.MemberType;
 import sumcoda.boardbuddy.enumerate.Role;
 
 import java.util.ArrayList;
@@ -130,6 +131,10 @@ public class Member {
     // 랭킹 산정을 위한 점수
     private Double rankScore;
 
+    // ex) REGULAR, SOCIAL
+    @Column(nullable = false)
+    private MemberType memberType;
+
     // 사용자의 권한을 나타내기위한 role
     // ex) ADMIN, USER
     @Column(nullable = false)
@@ -163,7 +168,7 @@ public class Member {
     private List<BadgeImage> badgeImages = new ArrayList<>();
 
     @Builder
-    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, Role role, ProfileImage profileImage) {
+    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberType memberType, Role role, ProfileImage profileImage) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
@@ -186,12 +191,13 @@ public class Member {
         this.description = description;
         this.rank = rank;
         this.rankScore = rankScore;
+        this.memberType = memberType;
         this.role = role;
         this.assignProfileImage(profileImage);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, Role role, ProfileImage profileImage) {
+    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberType memberType, Role role, ProfileImage profileImage) {
         return Member.builder()
                 .username(username)
                 .password(password)
@@ -215,6 +221,7 @@ public class Member {
                 .description(description)
                 .rank(rank)
                 .rankScore(rankScore)
+                .memberType(memberType)
                 .role(role)
                 .profileImage(profileImage)
                 .build();

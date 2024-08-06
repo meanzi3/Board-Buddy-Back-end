@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sumcoda.boardbuddy.dto.*;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.ProfileImage;
+import sumcoda.boardbuddy.enumerate.MemberType;
 import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.exception.member.*;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
@@ -108,6 +109,7 @@ public class MemberService {
                 null,
                 null,
                 0.0,
+                MemberType.REGULAR,
                 Role.USER,
                 null)).getId();
 
@@ -156,6 +158,7 @@ public class MemberService {
                 null,
                 null,
                 0.0,
+                MemberType.REGULAR,
                 Role.USER,
                 null)
         );

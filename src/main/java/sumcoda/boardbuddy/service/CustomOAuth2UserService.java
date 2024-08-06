@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import sumcoda.boardbuddy.dto.auth.oauth2.*;
 import sumcoda.boardbuddy.entity.Member;
+import sumcoda.boardbuddy.enumerate.MemberType;
 import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.exception.auth.ClientRegistrationRetrievalException;
 import sumcoda.boardbuddy.exception.auth.SocialUserInfoRetrievalException;
@@ -77,32 +78,33 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // 만약 신규 로그인 회원이라면
         if (findMember == null) {
-            Member member = Member.builder()
-                    .username(username)
-                    .password(bCryptPasswordEncoder.encode(oAuth2UserInfo.getEmail()))
-                    .nickname(oAuth2UserInfo.getName() + randomNumber)
-                    .email(oAuth2UserInfo.getEmail())
-                    .phoneNumber(null)
-                    .sido(null)
-                    .sgg(null)
-                    .emd(null)
-                    .radius(2)
-                    .buddyScore(50.0)
-                    .joinCount(0)
-                    .monthlyExcellentCount(0)
-                    .totalExcellentCount(0)
-                    .monthlyGoodCount(0)
-                    .totalGoodCount(0)
-                    .monthlyBadCount(0)
-                    .totalBadCount(0)
-                    .monthlyNoShowCount(0)
-                    .monthlySendReviewCount(0)
-                    .description(null)
-                    .rank(null)
-                    .rankScore(0.0)
-                    .role(Role.USER)
-                    .profileImage(null)
-                    .build();
+            Member member = Member.buildMember(
+                    username,
+                    bCryptPasswordEncoder.encode(oAuth2UserInfo.getEmail()),
+                    oAuth2UserInfo.getName() + randomNumber,
+                    oAuth2UserInfo.getEmail(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    2,
+                    50.0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    null,
+                    null,
+                    0.0,
+                    MemberType.SOCIAL,
+                    Role.USER,
+                    null
+            );
 
             memberRepository.save(member);
 

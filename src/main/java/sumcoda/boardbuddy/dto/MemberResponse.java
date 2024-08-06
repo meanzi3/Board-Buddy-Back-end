@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.boardbuddy.enumerate.MemberType;
 
 import java.util.List;
 import java.util.Map;
@@ -28,16 +29,20 @@ public class MemberResponse {
 
         private Boolean isPhoneNumberVerified;
 
+        private MemberType memberType;
+
         private String profileImageS3SavedURL;
 
+
         @Builder
-        public ProfileDTO(String nickname, String sido, String sgg, String emd, String phoneNumber, Boolean isPhoneNumberVerified, String profileImageS3SavedURL) {
+        public ProfileDTO(String nickname, String sido, String sgg, String emd, String phoneNumber, Boolean isPhoneNumberVerified, MemberType memberType, String profileImageS3SavedURL) {
             this.nickname = nickname;
             this.sido = sido;
             this.sgg = sgg;
             this.emd = emd;
             this.phoneNumber = phoneNumber;
             this.isPhoneNumberVerified = isPhoneNumberVerified;
+            this.memberType = memberType;
             this.profileImageS3SavedURL = profileImageS3SavedURL;
         }
     }

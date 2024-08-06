@@ -44,6 +44,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                         member.sgg,
                         member.emd,
                         member.phoneNumber,
+                        member.memberType,
                         profileImage.profileImageS3SavedURL
                 ))
                 .from(member)

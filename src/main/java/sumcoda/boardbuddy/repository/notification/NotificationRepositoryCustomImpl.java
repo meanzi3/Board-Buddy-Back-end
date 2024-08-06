@@ -10,7 +10,6 @@ import java.util.List;
 import static sumcoda.boardbuddy.entity.QMember.member;
 import static sumcoda.boardbuddy.entity.QNotification.notification;
 
-
 @RequiredArgsConstructor
 public class NotificationRepositoryCustomImpl implements NotificationRepositoryCustom {
 
@@ -27,6 +26,7 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
         return jpaQueryFactory.select(Projections.fields(NotificationResponse.NotificationDTO.class,
                         notification.message,
                         notification.createdAt))
+                .from(notification)
                 .join(notification.member, member)
                 .where(member.username.eq(username))
                 .orderBy(notification.createdAt.desc())

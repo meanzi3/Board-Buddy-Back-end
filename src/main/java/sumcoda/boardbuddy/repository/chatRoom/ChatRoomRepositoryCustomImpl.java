@@ -78,6 +78,7 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
                                         .where(chatRoom.id.eq(chatRoom.id))
                         ))
                 )
+                .orderBy(chatMessage.createdAt.desc())
                 .fetch();
     }
 }

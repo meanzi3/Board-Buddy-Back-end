@@ -5,11 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import sumcoda.boardbuddy.dto.CommentResponse;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.NotificationResponse;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.Notification;
+import sumcoda.boardbuddy.enumerate.EventName;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleRetrievalException;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
@@ -21,13 +23,15 @@ import sumcoda.boardbuddy.repository.comment.CommentRepository;
 import sumcoda.boardbuddy.repository.notification.NotificationRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
-import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
 import sumcoda.boardbuddy.repository.sseEmitter.SseEmitterRepository;
+import sumcoda.boardbuddy.util.NotificationMessageUtil;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -48,7 +52,7 @@ public class NotificationService {
 
     private final CommentRepository commentRepository;
 
-    private final PublicDistrictRepository publicDistrictRepository;
+    private final NotificationMessageUtil notificationMessageUtil;
 
     // SSE Emitter와 이벤트 캐시를 위한 저장소
     private static final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
@@ -107,9 +111,11 @@ public class NotificationService {
         String authorUsername = authorUsernameDTO.getUsername();
 
         // 참가 신청 메시지를 포맷하여 생성
-        String message = String.format("%s 님이 '%s'에 참가 신청을 했습니다.", getNickname(appliedUsername), formattingTitle(gatherArticleId));
+        String message = notificationMessageUtil.formatApplyParticipationMessage(
+                getNickname(appliedUsername),
+                getTitle(gatherArticleId));
 
-        saveNotification(authorUsername, message, "applyParticipationApplication");
+        saveNotification(authorUsername, message, EventName.APPLY_PARTICIPATION);
     }
 
     /**
@@ -124,9 +130,10 @@ public class NotificationService {
         String receiverUsername = getUsername(appliedNickname);
 
         // 참가 신청 승인 메시지를 포맷하여 생성
-        String message = String.format("'%s'의 참가 신청이 승인되었습니다.", formattingTitle(gatherArticleId));
+        String message = notificationMessageUtil.formatApproveParticipationMessage(
+                getTitle(gatherArticleId));
 
-        saveNotification(receiverUsername, message, "approveParticipationApplication");
+        saveNotification(receiverUsername, message, EventName.APPROVE_PARTICIPATION);
     }
 
     /**
@@ -141,9 +148,10 @@ public class NotificationService {
         String receiverUsername = getUsername(appliedNickname);
 
         // 참가 신청 거절 메시지를 포맷하여 생성
-        String message = String.format("'%s'의 참가 신청이 거절되었습니다.", formattingTitle(gatherArticleId));
+        String message = notificationMessageUtil.formatRejectParticipationMessage(
+                getTitle(gatherArticleId));
 
-        saveNotification(receiverUsername, message, "rejectParticipationApplication");
+        saveNotification(receiverUsername, message, EventName.REJECT_PARTICIPATION);
     }
 
     /**
@@ -161,9 +169,11 @@ public class NotificationService {
         String authorUsername = authorUsernameDTO.getUsername();
 
         // 참가 신청 취소 메시지를 포맷하여 생성
-        String message = String.format("%s 님이 '%s'의 참가 신청을 취소했습니다.", getNickname(canceledUsername), formattingTitle(gatherArticleId));
+        String message = notificationMessageUtil.formatCancelParticipationMessage(
+                getNickname(canceledUsername),
+                getTitle(gatherArticleId));
 
-        saveNotification(authorUsername, message, "cancelParticipationApplication");
+        saveNotification(authorUsername, message, EventName.CANCEL_PARTICIPATION);
     }
 
     /**
@@ -174,19 +184,22 @@ public class NotificationService {
     @Transactional
     public void notifyReviewRequest(Long gatherArticleId) {
         // 리뷰 요청 메시지를 포맷하여 생성
-        String message = String.format("모집글 '%s'에 대한 리뷰를 남겨주세요!", formattingTitle(gatherArticleId));
+        String message = notificationMessageUtil.formatReviewRequestMessage(
+                getTitle(gatherArticleId));
 
         // 모든 참가자들의 아이디 조회
         List<MemberResponse.UsernameDTO> participants = memberGatherArticleRepository.findParticipantsByGatherArticleId(gatherArticleId);
 
         // 모든 참가자에게 알림 전송
-        participants.forEach(userNameDTO -> saveNotification(userNameDTO.getUsername(), message, "reviewRequest"));
+        participants.forEach(userNameDTO -> saveNotification(userNameDTO.getUsername(), message, EventName.REVIEW_REQUEST));
     }
 
     /**
      * 모집글에 댓글이 달리면 모집글 작성자에게, 대댓글이 달리면 원댓글 작성자에게 알림 보내기
      *
      * @param gatherArticleId 해당 모집글 Id
+     * @param parentId 원댓글 id
+     * @param writtenUsername 댓글 작성 유저 아이디
      **/
     @Transactional
     public void notifyWriteComment(Long gatherArticleId, Long parentId, String writtenUsername) {
@@ -198,20 +211,31 @@ public class NotificationService {
 
             String authorUsername = authorUsernameDTO.getUsername();
 
-            // 리뷰 요청 메시지를 포맷하여 생성
-            String message = String.format("%s 님이 '%s'에 댓글을 달았습니다.", getNickname(writtenUsername), formattingTitle(gatherArticleId));
+            // 댓글 작성자와 모집글 작성자가 다를때만 알림 전송
+            if (!Objects.equals(writtenUsername, authorUsername)) {
+                // 댓글 알림 메시지를 포맷하여 생성
+                String message = notificationMessageUtil.formatWriteCommentMessage(
+                        getNickname(writtenUsername),
+                        getTitle(gatherArticleId));
 
-            saveNotification(authorUsername, message, "writeComment");
+                saveNotification(authorUsername, message, EventName.WRITE_COMMENT);
+            }
+
         } else {
             // 원댓글 작성자의 유저 아이디를 조회
-            MemberResponse.UsernameDTO authorUsernameDTO = commentRepository.findCommentAuthorByCommentId(parentId);
+            Optional<CommentResponse.AuthorUsernameDTO> authorUsernameDTO = commentRepository.findCommentAuthorByCommentId(parentId);
 
-            String authorUsername = authorUsernameDTO.getUsername();
+            String authorUsername = authorUsernameDTO.get().getUsername();
 
-            // 리뷰 요청 메시지를 포맷하여 생성
-            String message = String.format("%s 님이 '%s'에 대댓글을 달았습니다.", getNickname(writtenUsername), formattingTitle(gatherArticleId));
+            // 대댓글 작성자와 원댓글 작성자가 다를때만 알림 전송
+            if (!authorUsername.equals(writtenUsername)) {
+                // 대댓글 알림 메시지를 포맷하여 생성
+                String message = notificationMessageUtil.formatReplyCommentMessage(
+                        getNickname(writtenUsername),
+                        getTitle(gatherArticleId));
 
-            saveNotification(authorUsername, message, "writeComment");
+                saveNotification(authorUsername, message, EventName.WRITE_COMMENT);
+            }
         }
     }
 
@@ -234,20 +258,21 @@ public class NotificationService {
 
         for (String username : usernamesWithGatherArticleInRange) {
             // 리뷰 요청 메시지를 포맷하여 생성
-            String message = String.format("%s님의 주변에 '%s' 모집글이 작성되었습니다.", getNickname(username), formattingTitle(gatherArticleId));
+            String message = notificationMessageUtil.formatWriteGatherArticleMessage(
+                    getNickname(username),
+                    getTitle(gatherArticleId));
 
             log.info(message);
 
-            saveNotification(username, message, "writeGatherArticle");
+            saveNotification(username, message, EventName.WRITE_GATHER_ARTICLE);
         }
     }
-
 
     /**
      * 유저의 알림을 조회하여 최신순으로 반환하는 메서드
      *
      * @param username 알림 목록 조회 사용자 아이디
-     * @return NotificationResponse 알림 응답 DTO
+     * @return 알림 응답 DTO
      **/
     public List<NotificationResponse.NotificationDTO> getNotifications(String username) {
         Boolean isMemberExists = memberRepository.existsByUsername(username);
@@ -267,7 +292,7 @@ public class NotificationService {
      * @param message 알림 메세지
      * @param eventName 알림 이벤트 이름
      **/
-    public void saveNotification(String username, String message, String eventName) {
+    public void saveNotification(String username, String message, EventName eventName) {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
@@ -278,13 +303,13 @@ public class NotificationService {
     }
 
     /**
-     * 유저가 SSE Emitter에 등록되어 있는지 확인하고 DB에 저장 후 알림을 보내는 메서드
+     * 유저가 SSE Emitter에 등록되어 있는지 확인하고 알림을 보내는 메서드
      *
      * @param username 알림을 받는 유저의 아이디
      * @param message 알림 메세지
      * @param eventName 알림 이벤트 이름
      **/
-    private void sendNotification(String username, String message, String eventName) {
+    private void sendNotification(String username, String message, EventName eventName) {
         // 작성자가 SSE 이벤트 수신을 위해 등록되어 있는지 확인
         if (emitters.containsKey(username)) {
 
@@ -293,7 +318,7 @@ public class NotificationService {
 
             try {
                 // 알림 메세지를 SSE Emitter를 통해 전송
-                sseEmitterReceiver.send(SseEmitter.event().name(eventName).data(message));
+                sseEmitterReceiver.send(SseEmitter.event().name(String.valueOf(eventName)).data(message));
 
                 // 이벤트 캐시에 알림 메세지를 저장
                 String eventCacheId = username + "_" + System.currentTimeMillis();
@@ -308,35 +333,29 @@ public class NotificationService {
     }
 
     /**
-     * 모집글 Id로 모집글 제목을 가져와 10글자 이상이면 포맷팅하여 반환하는 메서드
+     * 모집글 Id로 모집글 제목 조회
      *
      * @param gatherArticleId 해당 모집글 Id
-     * @return title 포맷팅한 제목
+     * @return 모집글 제목
      **/
-    private String formattingTitle(Long gatherArticleId) {
-
+    private String getTitle(Long gatherArticleId) {
         // 모집글 조회
-        GatherArticleResponse.TitleDTO gatherArticle = gatherArticleRepository.findTitleDTOById(gatherArticleId)
+        GatherArticleResponse.TitleDTO titleDTO = gatherArticleRepository.findTitleDTOById(gatherArticleId)
                 .orElseThrow(() -> new GatherArticleNotFoundException("존재하지 않는 모집글입니다."));
 
-        // 해당 모집글 제목 가져오기
-        String gatherArticleTitle = gatherArticle.getTitle();
-
-        return gatherArticleTitle.length() > 9 ? gatherArticleTitle.substring(0,9) + "..." : gatherArticleTitle;
+        return titleDTO.getTitle();
     }
 
     /**
      * 유저 아이디로 조회하여 유저 닉네임을 반환하는 메서드
      *
      * @param username 유저 아이디
-     * @return nickname 유저 닉네임
+     * @return 유저 닉네임
      **/
     private String getNickname(String username) {
-
         // 유저 아이디로 유저 닉네임 조회
         MemberResponse.NicknameDTO nicknameDTO = memberRepository.findNicknameDTOByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
-
         return nicknameDTO.getNickname();
     }
 
@@ -344,14 +363,12 @@ public class NotificationService {
      * 유저 닉네임으로 조회하여 유저 아이디를 반환하는 메서드
      *
      * @param nickname 유저 닉네임
-     * @return username 유저 아이디
+     * @return 유저 아이디
      **/
     private String getUsername(String nickname) {
-
         // 유저 닉네임으로 유저 아이디 조회
         MemberResponse.UsernameDTO userNameDTO = memberRepository.findUsernameDTOByNickname(nickname)
                 .orElseThrow(() -> new MemberRetrievalException("서버 문제로 해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
-
         return userNameDTO.getUsername();
     }
 }

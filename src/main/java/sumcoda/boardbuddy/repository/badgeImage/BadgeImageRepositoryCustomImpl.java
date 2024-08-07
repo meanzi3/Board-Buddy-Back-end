@@ -16,9 +16,10 @@ public class BadgeImageRepositoryCustomImpl implements BadgeImageRepositoryCusto
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<BadgeImageResponse.BadgeImageUrlDTO> findBadgeImagesByNickname(String nickname) {
-        return jpaQueryFactory.select(Projections.fields(BadgeImageResponse.BadgeImageUrlDTO.class,
-                        badgeImage.badgeImageS3SavedURL))
+    public List<BadgeImageResponse.BadgeImageInfosDTO> findBadgeImagesByNickname(String nickname) {
+        return jpaQueryFactory.select(Projections.fields(BadgeImageResponse.BadgeImageInfosDTO.class,
+                        badgeImage.badgeImageS3SavedURL,
+                        badgeImage.badgeYearMonth))
                 .from(badgeImage)
                 .leftJoin(badgeImage.member, member)
                 .where(member.nickname.eq(nickname))

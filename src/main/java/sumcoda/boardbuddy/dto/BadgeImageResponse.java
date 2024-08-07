@@ -8,14 +8,16 @@ public class BadgeImageResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class BadgeImageUrlDTO {
+    public static class BadgeImageInfosDTO {
 
         private String badgeImageS3SavedURL;
 
+        private String badgeYearMonth;
 
         @Builder
-        public BadgeImageUrlDTO (String badgeImageS3SavedURL) {
+        public BadgeImageInfosDTO (String badgeImageS3SavedURL, String badgeYearMonth) {
             this.badgeImageS3SavedURL = badgeImageS3SavedURL;
+            this.badgeYearMonth = badgeYearMonth;
         }
     }
 }

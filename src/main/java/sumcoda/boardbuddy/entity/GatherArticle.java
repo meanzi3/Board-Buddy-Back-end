@@ -85,6 +85,10 @@ public class GatherArticle extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "gatherArticle", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
+    // 양방향 연관관계
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "gatherArticle", cascade = CascadeType.REMOVE)
+    private List<Review> reviews = new ArrayList<>();
+
     @Builder
     public GatherArticle(String title, Integer currentParticipants, Integer maxParticipants, GatherArticleStatus gatherArticleStatus, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String sido, String sgg, String emd, String meetingLocation, Double x, Double y) {
         this.title = title;
@@ -165,6 +169,16 @@ public class GatherArticle extends BaseTimeEntity {
 
         if (comment.getGatherArticle() != this) {
             comment.assignGatherArticle(this);
+        }
+    }
+
+    // GatherArticle 1 <-> N Comment
+    // 양방향 연관관계 편의 메서드
+    public void addReview(Review review) {
+        this.reviews.add(review);
+
+        if (review.getGatherArticle() != this) {
+            review.assignGatherArticle(this);
         }
     }
 

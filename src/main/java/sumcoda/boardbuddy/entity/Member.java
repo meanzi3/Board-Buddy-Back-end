@@ -163,6 +163,14 @@ public class Member {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<BadgeImage> badgeImages = new ArrayList<>();
 
+    // 양방향 연관관계
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "reviewer", cascade = CascadeType.REMOVE)
+    private List<Review> sentReviews = new ArrayList<>();
+
+    // 양방향 연관관계
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "reviewee", cascade = CascadeType.REMOVE)
+    private List<Review> receiveReviews = new ArrayList<>();
+
     @Builder
     public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberType memberType, Role role, ProfileImage profileImage) {
         this.username = username;
@@ -266,6 +274,26 @@ public class Member {
 
         if (badgeImage.getMember() != this) {
             badgeImage.assignMember(this);
+        }
+    }
+
+    // Member 1 <-> N Review(reviewer)
+    // 양방향 연관관계 편의 메서드
+    public void addSentReview(Review review) {
+        this.sentReviews.add(review);
+
+        if (review.getReviewer() != this) {
+            review.assignReviewer(this);
+        }
+    }
+
+    // Member 1 <-> N Review(reviewee)
+    // 양방향 연관관계 편의 메서드
+    public void addReceiveReview(Review review) {
+        this.receiveReviews.add(review);
+
+        if (review.getReviewee() != this) {
+            review.assignReviewee(this);
         }
     }
 

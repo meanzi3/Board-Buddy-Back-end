@@ -6,6 +6,7 @@ import sumcoda.boardbuddy.entity.MemberGatherArticle;
 
 import java.util.Optional;
 
+@Repository
 public interface MemberGatherArticleRepository extends JpaRepository<MemberGatherArticle, Long>, MemberGatherArticleRepositoryCustom {
     Boolean existsByGatherArticleIdAndMemberUsername(Long gatherArticleId, String username);
 

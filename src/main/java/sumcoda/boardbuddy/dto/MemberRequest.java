@@ -1,7 +1,6 @@
 package sumcoda.boardbuddy.dto;
 
 import lombok.*;
-import sumcoda.boardbuddy.enumerate.ReviewType;
 
 public class MemberRequest {
 
@@ -109,21 +108,6 @@ public class MemberRequest {
         @Builder
         public RadiusDTO(Integer radius) {
             this.radius = radius;
-        }
-    }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReviewDTO {
-
-        private String nickname;
-
-        private ReviewType review;
-
-        @Builder
-        public ReviewDTO(String nickname, ReviewType review) {
-            this.nickname = nickname;
-            this.review = review;
         }
     }
 

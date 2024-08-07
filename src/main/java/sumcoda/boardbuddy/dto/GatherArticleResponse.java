@@ -380,4 +380,15 @@ public class GatherArticleResponse {
             this.status = status;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class StatusDTO {
+        private GatherArticleStatus status;
+
+        @Builder
+        public StatusDTO(GatherArticleStatus status) {
+            this.status = status;
+        }
+    }
 }

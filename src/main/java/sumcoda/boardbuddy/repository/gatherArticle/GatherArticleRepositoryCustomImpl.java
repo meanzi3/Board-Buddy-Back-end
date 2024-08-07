@@ -322,4 +322,13 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .or(descriptionTemplate.containsIgnoreCase(keywordWithoutWhiteSpace));
     }
 
+    @Override
+    public Optional<GatherArticleResponse.StatusDTO> findStatusDTOById(Long gatherArticleId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.fields(GatherArticleResponse.StatusDTO.class,
+                        gatherArticle.gatherArticleStatus.as("status")))
+                .from(gatherArticle)
+                .where(gatherArticle.id.eq(gatherArticleId))
+                .fetchOne());
+    }
 }

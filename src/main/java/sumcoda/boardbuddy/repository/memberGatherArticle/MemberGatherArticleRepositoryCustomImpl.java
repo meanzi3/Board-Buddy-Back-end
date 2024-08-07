@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.dto.ReviewResponse;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.Optional;
 import static sumcoda.boardbuddy.entity.QGatherArticle.gatherArticle;
 import static sumcoda.boardbuddy.entity.QMember.member;
 import static sumcoda.boardbuddy.entity.QMemberGatherArticle.memberGatherArticle;
+import static sumcoda.boardbuddy.entity.QProfileImage.profileImage;
+import static sumcoda.boardbuddy.entity.QReview.review;
 
 @RequiredArgsConstructor
 public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArticleRepositoryCustom {
@@ -73,5 +76,28 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
                             MemberGatherArticleRole.PARTICIPANT,
                             MemberGatherArticleRole.AUTHOR)))
             .fetch();
+  }
+
+  // 자신을 제외한 모임 참가 유저 리스트를 반환하는 메서드
+  @Override
+  public List<ReviewResponse.ReviewDTO> findParticipantsExcludingUsername(Long gatherArticleId, String username) {
+      return jpaQueryFactory
+              .select(Projections.fields(ReviewResponse.ReviewDTO.class,
+                      profileImage.profileImageS3SavedURL,
+                      member.rank,
+                      member.nickname,
+                      review.id.isNotNull().as("hasReviewed")
+              ))
+              .from(memberGatherArticle)
+              .join(memberGatherArticle.member, member)
+              .leftJoin(member.profileImage, profileImage)
+              .leftJoin(review).on(
+                      review.reviewer.username.eq(username)
+                              .and(review.reviewee.eq(member))
+                              .and(review.gatherArticle.id.eq(gatherArticleId))
+              )
+              .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
+                      .and(member.username.ne(username)))
+              .fetch();
   }
 }

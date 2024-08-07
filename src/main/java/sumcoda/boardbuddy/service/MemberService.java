@@ -357,7 +357,7 @@ public class MemberService {
         } else {
             // 이미지 파일 형식 검증
             String contentType = profileImageFile.getContentType();
-            if (contentType != null && !contentType.startsWith("multipart/form-data")) {
+            if (contentType != null && !contentType.startsWith("image")) {
                 throw new InvalidFileFormatException("지원되지 않는 파일 형식입니다.");
             }
             try {

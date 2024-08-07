@@ -22,7 +22,7 @@ public interface GatherArticleRepositoryCustom {
     Optional<GatherArticleResponse.IdDTO> findIdDTOById(Long gatherArticleId);
 
     Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
-            List<String> sidoList, List<String> siguList, List<String> dongList,
+            List<String> sidoList, List<String> sggList, List<String> emdList,
             String status, String sort, MemberGatherArticleRole role, Pageable pageable);
 
     Optional<GatherArticleResponse.SummaryInfoDTO> findSimpleInfoByGatherArticleId(Long gatherArticleId);

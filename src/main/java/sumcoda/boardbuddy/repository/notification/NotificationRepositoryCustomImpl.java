@@ -29,7 +29,7 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
                 .from(notification)
                 .join(notification.member, member)
                 .where(member.username.eq(username))
-                .orderBy(notification.createdAt.desc())
+                .orderBy(notification.id.desc())
                 .fetch();
     }
 }

@@ -63,6 +63,8 @@ public class MemberResponse {
     @Getter
     @NoArgsConstructor
     public static class ProfileInfosDTO {
+        private String profileImageS3SavedURL;
+
         private String description;
 
         private Integer rank;
@@ -80,7 +82,8 @@ public class MemberResponse {
         private Integer totalBadCount;
 
         @Builder(toBuilder = true)
-        public ProfileInfosDTO(String description, Integer rank, Double buddyScore, List<String> badges, Integer joinCount, Integer totalExcellentCount, Integer totalGoodCount, Integer totalBadCount) {
+        public ProfileInfosDTO(String profileImageS3SavedURL, String description, Integer rank, Double buddyScore, List<String> badges, Integer joinCount, Integer totalExcellentCount, Integer totalGoodCount, Integer totalBadCount) {
+            this.profileImageS3SavedURL = profileImageS3SavedURL;
             this.description = description;
             this.rank = rank;
             this.buddyScore = buddyScore;

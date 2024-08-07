@@ -51,12 +51,13 @@ public class GatherArticleService {
 
     private final PublicDistrictRepository publicDistrictRepository;
 
-    private static final int PAGE_SIZE = 15;
     private final ParticipationApplicationRepository participationApplicationRepository;
 
     private final GatherArticleStatusUpdateSchedulingService gatherArticleStatusUpdateSchedulingService;
 
     private final PublicDistrictRedisService publicDistrictRedisService;
+
+    private static final int PAGE_SIZE = 15;
 
     private static final int GATHER_ARTICLE_MINIMUM_SEARCH_LENGTH = 2;
 

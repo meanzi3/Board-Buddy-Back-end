@@ -16,13 +16,14 @@ public interface GatherArticleRepositoryCustom {
     List<GatherArticleResponse.GatherArticleInfosDTO> findParticipationsByUsername(String username);
 
     Boolean isMemberAuthorOfGatherArticle(Long gatherArticleId, String username);
-  
+
     long countGatherArticlesByMember(Member member, LocalDateTime startOfLastMonth, LocalDateTime endOfLastMonth);
 
     Optional<GatherArticleResponse.IdDTO> findIdDTOById(Long gatherArticleId);
 
     Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
-            List<String> sidoList, List<String> siguList, List<String> dongList, String status, String sort, MemberGatherArticleRole role, Pageable pageable);
+            List<String> sidoList, List<String> siguList, List<String> dongList,
+            String status, String sort, MemberGatherArticleRole role, Pageable pageable);
 
     Optional<GatherArticleResponse.SummaryInfoDTO> findSimpleInfoByGatherArticleId(Long gatherArticleId);
 

@@ -134,11 +134,11 @@ public class GatherArticleController {
      * @return 참가한 모집글 리스트
      **/
     @GetMapping(value = "/api/my/participations")
-    public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.GatherArticleInfosDTO>>>> getMyParticipations (
+    public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.MyParticipationInfosDTO>>>> getMyParticipations (
             @RequestAttribute String username) {
         log.info("get my participations is working");
 
-        List<GatherArticleResponse.GatherArticleInfosDTO> participations = gatherArticleService.getMyParticipations(username);
+        List<GatherArticleResponse.MyParticipationInfosDTO> participations = gatherArticleService.getMyParticipations(username);
 
         return buildSuccessResponseWithPairKeyData("posts", participations, "참가한 모집글이 조회되었습니다.", HttpStatus.OK);
     }

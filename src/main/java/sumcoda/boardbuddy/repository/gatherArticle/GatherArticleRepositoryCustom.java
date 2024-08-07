@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface GatherArticleRepositoryCustom {
     List<GatherArticleResponse.GatherArticleInfosDTO> findGatherArticleInfosByUsername(String username);
 
-    List<GatherArticleResponse.GatherArticleInfosDTO> findParticipationsByUsername(String username);
+    List<GatherArticleResponse.MyParticipationInfosDTO> findParticipationsByUsername(String username);
 
     Boolean isMemberAuthorOfGatherArticle(Long gatherArticleId, String username);
 

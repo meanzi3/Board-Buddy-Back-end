@@ -3,19 +3,26 @@ package sumcoda.boardbuddy.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.boardbuddy.dto.MemberRequest;
+import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.dto.ReviewRequest;
+import sumcoda.boardbuddy.dto.ReviewResponse;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
+import sumcoda.boardbuddy.entity.Review;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.enumerate.ReviewType;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotCompletedException;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.memberGatherArticle.MemberNotJoinedGatherArticleException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
+import sumcoda.boardbuddy.exception.review.ReviewAlreadyExistsException;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
+import sumcoda.boardbuddy.repository.review.ReviewRepository;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +35,25 @@ public class ReviewService {
 
     private final MemberGatherArticleRepository memberGatherArticleRepository;
 
+    private final ReviewRepository reviewRepository;
+
+    /**
+     * 모집글에 참가한 유저 리스트 조회 요청 캐치
+     *
+     * @param gatherArticleId 모집글 Id
+     * @param username 로그인 사용자 아이디
+     **/
+    public List<ReviewResponse.ReviewDTO> getParticipatedList(Long gatherArticleId, String username) {
+        GatherArticleResponse.StatusDTO statusDTO = gatherArticleRepository.findStatusDTOById(gatherArticleId)
+                .orElseThrow(() -> new GatherArticleNotFoundException("해당 모집글을 찾을 수 없습니다."));
+
+        if (statusDTO.getStatus() != GatherArticleStatus.COMPLETED) {
+            throw new GatherArticleNotCompletedException("모임이 종료된 모집글만 조회할 수 있습니다.");
+        }
+
+        return memberGatherArticleRepository.findParticipantsExcludingUsername(gatherArticleId, username);
+    }
+
     /**
      * 리뷰 보내기 요청 캐치
      *
@@ -36,7 +62,10 @@ public class ReviewService {
      * @param username 로그인 사용자 아이디
      **/
     @Transactional
-    public void sendReview(Long gatherArticleId, MemberRequest.ReviewDTO reviewDTO, String username) {
+    public void sendReview(Long gatherArticleId, ReviewRequest.ReviewDTO reviewDTO, String username) {
+        MemberGatherArticle memberGatherArticle = memberGatherArticleRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, username)
+                .orElseThrow(() -> new MemberNotJoinedGatherArticleException("해당 유저는 해당 모집글에 참여하지 않았습니다."));
+
         GatherArticle gatherArticle = gatherArticleRepository.findById(gatherArticleId)
                 .orElseThrow(() -> new GatherArticleNotFoundException("해당 모집글을 찾을 수 없습니다."));
 
@@ -58,7 +87,20 @@ public class ReviewService {
         Member reviewee = memberRepository.findByNickname(reviewDTO.getNickname())
                 .orElseThrow(() -> new MemberRetrievalException("리뷰를 받는 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
+        // 이미 리뷰를 보냈는지 확인
+        if (reviewRepository.existsByReviewerAndRevieweeAndGatherArticle(reviewer, reviewee, gatherArticle)) {
+            throw new ReviewAlreadyExistsException("이미 해당 유저에게 리뷰를 보냈습니다.");
+        }
         ReviewType reviewType = ReviewType.valueOf(String.valueOf(reviewDTO.getReview()));
+
+        Review review = Review.buildReview(
+                reviewer,
+                reviewee,
+                gatherArticle,
+                true
+        );
+
+        reviewRepository.save(review);
 
         incrementReviewCounts(reviewee, reviewType, gatherArticleId);
         incrementSendReviewCount(reviewer);

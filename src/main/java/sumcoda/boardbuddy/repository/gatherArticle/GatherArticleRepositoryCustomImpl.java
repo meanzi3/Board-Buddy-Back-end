@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.entity.QMember;
 import sumcoda.boardbuddy.entity.QMemberGatherArticle;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 import sumcoda.boardbuddy.entity.Member;
@@ -58,11 +59,18 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
     }
 
     @Override
-    public List<GatherArticleResponse.GatherArticleInfosDTO> findParticipationsByUsername(String username) {
-        return jpaQueryFactory.select(Projections.fields(GatherArticleResponse.GatherArticleInfosDTO.class,
+    public List<GatherArticleResponse.MyParticipationInfosDTO> findParticipationsByUsername(String username) {
+
+        QMember author = new QMember("author");
+        QMemberGatherArticle authorMemberGatherArticle = new QMemberGatherArticle("authorMemberGatherArticle");
+
+        return jpaQueryFactory.select(Projections.fields(GatherArticleResponse.MyParticipationInfosDTO.class,
                         gatherArticle.id,
                         gatherArticle.title,
                         gatherArticle.description,
+                        Projections.fields(GatherArticleResponse.AuthorSimpleDTO.class,
+                                author.nickname.as("nickname"),
+                                author.rank.as("rank")).as("author"),
                         gatherArticle.meetingLocation,
                         gatherArticle.maxParticipants,
                         gatherArticle.currentParticipants,
@@ -74,8 +82,11 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .from(member)
                 .join(member.memberGatherArticles, memberGatherArticle)
                 .join(memberGatherArticle.gatherArticle, gatherArticle)
+                .join(gatherArticle.memberGatherArticles, authorMemberGatherArticle)
+                .join(authorMemberGatherArticle.member, author)
                 .where(member.username.eq(username)
-                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.PARTICIPANT)))
+                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.PARTICIPANT))
+                        .and(authorMemberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)))
                 .fetch();
     }
 
@@ -301,7 +312,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         eqMemberGatherArticleRole(role),
                         titleOrDescriptionContains(keyword)
                 )
-                .orderBy(gatherArticle.createdAt.desc())
+                .orderBy(gatherArticle.id.desc())
                 .fetch();
 
     }

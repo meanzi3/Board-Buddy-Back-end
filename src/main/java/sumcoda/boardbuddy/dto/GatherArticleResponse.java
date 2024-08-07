@@ -347,6 +347,42 @@ public class GatherArticleResponse {
 
     @Getter
     @NoArgsConstructor
+    public static class MyParticipationInfosDTO {
+        private Long id;
+        private String title;
+        private String description;
+        private AuthorSimpleDTO author;
+        private String meetingLocation;
+        private Integer maxParticipants;
+        private Integer currentParticipants;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime startDateTime;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime endDateTime;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime createdAt;
+        private GatherArticleStatus status;
+
+        @Builder
+        public MyParticipationInfosDTO(Long id, String title, String description, AuthorSimpleDTO author, String meetingLocation,
+                            Integer maxParticipants, Integer currentParticipants, LocalDateTime startDateTime,
+                            LocalDateTime endDateTime, LocalDateTime createdAt, GatherArticleStatus status) {
+            this.id = id;
+            this.title = title;
+            this.description = description;
+            this.author = author;
+            this.meetingLocation = meetingLocation;
+            this.maxParticipants = maxParticipants;
+            this.currentParticipants = currentParticipants;
+            this.startDateTime = startDateTime;
+            this.endDateTime = endDateTime;
+            this.createdAt = createdAt;
+            this.status = status;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
     public static class StatusDTO {
         private GatherArticleStatus status;
 

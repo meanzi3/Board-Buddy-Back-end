@@ -312,7 +312,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         eqMemberGatherArticleRole(role),
                         titleOrDescriptionContains(keyword)
                 )
-                .orderBy(gatherArticle.createdAt.desc())
+                .orderBy(gatherArticle.id.desc())
                 .fetch();
 
     }

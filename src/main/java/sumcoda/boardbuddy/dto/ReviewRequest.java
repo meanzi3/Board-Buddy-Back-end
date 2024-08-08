@@ -10,14 +10,14 @@ public class ReviewRequest {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReviewDTO {
+    public static class SendDTO {
 
         private String nickname;
 
         private ReviewType review;
 
         @Builder
-        public ReviewDTO(String nickname, ReviewType review) {
+        public SendDTO(String nickname, ReviewType review) {
             this.nickname = nickname;
             this.review = review;
         }

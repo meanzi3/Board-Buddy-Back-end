@@ -31,12 +31,12 @@ public class ReviewController {
      * @return 유저 리스트 조회가 성공했다면 약속된 SuccessResponse 반환
      **/
     @GetMapping("/api/reviews/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<Map<String, List<ReviewResponse.ReviewDTO>>>> getParticipatedList (
+    public ResponseEntity<ApiResponse<Map<String, List<ReviewResponse.UserDTO>>>> getParticipatedList (
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username) {
         log.info("get participated list is working");
 
-        List<ReviewResponse.ReviewDTO> participatedList = reviewService.getParticipatedList(gatherArticleId, username);
+        List<ReviewResponse.UserDTO> participatedList = reviewService.getParticipatedList(gatherArticleId, username);
 
         return buildSuccessResponseWithPairKeyData("users", participatedList, "참가한 유저 리스트 조회에 성공하였습니다.", HttpStatus.OK);
     }
@@ -45,18 +45,18 @@ public class ReviewController {
      * 리뷰 보내기 요청 캐치
      *
      * @param gatherArticleId 모집글 Id
-     * @param reviewDTO 리뷰를 받는 유저 닉네임과 리뷰 타입을 담은 dto
+     * @param sendDTO 리뷰를 받는 유저 닉네임과 리뷰 타입을 담은 dto
      * @param username 로그인 사용자 아이디
      * @return 리뷰 보내기가 성공했다면 약속된 SuccessResponse 반환
      **/
     @PostMapping("/api/reviews/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Void>> sendReview (
             @PathVariable Long gatherArticleId,
-            @RequestBody ReviewRequest.ReviewDTO reviewDTO,
+            @RequestBody ReviewRequest.SendDTO sendDTO,
             @RequestAttribute String username) {
         log.info("send Review is working");
 
-        reviewService.sendReview(gatherArticleId, reviewDTO, username);
+        reviewService.sendReview(gatherArticleId, sendDTO, username);
 
         return buildSuccessResponseWithoutData("후기가 전송되었습니다.", HttpStatus.OK);
     }

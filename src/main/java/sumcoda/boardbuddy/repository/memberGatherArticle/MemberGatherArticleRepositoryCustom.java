@@ -16,5 +16,5 @@ public interface MemberGatherArticleRepositoryCustom {
 
   List<MemberResponse.UsernameDTO> findParticipantsByGatherArticleId(Long gatherArticleId);
 
-  List<ReviewResponse.ReviewDTO> findParticipantsExcludingUsername(Long gatherArticleId, String username);
+  List<ReviewResponse.UserDTO> findParticipantsExcludingUsername(Long gatherArticleId, String username);
 }

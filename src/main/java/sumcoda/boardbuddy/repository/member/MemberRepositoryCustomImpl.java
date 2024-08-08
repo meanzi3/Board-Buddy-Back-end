@@ -5,6 +5,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.AuthResponse;
+import sumcoda.boardbuddy.dto.BadgeImageResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.entity.Member;
 
@@ -78,7 +79,10 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
     @Override
     public Optional<MemberResponse.ProfileInfosDTO> findMemberProfileByNickname(String nickname) {
-        List<String> badges = jpaQueryFactory.select(badgeImage.badgeImageS3SavedURL)
+        List<BadgeImageResponse.BadgeImageInfosDTO> badges = jpaQueryFactory.select(
+                Projections.fields(BadgeImageResponse.BadgeImageInfosDTO.class,
+                        badgeImage.badgeImageS3SavedURL,
+                        badgeImage.badgeYearMonth))
                 .from(badgeImage)
                 .leftJoin(badgeImage.member, member)
                 .where(member.nickname.eq(nickname))

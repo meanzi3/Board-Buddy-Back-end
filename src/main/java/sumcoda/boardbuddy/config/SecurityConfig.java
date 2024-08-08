@@ -55,7 +55,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 허용할 출처 설정
-        configuration.setAllowedOrigins(List.of("https://boardbuddyapp.vercel.app", "wss://boardbuddyapp.com/api/ws-stomp/**"));
+        configuration.setAllowedOrigins(List.of("https://boardbuddyapp.vercel.app", "https://boardbuddyapp.com"));
 
         // 허용할 HTTP 메서드 설정
         configuration.addAllowedMethod("GET");
@@ -177,7 +177,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .rememberMe(auth -> auth
-//                        .useSecureCookie(true) // HTTPS 환경에서만 쿠키전송
+                        .useSecureCookie(true) // HTTPS 환경에서만 쿠키전송
                         .tokenValiditySeconds(86400));
 
         return http.build();

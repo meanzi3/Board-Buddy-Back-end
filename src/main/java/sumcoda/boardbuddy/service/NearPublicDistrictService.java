@@ -215,6 +215,76 @@ public class NearPublicDistrictService {
     }
 
     /**
+     * 관리자 계정의 위치를 기준으로 주변 행정 구역을 저장하는 메서드
+     * @param baseLocation 기준 위치
+     */
+    @Transactional
+    public void saveNearDistrictByAdminLocation(NearPublicDistrictRequest.LocationDTO baseLocation) {
+
+        // 기준 위치 선언
+        String sido = baseLocation.getSido();
+        String sgg = baseLocation.getSgg();
+        String emd = baseLocation.getEmd();
+
+        // redis 에서 조회 - 기준 위치에 해당하는 행정 구역을 조회
+        PublicDistrict publicDistrict = publicDistrictRedisService.findBySidoAndSggAndEmd(sido, sgg, emd)
+                .orElseGet(() -> {
+                    // mariadb 에서 조회 - 기준 위치에 해당하는 행정 구역을 조회(redis 장애 발생 시 mariadb 에서 조회)
+                    log.error("[redis findBySidoAndSggAndEmd() error]");
+                    return publicDistrictRepository.findBySidoAndSggAndEmd(sido, sgg, emd)
+                            .orElseThrow(() -> new PublicDistrictRetrievalException("입력한 위치 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+                });
+
+        // redis 에서 조회 - redis 를 사용해서 모든 행정 구역 정보를 조회
+        List<PublicDistrictResponse.InfoDTO> allLocations = publicDistrictRedisService.findAllInfoDTOs();
+
+        // mariadb 에서 조회 - mariadb 를 사용해서 모든 행정 구역 정보를 조회(redis 장애 발생 시 mariadb 에서 조회)
+        if (!allLocations.isEmpty()) {
+            log.info("[redis findAllInfoDTOs() success]");
+        } else {
+            log.error("[redis findAllInfoDTOs() error]");
+            allLocations = publicDistrictRepository.findAllInfoDTOs();
+        }
+
+        // 데이터베이스에 새로 추가할 주변 행정 구역 리스트
+        List<NearPublicDistrict> allNearPublicDistricts = new ArrayList<>();
+
+        // 각 반경 범위에 대해 주변 행정 구역을 찾고 리스트에 추가
+        for (RadiusRange range : RadiusRange.values()) {
+            // 반경 범위에 대해 주변 행정 구역 찾기
+            List<PublicDistrictResponse.InfoDTO> filteredLocations = allLocations.stream()
+                    .filter(infoDTO -> GeoUtil.calculateDistance(
+                            publicDistrict.getLongitude(),
+                            publicDistrict.getLatitude(),
+                            infoDTO.getLongitude(),
+                            infoDTO.getLatitude()) <= range.getRadius())
+                    .collect(Collectors.toList());
+
+            // 주변 행정 구역 객체 생성
+            List<NearPublicDistrict> nearPublicDistricts = filteredLocations.stream()
+                    .map(filteredLocation -> NearPublicDistrict.buildNearPublicDistrict(
+                            filteredLocation.getSido(),
+                            filteredLocation.getSgg(),
+                            filteredLocation.getEmd(),
+                            range.getRadius(),
+                            publicDistrict))
+                    .toList();
+
+            // 모든 주변 행정 구역 리스트에 추가
+            allNearPublicDistricts.addAll(nearPublicDistricts);
+
+            // 기존에 있던 모든 행정 구역을 필터된 주변 행정 구역으로 값을 대체
+            allLocations = filteredLocations;
+        }
+
+        // 일반 쿼리(general insert query)로 주변 행정 구역을 저장 - 쿼리 약 1000 개
+//        nearPublicDistrictRepository.saveAll(allNearPublicDistricts);
+
+        // 벌크 쿼리(bulk insert query)로 주변 행정 구역을 저장 - 쿼리 1 개
+        nearPublicDistrictJdbcRepository.saveAll(allNearPublicDistricts);
+    }
+
+    /**
      * 주변 행정 구역을 조회하는 메서드
      * @param baseLocation 기준 위치
      * @return 주변 행정 구역의 정보

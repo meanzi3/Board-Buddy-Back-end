@@ -43,7 +43,7 @@ public class ReviewService {
      * @param gatherArticleId 모집글 Id
      * @param username 로그인 사용자 아이디
      **/
-    public List<ReviewResponse.ReviewDTO> getParticipatedList(Long gatherArticleId, String username) {
+    public List<ReviewResponse.UserDTO> getParticipatedList(Long gatherArticleId, String username) {
         GatherArticleResponse.StatusDTO statusDTO = gatherArticleRepository.findStatusDTOById(gatherArticleId)
                 .orElseThrow(() -> new GatherArticleNotFoundException("해당 모집글을 찾을 수 없습니다."));
 
@@ -58,12 +58,12 @@ public class ReviewService {
      * 리뷰 보내기 요청 캐치
      *
      * @param gatherArticleId 모집글 Id
-     * @param reviewDTO 리뷰를 받는 유저 닉네임과 리뷰 타입을 담은 dto
+     * @param sendDTO 리뷰를 받는 유저 닉네임과 리뷰 타입을 담은 dto
      * @param username 로그인 사용자 아이디
      **/
     @Transactional
-    public void sendReview(Long gatherArticleId, ReviewRequest.ReviewDTO reviewDTO, String username) {
-        MemberGatherArticle memberGatherArticle = memberGatherArticleRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, username)
+    public void sendReview(Long gatherArticleId, ReviewRequest.SendDTO sendDTO, String username) {
+        memberGatherArticleRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, username)
                 .orElseThrow(() -> new MemberNotJoinedGatherArticleException("해당 유저는 해당 모집글에 참여하지 않았습니다."));
 
         GatherArticle gatherArticle = gatherArticleRepository.findById(gatherArticleId)
@@ -84,14 +84,14 @@ public class ReviewService {
         }
 
         // 리뷰 받는 유저 조회
-        Member reviewee = memberRepository.findByNickname(reviewDTO.getNickname())
+        Member reviewee = memberRepository.findByNickname(sendDTO.getNickname())
                 .orElseThrow(() -> new MemberRetrievalException("리뷰를 받는 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 이미 리뷰를 보냈는지 확인
         if (reviewRepository.existsByReviewerAndRevieweeAndGatherArticle(reviewer, reviewee, gatherArticle)) {
             throw new ReviewAlreadyExistsException("이미 해당 유저에게 리뷰를 보냈습니다.");
         }
-        ReviewType reviewType = ReviewType.valueOf(String.valueOf(reviewDTO.getReview()));
+        ReviewType reviewType = ReviewType.valueOf(String.valueOf(sendDTO.getReview()));
 
         Review review = Review.buildReview(
                 reviewer,

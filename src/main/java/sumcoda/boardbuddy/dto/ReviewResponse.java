@@ -8,7 +8,7 @@ public class ReviewResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class ReviewDTO {
+    public static class UserDTO {
 
         private String profileImageS3SavedURL;
 
@@ -19,7 +19,7 @@ public class ReviewResponse {
         private boolean hasReviewed;
 
         @Builder
-        public ReviewDTO(String profileImageS3SavedURL, Integer rank, String nickname, boolean hasReviewed) {
+        public UserDTO(String profileImageS3SavedURL, Integer rank, String nickname, boolean hasReviewed) {
             this.profileImageS3SavedURL = profileImageS3SavedURL;
             this.rank = rank;
             this.nickname = nickname;

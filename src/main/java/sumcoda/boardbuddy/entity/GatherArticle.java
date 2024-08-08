@@ -172,7 +172,7 @@ public class GatherArticle extends BaseTimeEntity {
         }
     }
 
-    // GatherArticle 1 <-> N Comment
+    // GatherArticle 1 <-> N Review
     // 양방향 연관관계 편의 메서드
     public void addReview(Review review) {
         this.reviews.add(review);

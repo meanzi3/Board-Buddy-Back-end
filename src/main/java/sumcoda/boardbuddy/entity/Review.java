@@ -61,6 +61,7 @@ public class Review {
             this.reviewer.getSentReviews().remove(this);
         }
         this.reviewer = reviewer;
+
         if (!reviewer.getSentReviews().contains(this)) {
             reviewer.addSentReview(this);
         }
@@ -73,6 +74,7 @@ public class Review {
             this.reviewee.getReceiveReviews().remove(this);
         }
         this.reviewee = reviewee;
+
         if (!reviewee.getReceiveReviews().contains(this)) {
             reviewee.addReceiveReview(this);
         }

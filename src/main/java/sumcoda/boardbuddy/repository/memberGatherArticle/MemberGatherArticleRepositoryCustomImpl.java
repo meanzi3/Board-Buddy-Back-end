@@ -80,9 +80,9 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
 
   // 자신을 제외한 모임 참가 유저 리스트를 반환하는 메서드
   @Override
-  public List<ReviewResponse.ReviewDTO> findParticipantsExcludingUsername(Long gatherArticleId, String username) {
+  public List<ReviewResponse.UserDTO> findParticipantsExcludingUsername(Long gatherArticleId, String username) {
       return jpaQueryFactory
-              .select(Projections.fields(ReviewResponse.ReviewDTO.class,
+              .select(Projections.fields(ReviewResponse.UserDTO.class,
                       profileImage.profileImageS3SavedURL,
                       member.rank,
                       member.nickname,

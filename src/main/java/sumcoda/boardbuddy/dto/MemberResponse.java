@@ -71,7 +71,7 @@ public class MemberResponse {
 
         private Double buddyScore;
 
-        private List<String> badges;
+        private List<BadgeImageResponse.BadgeImageInfosDTO> badges;
 
         private Integer joinCount;
 
@@ -82,7 +82,7 @@ public class MemberResponse {
         private Integer totalBadCount;
 
         @Builder(toBuilder = true)
-        public ProfileInfosDTO(String profileImageS3SavedURL, String description, Integer rank, Double buddyScore, List<String> badges, Integer joinCount, Integer totalExcellentCount, Integer totalGoodCount, Integer totalBadCount) {
+        public ProfileInfosDTO(String profileImageS3SavedURL, String description, Integer rank, Double buddyScore, List<BadgeImageResponse.BadgeImageInfosDTO> badges, Integer joinCount, Integer totalExcellentCount, Integer totalGoodCount, Integer totalBadCount) {
             this.profileImageS3SavedURL = profileImageS3SavedURL;
             this.description = description;
             this.rank = rank;

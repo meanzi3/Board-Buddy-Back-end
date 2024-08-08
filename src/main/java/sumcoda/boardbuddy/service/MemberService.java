@@ -137,15 +137,20 @@ public class MemberService {
         if (existsByUsername) {
             return;
         }
+
+        String sido = "서울특별시";
+        String sgg = "강남구";
+        String emd = "삼성동";
+
         memberRepository.save(Member.buildMember(
                 "admin",
                 bCryptPasswordEncoder.encode("a12345#"),
                 "admin",
                 "admin@naver.com",
                 "01012345678",
-                "서울특별시",
-                "강남구",
-                "삼성동",
+                sido,
+                sgg,
+                emd,
                 2,
                 50.0,
                 0,
@@ -164,6 +169,14 @@ public class MemberService {
                 Role.USER,
                 null)
         );
+
+        // 관리자 계정의 행정 구역 저장
+        nearPublicDistrictService.saveNearDistrictByAdminLocation(
+                NearPublicDistrictRequest.LocationDTO.builder()
+                        .sido(sido)
+                        .sgg(sgg)
+                        .emd(emd)
+                        .build());
     }
 
     /**

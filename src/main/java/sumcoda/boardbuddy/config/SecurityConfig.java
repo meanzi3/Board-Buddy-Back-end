@@ -177,7 +177,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .rememberMe(auth -> auth
-                        .useSecureCookie(true) // HTTPS 환경에서만 쿠키전송
+//                        .useSecureCookie(true) // HTTPS 환경에서만 쿠키전송
                         .tokenValiditySeconds(86400));
 
         return http.build();

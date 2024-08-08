@@ -44,6 +44,10 @@ public class MemberService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 //    private final AmazonS3Client amazonS3Client;
 
+//    // S3에 등록된 버킷 이름
+//    @Value("${cloud.aws.s3.bucket-name}")
+//    private String bucketName;
+
     /**
      * 아이디 중복검사
      *
@@ -392,7 +396,6 @@ public class MemberService {
                 file.delete();
 
 //                 // 프로필 이미지 S3 저장 시 필요
-//                String bucketName = "";
 //                ProfileImage existingProfileImage = member.getProfileImage();
 //
 //                // 기존 프로필 이미지가 있다면 S3에서 삭제

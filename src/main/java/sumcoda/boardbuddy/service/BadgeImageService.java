@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class BadgeImageService {
 
@@ -149,6 +150,9 @@ public class BadgeImageService {
         // S3 환경에서 이용할 코드 주석
         // 클라이언트가 해당 이미지를 요청할 수 있는 URL
         String awsS3URL = awsS3Config.amazonS3Client().getUrl(bucketName, badgeImageName).toString();
+
+        // 뱃지 경로 로그 확인
+        log.info(awsS3URL);
 
         // 초기 멤버에게 뱃지 이미지 부여, 저장
         initMemberIds.stream()

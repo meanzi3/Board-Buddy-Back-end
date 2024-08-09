@@ -145,8 +145,8 @@ public class MemberService {
         }
 
         String sido = "서울특별시";
-        String sgg = "강남구";
-        String emd = "삼성동";
+        String sgg = "마포구";
+        String emd = "서교동";
 
         memberRepository.save(Member.buildMember(
                 "admin",
@@ -183,6 +183,103 @@ public class MemberService {
                         .sgg(sgg)
                         .emd(emd)
                         .build());
+    }
+
+    /**
+     * 애플리케이션 시작시 계정 3개 생성
+     *
+     **/
+    public void createInitTestAccounts() {
+
+        String sido = "서울특별시";
+        String sgg = "마포구";
+        String emd = "서교동";
+
+        memberRepository.save(Member.buildMember(
+                "user1",
+                bCryptPasswordEncoder.encode("a12345#"),
+                "김근호",
+                "admin@naver.com",
+                "01012345678",
+                sido,
+                sgg,
+                emd,
+                2,
+                60.0,
+                7,
+                0,
+                12,
+                0,
+                5,
+                0,
+                0,
+                0,
+                0,
+                null,
+                1,
+                0.0,
+                MemberType.REGULAR,
+                Role.USER,
+                null)
+        );
+
+        memberRepository.save(Member.buildMember(
+                "user2",
+                bCryptPasswordEncoder.encode("a12345#"),
+                "이다솜",
+                "admin@naver.com",
+                "01012345678",
+                sido,
+                sgg,
+                emd,
+                2,
+                58.0,
+                5,
+                0,
+                10,
+                0,
+                3,
+                0,
+                0,
+                0,
+                0,
+                null,
+                2,
+                0.0,
+                MemberType.REGULAR,
+                Role.USER,
+                null)
+        );
+
+        memberRepository.save(Member.buildMember(
+                "user3",
+                bCryptPasswordEncoder.encode("a12345#"),
+                "최민지",
+                "admin@naver.com",
+                "01012345678",
+                sido,
+                sgg,
+                emd,
+                2,
+                55.0,
+                4,
+                0,
+                5,
+                0,
+                3,
+                0,
+                0,
+                0,
+                0,
+                null,
+                3,
+                0.0,
+                MemberType.REGULAR,
+                Role.USER,
+                null)
+        );
+
+
     }
 
     /**

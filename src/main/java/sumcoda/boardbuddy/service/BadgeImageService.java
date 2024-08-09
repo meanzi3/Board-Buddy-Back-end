@@ -15,6 +15,7 @@ import sumcoda.boardbuddy.util.FileStorageUtil;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -112,5 +113,50 @@ public class BadgeImageService {
                         .orElseThrow(() -> new MemberNotFoundException("해당 유저를 찾을 수 없습니다.")))
                 .map(member -> BadgeImage.buildBadgeImage(badgeImageName, awsS3URL, badgeYearMonth, member))
                 .forEach(badgeImageRepository::save);
+    }
+
+    /**
+     * 초기 멤버 뱃지 URL 부여 메서드
+     *
+     * @param top3MemberIds
+     * @param lastMonth
+     */
+    @Transactional
+    public void assignBadgesToInitTestMembers(YearMonth lastMonth) {
+
+        List<Long> initMemberIds = Arrays.asList(2L, 3L, 4L);
+
+        // 받을 뱃지의 년, 월 문자열 구하기 예: "202407"
+        String lastMonthStr = lastMonth.format(DateTimeFormatter.ofPattern("yyyyMM"));
+
+        // 뱃지 이미지 파일 이름 예: "202407_badge.png"
+        String badgeImageName = lastMonthStr + BADGE_IMAGE_SUFFIX;
+
+        // DB에 저장할 뱃지 발급 연월 정보 예: 2024.07
+        String badgeYearMonth = lastMonth.format(DateTimeFormatter.ofPattern("yyyy.MM"));
+
+        // 로컬 환경용 코드
+        // 임시로 로컬에 저장된 뱃지 이미지 경로로 만듦.
+//        String badgeImageURL = FileStorageUtil.getLocalStoreDir(badgeImageName);
+//
+//        // TOP3에 뱃지 이미지 부여, 저장
+//        top3MemberIds.stream()
+//                .map(memberId -> memberRepository.findById(memberId)
+//                        .orElseThrow(() -> new MemberNotFoundException("해당 유저를 찾을 수 없습니다.")))
+//                .map(member -> BadgeImage.buildBadgeImage(badgeImageName, badgeImageURL, badgeYearMonth, member))
+//                .forEach(badgeImageRepository::save);
+
+        // S3 환경에서 이용할 코드 주석
+        // 클라이언트가 해당 이미지를 요청할 수 있는 URL
+        String awsS3URL = aws3Config.amazonS3Client().getUrl(bucketName, badgeImageName).toString();
+
+        // 초기 멤버에게 뱃지 이미지 부여, 저장
+        initMemberIds.stream()
+                .map(memberId -> memberRepository.findById(memberId)
+                        .orElseThrow(() -> new MemberNotFoundException("해당 유저를 찾을 수 없습니다.")))
+                .map(member -> BadgeImage.buildBadgeImage(badgeImageName, awsS3URL, badgeYearMonth, member))
+                .forEach(badgeImageRepository::save);
+
+
     }
 }

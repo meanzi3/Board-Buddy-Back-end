@@ -29,12 +29,12 @@ public class BadgeImageService {
 
     private static final String BADGE_IMAGE_SUFFIX = "_badge.png";
 
-//    // AWS S3 활용을 위해 필요한 설정 클래스
-//    private final AwsS3Config aws3Config;
-//
-//    // S3에 등록된 버킷 이름
-//    @Value("${cloud.aws.s3.bucket-name}")
-//    private String bucketName;
+    // AWS S3 활용을 위해 필요한 설정 클래스
+    private final AwsS3Config awsS3Config;
+
+    // S3에 등록된 버킷 이름
+    @Value("${cloud.aws.s3.bucket-name}")
+    private String bucketName;
 
     /**
      * 뱃지 조회 요청 캐치
@@ -52,13 +52,13 @@ public class BadgeImageService {
         }
 
         // 로컬 환경용 코드
-        return badgeImageRepository.findBadgeImagesByNickname(nickname)
-                .stream()
-                .map(dto -> new BadgeImageResponse.BadgeImageInfosDTO(buildBadgeUrl(dto.getBadgeImageS3SavedURL()), dto.getBadgeYearMonth()))
-                .collect(Collectors.toList());
+//        return badgeImageRepository.findBadgeImagesByNickname(nickname)
+//                .stream()
+//                .map(dto -> new BadgeImageResponse.BadgeImageInfosDTO(buildBadgeUrl(dto.getBadgeImageS3SavedURL()), dto.getBadgeYearMonth()))
+//                .collect(Collectors.toList());
 
         // S3 환경에서 이용할 코드 주석
-//        return badgeImageRepository.findBadgeImagesByNickname(nickname);
+        return badgeImageRepository.findBadgeImagesByNickname(nickname);
     }
 
     /**
@@ -93,24 +93,24 @@ public class BadgeImageService {
 
         // 로컬 환경용 코드
         // 임시로 로컬에 저장된 뱃지 이미지 경로로 만듦.
-        String badgeImageURL = FileStorageUtil.getLocalStoreDir(badgeImageName);
+//        String badgeImageURL = FileStorageUtil.getLocalStoreDir(badgeImageName);
+//
+//        // TOP3에 뱃지 이미지 부여, 저장
+//        top3MemberIds.stream()
+//                .map(memberId -> memberRepository.findById(memberId)
+//                        .orElseThrow(() -> new MemberNotFoundException("해당 유저를 찾을 수 없습니다.")))
+//                .map(member -> BadgeImage.buildBadgeImage(badgeImageName, badgeImageURL, badgeYearMonth, member))
+//                .forEach(badgeImageRepository::save);
+
+        // S3 환경에서 이용할 코드 주석
+        // 클라이언트가 해당 이미지를 요청할 수 있는 URL
+        String awsS3URL = awsS3Config.amazonS3Client().getUrl(bucketName, badgeImageName).toString();
 
         // TOP3에 뱃지 이미지 부여, 저장
         top3MemberIds.stream()
                 .map(memberId -> memberRepository.findById(memberId)
                         .orElseThrow(() -> new MemberNotFoundException("해당 유저를 찾을 수 없습니다.")))
-                .map(member -> BadgeImage.buildBadgeImage(badgeImageName, badgeImageURL, badgeYearMonth, member))
+                .map(member -> BadgeImage.buildBadgeImage(badgeImageName, awsS3URL, badgeYearMonth, member))
                 .forEach(badgeImageRepository::save);
-
-        // S3 환경에서 이용할 코드 주석
-//        // 클라이언트가 해당 이미지를 요청할 수 있는 URL
-//        String awsS3URL = aws3Config.amazonS3Client().getUrl(bucketName, badgeImageName).toString();
-
-//        // TOP3에 뱃지 이미지 부여, 저장
-//        top3MemberIds.stream()
-//                .map(memberId -> memberRepository.findById(memberId)
-//                        .orElseThrow(() -> new MemberNotFoundException("해당 유저를 찾을 수 없습니다.")))
-//                .map(member -> BadgeImage.buildBadgeImage(badgeImageName, awsS3URL, badgeYearMonth, member))
-//                .forEach(badgeImageRepository::save);
     }
 }

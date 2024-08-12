@@ -8,6 +8,7 @@ import sumcoda.boardbuddy.dto.ChatMessageResponse;
 import sumcoda.boardbuddy.dto.ChatRoomResponse;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.entity.QChatMessage;
+import sumcoda.boardbuddy.entity.QChatRoom;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,6 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
      **/
     @Override
     public List<ChatRoomResponse.ChatRoomDetailsDTO> findChatRoomDetailsListByUsername(String username) {
-        QChatMessage subQueryChatMessage = new QChatMessage("subQueryChatMessage");
 
         return jpaQueryFactory
                 .select(Projections.fields(ChatRoomResponse.ChatRoomDetailsDTO.class,
@@ -64,18 +64,16 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
                                 chatMessage.createdAt.as("sentAt")
                         ).as("latestChatMessageInfo")
                 ))
-                .from(chatRoom)
+                .from(memberChatRoom)
+                .join(memberChatRoom.member, member)
+                .join(memberChatRoom.chatRoom, chatRoom)
                 .leftJoin(chatRoom.chatMessages, chatMessage)
                 .join(chatRoom.gatherArticle, gatherArticle)
-                .join(chatRoom.memberChatRooms, memberChatRoom)
-                .join(memberChatRoom.member, member)
                 .where(member.username.eq(username)
                         .and(chatMessage.createdAt.in(
                                 JPAExpressions
-                                        .select(subQueryChatMessage.createdAt.max())
-                                        .from(subQueryChatMessage)
-                                        .join(subQueryChatMessage.chatRoom, chatRoom)
-                                        .where(chatRoom.id.eq(chatRoom.id))
+                                        .select(chatMessage.createdAt.max())
+                                        .from(chatMessage)
                         ))
                 )
                 .orderBy(chatMessage.createdAt.desc())

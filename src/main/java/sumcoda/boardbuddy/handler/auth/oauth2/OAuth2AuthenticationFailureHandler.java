@@ -45,7 +45,7 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
             messageCode = "9";
         }
 
-        redirectStrategy.sendRedirect(request, response, "https://boardbuddyapp.vercel.app/login/oauth/callback?isLoginSucceed=false&isVerifiedMember=false&messageCode=" + messageCode);
+        redirectStrategy.sendRedirect(request, response, "https://m.boardbuddyapp.com/login/oauth/callback?isLoginSucceed=false&isVerifiedMember=false&messageCode=" + messageCode);
     }
 
     private String getOAuth2MessageCode(String errorMessage) {

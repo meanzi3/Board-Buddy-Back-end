@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.ChatMessageResponse;
 import sumcoda.boardbuddy.dto.ChatRoomResponse;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
-import sumcoda.boardbuddy.entity.QChatMessage;
 import sumcoda.boardbuddy.entity.QChatRoom;
 
 import java.util.List;
@@ -49,6 +48,7 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
      **/
     @Override
     public List<ChatRoomResponse.ChatRoomDetailsDTO> findChatRoomDetailsListByUsername(String username) {
+        QChatRoom subQueryChatRoom = new QChatRoom("subQueryChatRoom");
 
         return jpaQueryFactory
                 .select(Projections.fields(ChatRoomResponse.ChatRoomDetailsDTO.class,
@@ -74,6 +74,8 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
                                 JPAExpressions
                                         .select(chatMessage.createdAt.max())
                                         .from(chatMessage)
+                                        .leftJoin(chatMessage.chatRoom, subQueryChatRoom)
+                                        .where(subQueryChatRoom.id.eq(chatRoom.id))
                         ))
                 )
                 .orderBy(chatMessage.createdAt.desc())

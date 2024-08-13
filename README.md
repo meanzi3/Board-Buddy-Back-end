@@ -98,7 +98,7 @@ Spring Security, OAuth2를 이용하였으며 인증된 사용자의 상태는 �
 위치 설정으로 내 동네를 설정할 수 있습니다. 가까운 곳부터 먼 곳까지 사용자가 원하는대로 반경을 선택할 수 있습니다.
 
 ### 랭킹 시스템
-매월 1일에 사용자의 월별 서비스 이용 내역, 받은 후기에 따라 TOP3를 선정하며, 프로필에 특별한 뱃지(1~3등)를 함께 표시합니다. 또한 해당하는 월의 뱃지(1~12월)를 얻을 수 있습니다. 
+매월 1일에 사용자의 월별 서비스 이용 내역, 받은 후기에 따라 TOP3를 선정하며, 프로필에 특별한 뱃지(1-3등)를 함께 표시합니다. 또한 해당하는 월의 뱃지(1-12월)를 얻을 수 있습니다. 
 랭킹 순위 집계는 SpringBoot의 Scheduler를 이용하여 자동화하도록 스케줄링 됩니다.
 
 ### 보드게임 카페 찾기
@@ -148,7 +148,7 @@ Spring Security, OAuth2를 이용하였으며 인증된 사용자의 상태는 �
 <br><br>
 
 ### ERD
-![board_buddy_db.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/b05d3f0b-9454-4f8e-bece-c207ea15c67a/b6a6ec1c-40ae-4364-afc6-91d0c7ed482f/board_buddy_db.png)
+![board_buddy_db](https://github.com/user-attachments/assets/82238e0a-0fd8-4319-af69-6970a4a3532d)
 
 <br><br>
 

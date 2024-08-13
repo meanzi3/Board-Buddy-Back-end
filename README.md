@@ -125,7 +125,7 @@ Spring Security, OAuth2를 이용하였으며 인증된 사용자의 상태는 �
 <br><br>
 
 ## 아키텍쳐
-![image](https://github.com/meanzi3/Programmers/assets/120402129/9c412f53-857f-4d11-a5cf-5e9387e92928)
+![Architecture](https://github.com/user-attachments/assets/c86b26a2-d0fd-445e-828d-7e385df44523)
 
 <br>
 
@@ -153,7 +153,7 @@ Spring Security, OAuth2를 이용하였으며 인증된 사용자의 상태는 �
 <br><br>
 
 ## 시연 영상
-[보러가기](https://www.youtube.com/watch?v=gfLYe-VhBAg)
+[![보드버디 시연영상](https://github.com/user-attachments/assets/cb9f0f10-1847-4ce0-bd8d-0884df89221f)](https://youtu.be/GB8Cqv4oayo?feature=shared)
 
 <br><br>
 

@@ -125,7 +125,7 @@ Spring Security, OAuth2를 이용하였으며 인증된 사용자의 상태는 �
 <br><br>
 
 ## 아키텍쳐
-![Architecture](https://github.com/user-attachments/assets/c86b26a2-d0fd-445e-828d-7e385df44523)
+![Architecture](https://github.com/user-attachments/assets/f2a00f79-f5d1-45e7-b315-b557a02638a4)
 
 <br>
 

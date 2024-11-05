@@ -115,16 +115,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(
-//                                "/api/login/oauth2/code/**",
-//                                "/api/auth/register",
-//                                "/api/auth/check-username",
-//                                "/api/auth/check-nickname",
-//                                "/api/auth/sms-certifications/send",
-//                                "/api/auth/sms-certifications/verify",
-//                                "/api/auth/login",
-//                                "/api/rankings",
-//                                "/api/oauth2/**",
-                                "/api/**"
+                                "/api/auth/register",
+                                "/api/auth/username/check",
+                                "/api/auth/nickname/check",
+                                "/api/auth/sms-certifications/send",
+                                "/api/auth/sms-certifications/verify",
+                                "/api/auth/login",
+                                "/api/oauth2/**",
+                                "/api/login/oauth2/code/**",
+                                "/api/auth/locations/search"
                         ).permitAll()
                         .anyRequest().authenticated())
 

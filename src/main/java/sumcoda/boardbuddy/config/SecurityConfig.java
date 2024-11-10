@@ -55,7 +55,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 허용할 출처 설정
-        configuration.setAllowedOriginPatterns(List.of("https://*.boardbuddyapp.com", "https://boardbuddyapp.vercel.app"));
+        configuration.setAllowedOriginPatterns(List.of("https://m.boardbuddyapp.com", "https://boardbuddyapp.vercel.app"));
 
         // 허용할 HTTP 메서드 설정
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -69,6 +69,8 @@ public class SecurityConfig {
         configuration.addExposedHeader("Authorization");
         configuration.addExposedHeader("Authorization_Refresh");
         configuration.addExposedHeader("Access-Control-Allow-Origin");
+        configuration.addExposedHeader("Access-Control-Allow-Methods");
+        configuration.addExposedHeader("Access-Control-Allow-Headers");
         configuration.addExposedHeader("Access-Control-Allow-Credentials");
 
         // 자격 증명 허용 설정

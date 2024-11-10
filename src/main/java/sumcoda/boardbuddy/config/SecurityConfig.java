@@ -127,7 +127,7 @@ public class SecurityConfig {
                                 "/api/auth/locations/search"
                         ).permitAll()
                         // 단순히 로그인한 인증 여부만 확인
-                        .anyRequest().authenticated()
+//                        .anyRequest().authenticated()
                         // 단순히 로그인하여 인증된것 뿐만 아니라 USER 라는 권한이 있어야만 서버로 요청을 보낼 수 있음
                         // 데이터베이스에 사용자의 권한을 저장할때 'ROLE_USER'가 아닌 'USER' 로 저장되기 때문에 hasRole() 메서드가 아닌 문자열 그대로 권한을 비교하는 hasAuthority() 메서드를 활용
                         .anyRequest().hasAuthority("USER")

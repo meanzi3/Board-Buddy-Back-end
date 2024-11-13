@@ -29,7 +29,7 @@ public class BadgeImageController {
      * @param nickname 유저 닉네임
      * @return 뱃지 리스트
      **/
-    @GetMapping(value = "/api/badges/{nickname}")
+    @GetMapping(value = "/v1/badges/{nickname}")
     public ResponseEntity<ApiResponse<Map<String, List<BadgeImageResponse.BadgeImageInfosDTO>>>> getBadges (@PathVariable String nickname) {
         log.info("get badges is working");
 

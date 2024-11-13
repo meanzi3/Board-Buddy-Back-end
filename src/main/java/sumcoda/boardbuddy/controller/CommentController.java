@@ -35,7 +35,7 @@ public class CommentController {
      * @param username        사용자 이름
      * @return 성공 응답
      */
-    @PostMapping(value = {"/api/gather-articles/{gatherArticleId}/comments", "/api/gather-articles/{gatherArticleId}/comments/{parentId}"})
+    @PostMapping(value = {"/v1/gather-articles/{gatherArticleId}/comments", "/v1/gather-articles/{gatherArticleId}/comments/{parentId}"})
     public ResponseEntity<ApiResponse<Void>> createComment(
             @PathVariable Long gatherArticleId,
             @PathVariable(required = false) Long parentId,
@@ -57,7 +57,7 @@ public class CommentController {
      * @param username        사용자 이름
      * @return 댓글 리스트 응답
      */
-    @GetMapping("/api/gather-articles/{gatherArticleId}/comments")
+    @GetMapping("/v1/gather-articles/{gatherArticleId}/comments")
     public ResponseEntity<ApiResponse<Map<String, List<CommentResponse.InfoDTO>>>> getComments(
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username) {
@@ -77,7 +77,7 @@ public class CommentController {
      * @param username        사용자 이름
      * @return 성공 응답
      */
-    @PutMapping("/api/gather-articles/{gatherArticleId}/comments/{commentId}")
+    @PutMapping("/v1/gather-articles/{gatherArticleId}/comments/{commentId}")
     public ResponseEntity<ApiResponse<Void>> updateComment(
             @PathVariable Long gatherArticleId,
             @PathVariable Long commentId,
@@ -98,7 +98,7 @@ public class CommentController {
      * @param username        사용자 이름
      * @return 성공 응답
      */
-    @DeleteMapping("/api/gather-articles/{gatherArticleId}/comments/{commentId}")
+    @DeleteMapping("/v1/gather-articles/{gatherArticleId}/comments/{commentId}")
     public ResponseEntity<ApiResponse<Void>> deleteComment(
             @PathVariable Long gatherArticleId,
             @PathVariable Long commentId,

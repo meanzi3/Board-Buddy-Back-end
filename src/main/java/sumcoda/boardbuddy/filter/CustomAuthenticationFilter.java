@@ -26,7 +26,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
 
     public CustomAuthenticationFilter() {
         // url과 일치할 경우 해당 필터가 동작합니다.
-        super(new AntPathRequestMatcher("/api/auth/login"));
+        super(new AntPathRequestMatcher("/v1/auth/login"));
     }
 
     // 요청으로 받은 유저 정보를 바탕으로 로그인 인증 시도

@@ -102,15 +102,15 @@ public class SecurityConfig {
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(
                                 // 로그인 하지 않은 사용자라도 요청을 보낼 수 있는 API Path
-                                "/api/auth/register",
-                                "/api/auth/username/check",
-                                "/api/auth/nickname/check",
-                                "/api/auth/sms-certifications/send",
-                                "/api/auth/sms-certifications/verify",
-                                "/api/auth/login",
-                                "/api/oauth2/**",
-                                "/api/login/oauth2/code/**",
-                                "/api/auth/locations/search"
+                                "/v1/auth/register",
+                                "/v1/auth/username/check",
+                                "/v1/auth/nickname/check",
+                                "/v1/auth/sms-certifications/send",
+                                "/v1/auth/sms-certifications/verify",
+                                "/v1/auth/login",
+                                "/v1/oauth2/**",
+                                "/v1/login/oauth2/code/**",
+                                "/v1/auth/locations/search"
                         ).permitAll()
                         // 단순히 로그인한 인증 여부만 확인
 //                        .anyRequest().authenticated()
@@ -139,9 +139,9 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
 //                        .loginPage("/auth/login")
                         .authorizationEndpoint(oAuth2 -> oAuth2
-                                .baseUri("/api/oauth2/authorization"))
+                                .baseUri("/v1/oauth2/authorization"))
                         .redirectionEndpoint(oAuth2 -> oAuth2
-                                .baseUri("/api/login/oauth2/code/**"))
+                                .baseUri("/v1/login/oauth2/code/**"))
                         .userInfoEndpoint(userInfoEndpointConfig ->
                                 userInfoEndpointConfig
                                         .userService(customOAuth2UserService))
@@ -149,7 +149,7 @@ public class SecurityConfig {
                         .failureHandler(oAuth2AuthenticationFailureHandler));
 
         http.logout(auth -> auth
-                .logoutUrl("/api/auth/logout")
+                .logoutUrl("/v1/auth/logout")
                 .logoutSuccessHandler(customLogoutSuccessHandler)
                 .deleteCookies("JSESSIONID"));
 

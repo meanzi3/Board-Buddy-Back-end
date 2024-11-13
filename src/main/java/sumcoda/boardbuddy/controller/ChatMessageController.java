@@ -48,7 +48,7 @@ public class ChatMessageController {
      * @param username 요청을 보낸 사용자 아이디
      * @return 채팅방 메세지 내역
      */
-    @GetMapping("/api/chat/rooms/{chatRoomId}/messages")
+    @GetMapping("/v1/chat/rooms/{chatRoomId}/messages")
     public ResponseEntity<ApiResponse<Map<String, List<ChatMessageResponse.ChatMessageInfoDTO>>>> getChatMessages(
             @PathVariable Long chatRoomId,
             @RequestAttribute String username) {

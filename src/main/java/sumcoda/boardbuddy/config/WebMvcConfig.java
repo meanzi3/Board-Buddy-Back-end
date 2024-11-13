@@ -18,23 +18,24 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor)
-                .addPathPatterns("/api/**")
+                .addPathPatterns("/v1/**")
                 .excludePathPatterns(List.of(
-                        "/api/auth/register",
-                        "/api/auth/username/check",
-                        "/api/auth/nickname/check",
-                        "/api/auth/sms-certifications/send",
-                        "/api/auth/sms-certifications/verify",
-                        "/api/auth/login",
-                        "/api/oauth2/**",
-                        "/api/login/oauth2/code/**",
-                        "/api/auth/locations/search",
-                        "/api/rankings",
-                        "/api/ws-stomp/**"
+                        "/v1/auth/register",
+                        "/v1/auth/username/check",
+                        "/v1/auth/nickname/check",
+                        "/v1/auth/sms-certifications/send",
+                        "/v1/auth/sms-certifications/verify",
+                        "/v1/auth/login",
+                        "/v1/oauth2/**",
+                        "/v1/login/oauth2/code/**",
+                        "/v1/auth/locations/search",
+                        "/v1/rankings",
+                        "/v1/ws-stomp/**"
                 ));
         WebMvcConfigurer.super.addInterceptors(registry);
     }
 
+    // 로컬 테스트용 저장공간 설정
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 

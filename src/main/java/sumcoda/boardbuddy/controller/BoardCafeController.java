@@ -33,7 +33,7 @@ public class BoardCafeController {
      * @param username 사용자 이름
      * @return 보드게임 카페 리스트
      */
-    @GetMapping("/api/board-cafes")
+    @GetMapping("/v1/board-cafes")
     public ResponseEntity<ApiResponse<Map<String, List<BoardCafeResponse.InfoDTO>>>> getBoardCafes(
             @RequestParam Double x,
             @RequestParam Double y,

@@ -31,7 +31,7 @@ public class NotificationController {
      * <p>
      * //     * @param nickname 알람 구독 요청 사용자 닉네임
      **/
-    @GetMapping(value = "/api/notifications/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/v1/notifications/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribe(
             @RequestAttribute String username
     ) {
@@ -52,7 +52,7 @@ public class NotificationController {
      * @param username 알림 목록 조회 사용자 아이디
      * @return 알림 목록 조회 성공 시 약속된 SuccessResponse 반환
      **/
-    @GetMapping(value = "/api/notifications")
+    @GetMapping(value = "/v1/notifications")
     public ResponseEntity<ApiResponse<Map<String, List<NotificationResponse.NotificationDTO>>>> getNotifications(
             @RequestAttribute String username
     ) {

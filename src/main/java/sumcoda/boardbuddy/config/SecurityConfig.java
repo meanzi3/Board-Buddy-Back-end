@@ -91,10 +91,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 새로추가
         http
+                .cors((corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource())))
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .cors((corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource())))
                 // 보안 컨텍스트의 저장 방식을 제어하는 설정
                 // 보안 컨텍스트가 명시적으로 저장될 때만 저장되도록 한다.
                 // 보안 컨텍스트가 실수로 변경되거나 저장되는 것을 방지하여 보안성을 높인다.

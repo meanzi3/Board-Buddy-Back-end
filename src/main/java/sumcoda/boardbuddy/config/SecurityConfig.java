@@ -54,11 +54,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
         // 허용할 출처 설정
         configuration.setAllowedOriginPatterns(List.of("https://board-buddy-front-end.vercel.app", "https://m.boardbuddyapp.com"));
-//        configuration.setAllowedOrigins(List.of("https://m.boardbuddyapp.com", "https://board-buddy-front-end.vercel.app", "https://boardbuddyapp.com"));
 
-//        configuration.setAllowedOriginPatterns(List.of("*"));
+        // configuration.setAllowedOrigins(List.of("https://m.boardbuddyapp.com", "https://board-buddy-front-end.vercel.app", "https://boardbuddyapp.com"));
 
         // 허용할 HTTP 메서드 설정
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

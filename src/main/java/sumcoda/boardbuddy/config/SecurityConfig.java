@@ -55,7 +55,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 허용할 출처 설정
-        configuration.setAllowedOriginPatterns(List.of("https://m.boardbuddyapp.com", "https://board-buddy-front-end.vercel.app", "https://boardbuddyapp.com"));
+        configuration.setAllowedOrigins(List.of("https://m.boardbuddyapp.com", "https://board-buddy-front-end.vercel.app", "https://boardbuddyapp.com"));
+
 //        configuration.setAllowedOriginPatterns(List.of("*"));
 
         // 허용할 HTTP 메서드 설정
@@ -78,7 +79,7 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true);
 
         // pre-flight 요청 캐싱 시간 설정
-        configuration.setMaxAge(1728000L);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

@@ -72,7 +72,7 @@ public class ChatMessageService {
         ChatMessageResponse.ChatMessageInfoDTO responseChatMessage = chatMessageRepository.findTalkMessageById(chatMessageId)
                 .orElseThrow(() -> new ChatMessageRetrievalException("서버 문제로 해당 메세지를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        messagingTemplate.convertAndSend("/v1/ws-stomp/reception/" + chatRoomId, responseChatMessage);
+        messagingTemplate.convertAndSend("/api/v1/ws-stomp/reception/" + chatRoomId, responseChatMessage);
     }
 
     /**
@@ -113,7 +113,7 @@ public class ChatMessageService {
                 .orElseThrow(() -> new ChatMessageRetrievalException("서버 문제로 해당 메세지를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 채팅방 구독자들에게 메시지 전송
-        messagingTemplate.convertAndSend("/v1/ws-stomp/reception/" + chatRoomId, responseChatMessage);
+        messagingTemplate.convertAndSend("/api/v1/ws-stomp/reception/" + chatRoomId, responseChatMessage);
     }
 
     /**

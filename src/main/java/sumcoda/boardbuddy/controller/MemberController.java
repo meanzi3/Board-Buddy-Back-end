@@ -29,7 +29,7 @@ public class MemberController {
      * @param verifyUsernameDuplicationDTO 사용자가 입력한 아이디
      * @return 아이디가 중복되지 않았다면 약속된 SuccessResponse 반환
      **/
-    @PostMapping(value = "/v1/auth/username/check")
+    @PostMapping(value = "/api/v1/auth/username/check")
     public ResponseEntity<ApiResponse<Void>> verifyUsernameDuplication(
             @RequestBody MemberRequest.VerifyUsernameDuplicationDTO verifyUsernameDuplicationDTO) {
         log.info("verify username duplication is working");
@@ -45,7 +45,7 @@ public class MemberController {
      * @param verifyNicknameDuplicationDTO 사용자가 입력한 닉네임
      * @return 닉네임이 중복되지 않았다면 약속된 SuccessResponse 반환
      **/
-    @PostMapping(value = "/v1/auth/nickname/check")
+    @PostMapping(value = "/api/v1/auth/nickname/check")
     public ResponseEntity<ApiResponse<Void>> verifyNicknameDuplication(
             @RequestBody MemberRequest.VerifyNicknameDuplicationDTO verifyNicknameDuplicationDTO) {
         log.info("verify nickname duplication is working");
@@ -61,7 +61,7 @@ public class MemberController {
      * @param registerDTO 프론트로부터 전달받은 회원가입 정보
      * @return 회원가입에 성공했다면약속된 SuccessResponse 반환
      **/
-    @PostMapping(value = "/v1/auth/register")
+    @PostMapping(value = "/api/v1/auth/register")
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody MemberRequest.RegisterDTO registerDTO) {
         log.info("register is working");
 
@@ -77,7 +77,7 @@ public class MemberController {
      * @param username 소셜 로그인 사용자 아이디
      * @return 첫 소셜 로그인 사용자가 회원가입에 성공했다면 약속된 SuccessResponse 반환
      **/
-    @PostMapping(value = "/v1/auth/oauth2/register")
+    @PostMapping(value = "/api/v1/auth/oauth2/register")
     public ResponseEntity<ApiResponse<Void>> oAuth2Register(@RequestBody MemberRequest.OAuth2RegisterDTO oAuth2RegisterDTO,
                                                             @RequestAttribute String username) {
         log.info("social register is working");
@@ -93,7 +93,7 @@ public class MemberController {
      * @param username 로그인 사용자 아이디
      * @return 회원 탈퇴가 완료되었다면 약속된 SuccessResponse 반환
      **/
-    @PostMapping(value = "/v1/auth/withdrawal")
+    @PostMapping(value = "/api/v1/auth/withdrawal")
     public ResponseEntity<ApiResponse<Void>> withdrawalMember(@RequestAttribute String username) {
         log.info("withdrawal member is working");
 
@@ -108,7 +108,7 @@ public class MemberController {
      * @param username 로그인 사용자 아이디
      * @return 내 동네 조회를 성공했다면 약속된 SuccessResponse 반환
      */
-    @GetMapping("/v1/my/neighborhoods")
+    @GetMapping("/api/v1/my/neighborhoods")
     public ResponseEntity<ApiResponse<MemberResponse.MyLocationsDTO>> getMemberNeighborhoods(@RequestAttribute String username) {
         log.info("getMemberNeighborhoods is working");
 
@@ -123,7 +123,7 @@ public class MemberController {
      * @param locationDTO 사용자가 입력한 위치 정보
      * @return 내 동네 설정을 성공했다면 약속된 SuccessResponse 반환
      **/
-    @PutMapping("/v1/my/neighborhoods")
+    @PutMapping("/api/v1/my/neighborhoods")
     public ResponseEntity<ApiResponse<Map<String, Map<Integer, List<MemberResponse.LocationDTO>>>>> updateMemberNeighborhood(
             @RequestBody MemberRequest.LocationDTO locationDTO,
             @RequestAttribute String username) {
@@ -141,7 +141,7 @@ public class MemberController {
      * @param username 로그인 사용자 아이디
      * @return 내 반경 설정을 성공했다면 약속된 SuccessResponse 반환
      **/
-    @PutMapping("/v1/my/radius")
+    @PutMapping("/api/v1/my/radius")
     public ResponseEntity<ApiResponse<Void>> updateMemberRadius(
             @RequestBody MemberRequest.RadiusDTO radiusDTO,
             @RequestAttribute String username) {
@@ -158,7 +158,7 @@ public class MemberController {
      * @param nickname 유저 닉네임
      * @return 프로필 조회가 성공했다면 약속된 SuccessResponse 반환
      **/
-    @GetMapping("/v1/profiles/{nickname}")
+    @GetMapping("/api/v1/profiles/{nickname}")
     public ResponseEntity<ApiResponse<Map<String, MemberResponse.ProfileInfosDTO>>> getMemberProfileByNickname (@PathVariable String nickname) {
         log.info("get member profile is working");
 
@@ -175,7 +175,7 @@ public class MemberController {
      * @param profileImageFile 수정할 프로필 이미지 파일
      * @return 프로필 조회가 성공했다면 약속된 SuccessResponse 반환
      **/
-    @PutMapping("/v1/profiles")
+    @PutMapping("/api/v1/profiles")
     public ResponseEntity<ApiResponse<Void>> updateProfile(
             @RequestAttribute String username,
             @RequestPart(value = "UpdateProfileDTO") MemberRequest.UpdateProfileDTO updateProfileDTO,

@@ -27,7 +27,7 @@ public class PublicDistrictController {
      * @param emd 읍면동 검색어
      * @return 검색된 위치 정보 리스트
      */
-    @GetMapping("/v1/auth/locations/search")
+    @GetMapping("/api/v1/auth/locations/search")
     public ResponseEntity<ApiResponse<Map<String, List<PublicDistrictResponse.InfoDTO>>>> searchAuthLocations(@RequestParam String emd) {
         log.info("searchLocations is working: " + emd + "으로 검색하였습니다.");
 
@@ -42,7 +42,7 @@ public class PublicDistrictController {
      * @param emd 읍면동 검색어
      * @return 검색된 위치 정보 리스트
      */
-    @GetMapping("/v1/locations/search")
+    @GetMapping("/api/v1/locations/search")
     public ResponseEntity<ApiResponse<Map<String, List<PublicDistrictResponse.InfoDTO>>>> searchLocations(
             @RequestParam String emd,
             @RequestAttribute String username) {

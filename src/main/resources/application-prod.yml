@@ -38,10 +38,10 @@ spring:
     api-key: ${PROD_SMS_API_KEY}
     api-secret: ${PROD_SMS_API_SECRET}
     sender-number: ${PROD_SMS_SENDER_NUMBER}
-server:
-  servlet:
-    session:
-      cookie:
-        secure: true
-        http-only: true
-        same-site: strict
+#server:
+#  servlet:
+#    session:
+#      cookie:
+#        secure: true
+#        http-only: true
+#        same-site: strict

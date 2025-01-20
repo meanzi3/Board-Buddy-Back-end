@@ -13,6 +13,7 @@ import sumcoda.boardbuddy.exception.auth.SMSCertificationAttemptExceededExceptio
 import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
+import sumcoda.boardbuddy.exception.member.PhoneNumberAlreadyExistsException;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.SmsCertificationRepository;
 import sumcoda.boardbuddy.util.SmsCertificationUtil;
@@ -39,6 +40,11 @@ public class AuthService {
      **/
     public void sendSMS(AuthRequest.SendSMSCertificationDTO sendSMSCertificationDTO){
         String receivePhoneNumber = sendSMSCertificationDTO.getPhoneNumber();
+        Boolean isExistsPhoneNumber = memberRepository.existsByPhoneNumber(receivePhoneNumber);
+
+        if (isExistsPhoneNumber) {
+            throw new PhoneNumberAlreadyExistsException("이미 회원가입된 핸드폰 번호 입니다. 핸드폰 번호를 한번 더 확인하세요.");
+        }
 
         SecureRandom secureRandom = new SecureRandom();
         int randomNumber = 100000 + secureRandom.nextInt(900000);

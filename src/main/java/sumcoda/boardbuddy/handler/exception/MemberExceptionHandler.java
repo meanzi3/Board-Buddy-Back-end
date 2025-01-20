@@ -22,6 +22,11 @@ public class MemberExceptionHandler {
         return buildFailureResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(PhoneNumberAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePhoneNumberAlreadyExistsException(PhoneNumberAlreadyExistsException e) {
+        return buildFailureResponse(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(MemberSaveException.class)
     public ResponseEntity<ApiResponse<Void>> handleMemberSaveException(MemberSaveException e) {
         return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

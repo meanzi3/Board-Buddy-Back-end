@@ -2,4 +2,5 @@ spring:
   profiles:
     group:
       "devEnv": "common,dev"
+      "localEnv": "common,local"
       "prodEnv": "common,prod"

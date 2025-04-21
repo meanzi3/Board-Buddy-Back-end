@@ -1,5 +1,6 @@
 HELP.md
 .gradle
+k6-test/*
 docker-compose.local.yml
 src/main/resources/application.yml
 src/main/resources/application-dev.yml

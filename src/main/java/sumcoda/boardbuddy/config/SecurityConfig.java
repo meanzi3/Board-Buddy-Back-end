@@ -56,7 +56,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // 허용할 출처 설정
-        configuration.setAllowedOriginPatterns(List.of("https://board-buddy-front-end.vercel.app", "https://m.boardbuddyapp.com", "http://localhost:3000"));
+        configuration.setAllowedOriginPatterns(List.of("https://board-buddy-front-end.vercel.app", "https://m.boardbuddi.com", "http://localhost:3000"));
 
         // configuration.setAllowedOrigins(List.of("https://m.boardbuddyapp.com", "https://board-buddy-front-end.vercel.app", "https://boardbuddyapp.com"));
 

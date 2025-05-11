@@ -113,8 +113,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/login",
                                 "/api/v1/oauth2/**",
                                 "/api/v1/login/oauth2/code/**",
-                                "/api/v1/auth/locations/search",
-                                "/actuator/**"
+                                "/api/v1/auth/locations/search"
                         ).permitAll()
                         // 단순히 로그인한 인증 여부만 확인
 //                        .anyRequest().authenticated()

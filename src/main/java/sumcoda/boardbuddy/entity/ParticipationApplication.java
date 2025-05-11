@@ -26,10 +26,8 @@ public class ParticipationApplication {
     @Enumerated(EnumType.STRING)
     private ParticipationApplicationStatus participationApplicationStatus;
 
-    // 연관관계 주인
-    // 양방향 관계
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "member_gather_article_id")
+    // 양방향 연관관계
+    @OneToOne(mappedBy = "participationApplication")
     private MemberGatherArticle memberGatherArticle;
 
     @Builder

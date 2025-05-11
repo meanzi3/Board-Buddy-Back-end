@@ -43,8 +43,10 @@ public class MemberGatherArticle {
     @JoinColumn(name = "gather_article_id")
     private GatherArticle gatherArticle;
 
-    // 양방향 연관관계
-    @OneToOne(mappedBy = "memberGatherArticle")
+    // 연관관계 주인
+    // 양방향 관계
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "participation_application_id")
     private ParticipationApplication participationApplication;
 
     @Builder

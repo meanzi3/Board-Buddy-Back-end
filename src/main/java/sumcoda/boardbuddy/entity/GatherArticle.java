@@ -82,11 +82,11 @@ public class GatherArticle extends BaseTimeEntity {
     private List<MemberGatherArticle> memberGatherArticles = new ArrayList<>();
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "gatherArticle", cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "gatherArticle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "gatherArticle", cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "gatherArticle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
     @Builder

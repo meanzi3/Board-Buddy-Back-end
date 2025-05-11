@@ -143,16 +143,16 @@ public class Member {
 
     // 연관관게 주인
     // 단방향 연관관계
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_image_id")
     private ProfileImage profileImage;
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberGatherArticle> memberGatherArticles = new ArrayList<>();
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     // 양방향 연관관계
@@ -160,15 +160,15 @@ public class Member {
     private List<MemberChatRoom> memberChatRooms = new ArrayList<>();
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BadgeImage> badgeImages = new ArrayList<>();
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "reviewer", cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "reviewer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> sentReviews = new ArrayList<>();
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "reviewee", cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "reviewee", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> receiveReviews = new ArrayList<>();
 
     @Builder

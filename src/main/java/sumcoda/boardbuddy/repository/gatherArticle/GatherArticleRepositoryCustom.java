@@ -38,6 +38,6 @@ public interface GatherArticleRepositoryCustom {
 
     Optional<GatherArticleResponse.StatusDTO> findStatusDTOById(Long gatherArticleId);
 
-    Long deleteAllByAuthorUsername(String username);
+    List<Long> findGatherArticleIdsByUsername(String username);
 
 }

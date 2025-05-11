@@ -323,10 +323,13 @@ public class MemberService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        Long deletedGatherArticleCount = gatherArticleRepository.deleteAllByAuthorUsername(username);
+        List<Long> deleteGatherArticleIds = gatherArticleRepository.findGatherArticleIdsByUsername(username);
 
-        if (deletedGatherArticleCount == null) {
-            throw new MemberDeletionFailureException("회원 탈퇴에 실패했습니다. 관리자에게 문의하세요.");
+        // 삭제해야할 모집글 아이디가 비어있지 않다면 삭제할 모집글 아이디를 바탕으로 모집글 삭제 진행
+        if (!deleteGatherArticleIds.isEmpty()) {
+            for (Long deleteGatherArticleId : deleteGatherArticleIds) {
+                gatherArticleRepository.deleteById(deleteGatherArticleId);
+            }
         }
 
         memberRepository.delete(member);

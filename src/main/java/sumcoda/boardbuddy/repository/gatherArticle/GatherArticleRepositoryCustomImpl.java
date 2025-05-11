@@ -345,19 +345,15 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
     }
 
     @Override
-    public Long deleteAllByAuthorUsername(String username) {
+    public List<Long> findGatherArticleIdsByUsername(String username) {
+        // Author 역할인 GatherArticle ID 목록 조회
         return jpaQueryFactory
-            .delete(gatherArticle)
-            .where(gatherArticle.id.in(
-                    JPAExpressions.select(memberGatherArticle.gatherArticle.id)
-                                  .from(memberGatherArticle)
-                                  .where(
-                                        memberGatherArticle.member.username.eq(username)
-                                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
-                                  )
-                    )
-            )
-            .execute();
+                .select(memberGatherArticle.gatherArticle.id)
+                .from(memberGatherArticle)
+                .where(
+                        memberGatherArticle.member.username.eq(username)
+                                .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
+                )
+                .fetch();
     }
-
 }

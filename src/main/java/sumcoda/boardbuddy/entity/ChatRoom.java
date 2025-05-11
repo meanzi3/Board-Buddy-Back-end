@@ -20,12 +20,12 @@ public class ChatRoom {
 
     // 연관관게 주인
     // 양방향 연관관계
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "gather_article_id")
     private GatherArticle gatherArticle;
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom", cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ChatMessage> chatMessages = new ArrayList<>();
 
     // 양방향 연관관계

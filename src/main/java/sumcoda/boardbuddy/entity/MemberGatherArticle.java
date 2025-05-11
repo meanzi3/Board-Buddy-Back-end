@@ -44,7 +44,7 @@ public class MemberGatherArticle {
     private GatherArticle gatherArticle;
 
     // 양방향 연관관계
-    @OneToOne(mappedBy = "memberGatherArticle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "memberGatherArticle")
     private ParticipationApplication participationApplication;
 
     @Builder

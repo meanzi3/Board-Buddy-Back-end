@@ -34,7 +34,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-quartz'
     implementation 'org.springframework.boot:spring-boot-starter-actuator' // actuator 추가
-    implementation 'io.micrometer:micrometer-registry-prometheus' // 프로메테우스 추가
 
     // CoolSMS 의존성 추가
     implementation 'net.nurigo:sdk:4.3.0'

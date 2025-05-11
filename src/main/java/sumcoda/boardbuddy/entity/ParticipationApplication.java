@@ -28,7 +28,7 @@ public class ParticipationApplication {
 
     // 연관관계 주인
     // 양방향 관계
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "member_gather_article_id")
     private MemberGatherArticle memberGatherArticle;
 

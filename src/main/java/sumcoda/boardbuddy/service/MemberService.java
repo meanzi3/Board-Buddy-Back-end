@@ -15,6 +15,7 @@ import sumcoda.boardbuddy.enumerate.MemberType;
 import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.exception.member.*;
 import sumcoda.boardbuddy.exception.publicDistrict.PublicDistrictRetrievalException;
+import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.ProfileImageRepository;
 import sumcoda.boardbuddy.repository.publicDistrict.PublicDistrictRepository;
@@ -34,6 +35,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     private final PublicDistrictRepository publicDistrictRepository;
+
+    private final GatherArticleRepository gatherArticleRepository;
 
     private final ProfileImageRepository profileImageRepository;
 
@@ -319,6 +322,12 @@ public class MemberService {
 
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        Long deletedGatherArticleCount = gatherArticleRepository.deleteAllByAuthorUsername(username);
+
+        if (deletedGatherArticleCount == null) {
+            throw new MemberDeletionFailureException("회원 탈퇴에 실패했습니다. 관리자에게 문의하세요.");
+        }
 
         memberRepository.delete(member);
 

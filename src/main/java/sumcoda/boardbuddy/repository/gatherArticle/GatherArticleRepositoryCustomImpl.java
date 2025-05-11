@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringTemplate;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -342,4 +343,21 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .where(gatherArticle.id.eq(gatherArticleId))
                 .fetchOne());
     }
+
+    @Override
+    public Long deleteAllByAuthorUsername(String username) {
+        return jpaQueryFactory
+            .delete(gatherArticle)
+            .where(gatherArticle.id.in(
+                    JPAExpressions.select(memberGatherArticle.gatherArticle.id)
+                                  .from(memberGatherArticle)
+                                  .where(
+                                        memberGatherArticle.member.username.eq(username)
+                                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
+                                  )
+                    )
+            )
+            .execute();
+    }
+
 }

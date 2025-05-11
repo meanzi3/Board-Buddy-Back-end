@@ -37,4 +37,7 @@ public interface GatherArticleRepositoryCustom {
             List<String> sidoList, List<String> sggList, List<String> emdList, MemberGatherArticleRole role, String keyword);
 
     Optional<GatherArticleResponse.StatusDTO> findStatusDTOById(Long gatherArticleId);
+
+    Long deleteAllByAuthorUsername(String username);
+
 }

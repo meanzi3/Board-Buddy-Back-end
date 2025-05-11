@@ -25,7 +25,7 @@ public class ChatRoom {
     private GatherArticle gatherArticle;
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> chatMessages = new ArrayList<>();
 
     // 양방향 연관관계

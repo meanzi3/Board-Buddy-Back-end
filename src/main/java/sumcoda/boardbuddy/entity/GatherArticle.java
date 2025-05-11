@@ -73,8 +73,10 @@ public class GatherArticle extends BaseTimeEntity {
     @Column(nullable = false)
     private Double y;
 
+    // 연관관게 주인
     // 양방향 연관관계
-    @OneToOne(mappedBy = "gatherArticle")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
     // 양방향 연관관계

@@ -18,10 +18,8 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 연관관게 주인
     // 양방향 연관관계
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "gather_article_id")
+    @OneToOne(mappedBy = "chatRoom")
     private GatherArticle gatherArticle;
 
     // 양방향 연관관계

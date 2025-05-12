@@ -16,7 +16,6 @@ import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.exception.*;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
-import sumcoda.boardbuddy.infra.event.*;
 import sumcoda.boardbuddy.repository.chatMessage.ChatMessageRepository;
 import sumcoda.boardbuddy.repository.chatRoom.ChatRoomRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;

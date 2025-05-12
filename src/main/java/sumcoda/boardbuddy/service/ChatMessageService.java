@@ -50,12 +50,6 @@ public class ChatMessageService {
      * @param chatRoomId 채팅방 Id
      * @param publishDTO 발행 및 전송할 메시지 내용, 메시지 발행 및 전송 사용자 닉네임
      **/
-    /**
-     * 메세지 발행 및 채팅방에 메세지 전송
-     *
-     * @param chatRoomId 채팅방 Id
-     * @param publishDTO 발행 및 전송할 메시지 내용, 메시지 발행 및 전송 사용자 닉네임
-     **/
     @Transactional
     public void publishMessage(Long chatRoomId, ChatMessageRequest.PublishDTO publishDTO) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
@@ -114,10 +108,7 @@ public class ChatMessageService {
 
         String content = ChatMessageUtil.buildChatMessageContent(nickname, messageType);
 
-//        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, messageType, member, chatRoom);
-
-        // 성능 개선용
-        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, "ENTER", member, chatRoom);
+        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, messageType, member, chatRoom);
 
         Long chatMessageId = chatMessageRepository.save(chatMessage).getId();
 
@@ -166,21 +157,12 @@ public class ChatMessageService {
                             .content(message.getContent())
                             .messageType(message.getMessageType());
 
-//                    if (message.getMessageType() == MessageType.TALK) {
-//                        builder.nickname(message.getNickname())
-//                                .profileImageS3SavedURL(message.getProfileImageS3SavedURL())
-//                                .rank(message.getRank())
-//                                .sentAt(message.getSentAt());
-//                    }
-
-                    // 성능 개선용
-                    if (Objects.equals(message.getMessageType(), "TALK")) {
+                    if (message.getMessageType() == MessageType.TALK) {
                         builder.nickname(message.getNickname())
                                 .profileImageS3SavedURL(message.getProfileImageS3SavedURL())
                                 .rank(message.getRank())
                                 .sentAt(message.getSentAt());
                     }
-
                     return builder.build();
                 })
                 .collect(Collectors.toList());

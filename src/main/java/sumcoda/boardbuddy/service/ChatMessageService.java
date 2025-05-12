@@ -1,6 +1,8 @@
 package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.util.Pair;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.exception.*;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
+import sumcoda.boardbuddy.infra.event.*;
 import sumcoda.boardbuddy.repository.chatMessage.ChatMessageRepository;
 import sumcoda.boardbuddy.repository.chatRoom.ChatRoomRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
@@ -21,8 +24,10 @@ import sumcoda.boardbuddy.repository.memberChatRoom.MemberChatRoomRepository;
 import sumcoda.boardbuddy.util.ChatMessageUtil;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -36,8 +41,16 @@ public class ChatMessageService {
 
     private final MemberChatRoomRepository memberChatRoomRepository;
 
+    private final ApplicationEventPublisher applicationEventPublisher;
+
     private final SimpMessagingTemplate messagingTemplate;
 
+    /**
+     * 메세지 발행 및 채팅방에 메세지 전송
+     *
+     * @param chatRoomId 채팅방 Id
+     * @param publishDTO 발행 및 전송할 메시지 내용, 메시지 발행 및 전송 사용자 닉네임
+     **/
     /**
      * 메세지 발행 및 채팅방에 메세지 전송
      *
@@ -72,8 +85,9 @@ public class ChatMessageService {
         ChatMessageResponse.ChatMessageInfoDTO responseChatMessage = chatMessageRepository.findTalkMessageById(chatMessageId)
                 .orElseThrow(() -> new ChatMessageRetrievalException("서버 문제로 해당 메세지를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        messagingTemplate.convertAndSend("/api/v1/ws-stomp/reception/" + chatRoomId, responseChatMessage);
+        messagingTemplate.convertAndSend("/ws-stomp/reception/" + chatRoomId, responseChatMessage);
     }
+
 
     /**
      * 채팅방 입장/퇴장 메세지 발행 및 채팅방에 사용자 입장/퇴장 메세지 전송
@@ -101,7 +115,10 @@ public class ChatMessageService {
 
         String content = ChatMessageUtil.buildChatMessageContent(nickname, messageType);
 
-        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, messageType, member, chatRoom);
+//        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, messageType, member, chatRoom);
+
+        // 성능 개선용
+        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, "ENTER", member, chatRoom);
 
         Long chatMessageId = chatMessageRepository.save(chatMessage).getId();
 
@@ -150,7 +167,15 @@ public class ChatMessageService {
                             .content(message.getContent())
                             .messageType(message.getMessageType());
 
-                    if (message.getMessageType() == MessageType.TALK) {
+//                    if (message.getMessageType() == MessageType.TALK) {
+//                        builder.nickname(message.getNickname())
+//                                .profileImageS3SavedURL(message.getProfileImageS3SavedURL())
+//                                .rank(message.getRank())
+//                                .sentAt(message.getSentAt());
+//                    }
+
+                    // 성능 개선용
+                    if (Objects.equals(message.getMessageType(), "TALK")) {
                         builder.nickname(message.getNickname())
                                 .profileImageS3SavedURL(message.getProfileImageS3SavedURL())
                                 .rank(message.getRank())
@@ -162,3 +187,4 @@ public class ChatMessageService {
                 .collect(Collectors.toList());
     }
 }
+

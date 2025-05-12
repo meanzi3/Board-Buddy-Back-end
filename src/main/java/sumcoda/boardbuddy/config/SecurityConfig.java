@@ -103,17 +103,15 @@ public class SecurityConfig {
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(
                                 // 로그인 하지 않은 사용자라도 요청을 보낼 수 있는 API Path
-//                                "/api/v1/auth/register",
-//                                "/api/v1/auth/username/check",
-//                                "/api/v1/auth/nickname/check",
-//                                "/api/v1/auth/sms-certifications/send",
-//                                "/api/v1/auth/sms-certifications/verify",
-//                                "/api/v1/auth/login",
-//                                "/api/v1/oauth2/**",
-//                                "/api/v1/login/oauth2/code/**",
-//                                "/api/v1/auth/locations/search"
-                                "/actuator/**",
-                                "/api/v1/**"
+                                "/api/v1/auth/register",
+                                "/api/v1/auth/username/check",
+                                "/api/v1/auth/nickname/check",
+                                "/api/v1/auth/sms-certifications/send",
+                                "/api/v1/auth/sms-certifications/verify",
+                                "/api/v1/auth/login",
+                                "/api/v1/oauth2/**",
+                                "/api/v1/login/oauth2/code/**",
+                                "/api/v1/auth/locations/search"
                         ).permitAll()
                         // 단순히 로그인한 인증 여부만 확인
 //                        .anyRequest().authenticated()

@@ -18,20 +18,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor)
-                .addPathPatterns("/api/**")
+//                .addPathPatterns("/api/v1/**")
                 .excludePathPatterns(List.of(
-                        "/api/v1/auth/register",
-                        "/api/v1/auth/username/check",
-                        "/api/v1/auth/nickname/check",
-                        "/api/v1/auth/sms-certifications/send",
-                        "/api/v1/auth/sms-certifications/verify",
-                        "/api/v1/auth/login",
-                        "/api/v1/oauth2/**",
-                        "/api/v1/login/oauth2/code/**",
-                        "/api/v1/auth/locations/search",
-                        "/api/v1/rankings",
-                        "/api/v1/ws-stomp/**",
-                        "/actuator/**"
+//                        "/api/v1/auth/register",
+//                        "/api/v1/auth/username/check",
+//                        "/api/v1/auth/nickname/check",
+//                        "/api/v1/auth/sms-certifications/send",
+//                        "/api/v1/auth/sms-certifications/verify",
+//                        "/api/v1/auth/login",
+//                        "/api/v1/oauth2/**",
+//                        "/api/v1/login/oauth2/code/**",
+//                        "/api/v1/auth/locations/search",
+//                        "/api/v1/rankings",
+//                        "/api/v1/ws-stomp/**",
+                        "/actuator/**",
+                        "/api/v1/**"
                 ));
         WebMvcConfigurer.super.addInterceptors(registry);
     }

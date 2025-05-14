@@ -21,10 +21,10 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // 메시지 발신 경로
-        registry.setApplicationDestinationPrefixes("/api/v1/chat/publications");
+        registry.setApplicationDestinationPrefixes("/ws/chat/messages/publication");
 
         // 채팅방 구독 경로
-        registry.enableSimpleBroker("/api/v1/chat/subscriptions");
+        registry.enableSimpleBroker("/ws/chat/messages/subscription");
     }
 
     /**
@@ -35,7 +35,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 웹소켓 연결 경로
-        registry.addEndpoint("/api/v1/chat/connection")
+        registry.addEndpoint("/ws/chat/connection")
                 .setAllowedOriginPatterns("*");
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
+import sumcoda.boardbuddy.infra.interceptor.CustomHandshakeInterceptor;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -20,9 +21,11 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
      **/
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-      registry.setApplicationDestinationPrefixes("/ws-stomp/publication");
+        // 메시지 발신 경로
+        registry.setApplicationDestinationPrefixes("/api/v1/chat/publications");
 
-      registry.enableSimpleBroker("/ws-stomp/reception");
+        // 채팅방 구독 경로
+        registry.enableSimpleBroker("/api/v1/chat/subscriptions");
     }
 
     /**
@@ -32,7 +35,8 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
      **/
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/api/v1/ws-stomp/connection")
+        // 웹소켓 연결 경로
+        registry.addEndpoint("/api/v1/chat/connection")
                 .setAllowedOriginPatterns("*");
     }
 }

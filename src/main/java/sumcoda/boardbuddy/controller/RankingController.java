@@ -26,7 +26,7 @@ public class RankingController {
      *
      * @return TOP3 리스트를 조회하여 약속된 SuccessResponse 반환
      */
-    @GetMapping("/api/v1/rankings")
+    @GetMapping("/api/rankings")
     public ResponseEntity<ApiResponse<Map<String, List<MemberResponse.RankingsDTO>>>> getTop3Rankings() {
         List<MemberResponse.RankingsDTO> rankingsDTO = rankingService.getTop3Rankings();
         return buildSuccessResponseWithPairKeyData("rankings", rankingsDTO,"랭킹 조회에 성공했습니다.", HttpStatus.OK);

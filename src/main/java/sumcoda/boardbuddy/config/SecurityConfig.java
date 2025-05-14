@@ -103,15 +103,15 @@ public class SecurityConfig {
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(
                                 // 로그인 하지 않은 사용자라도 요청을 보낼 수 있는 API Path
-                                "/api/v1/auth/register",
-                                "/api/v1/auth/username/check",
-                                "/api/v1/auth/nickname/check",
-                                "/api/v1/auth/sms-certifications/send",
-                                "/api/v1/auth/sms-certifications/verify",
-                                "/api/v1/auth/login",
-                                "/api/v1/oauth2/**",
-                                "/api/v1/login/oauth2/code/**",
-                                "/api/v1/auth/locations/search"
+                                "/api/auth/register",
+                                "/api/auth/username/check",
+                                "/api/auth/nickname/check",
+                                "/api/auth/sms-certifications/send",
+                                "/api/auth/sms-certifications/verify",
+                                "/api/auth/login",
+                                "/api/oauth2/**",
+                                "/api/login/oauth2/code/**",
+                                "/api/auth/locations/search"
                         ).permitAll()
                         // 단순히 로그인한 인증 여부만 확인
 //                        .anyRequest().authenticated()
@@ -140,9 +140,9 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
 //                        .loginPage("/auth/login")
                         .authorizationEndpoint(oAuth2 -> oAuth2
-                                .baseUri("/api/v1/oauth2/authorization"))
+                                .baseUri("/api/oauth2/authorization"))
                         .redirectionEndpoint(oAuth2 -> oAuth2
-                                .baseUri("/api/v1/login/oauth2/code/**"))
+                                .baseUri("/api/login/oauth2/code/**"))
                         .userInfoEndpoint(userInfoEndpointConfig ->
                                 userInfoEndpointConfig
                                         .userService(customOAuth2UserService))

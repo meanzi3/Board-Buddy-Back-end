@@ -33,7 +33,7 @@ public class ChatRoomController {
      * @param gatherArticleId 모집글 Id
      * @return 채팅방과 연관된 모집글 정보
      **/
-    @GetMapping("/api/v1/chat/rooms/{chatRoomId}/gather-articles/{gatherArticleId}")
+    @GetMapping("/api/chat/rooms/{chatRoomId}/gather-articles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.SummaryInfoDTO>>> getChatRoomGatherArticleInfo(@PathVariable Long chatRoomId,
                                                                                                                        @PathVariable Long gatherArticleId,
                                                                                                                        @RequestAttribute String username) {
@@ -49,7 +49,7 @@ public class ChatRoomController {
      * @param username 조회하려는 사용자의 아이디
      * @return 사용자가 참여한 채팅방 목록
      */
-    @GetMapping("/api/v1/chat/rooms")
+    @GetMapping("/api/chat/rooms")
     public ResponseEntity<ApiResponse<Map<String, List<ChatRoomResponse.ChatRoomDetailsDTO>>>> getChatRoomDetailsByUsername(@RequestAttribute String username) {
         List<ChatRoomResponse.ChatRoomDetailsDTO> chatRoomDetailsList = chatRoomService.getChatRoomDetailsListByUsername(username);
 

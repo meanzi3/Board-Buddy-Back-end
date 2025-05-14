@@ -30,7 +30,7 @@ public class ReviewController {
      * @param username        로그인 사용자 아이디
      * @return 유저 리스트 조회가 성공했다면 약속된 SuccessResponse 반환
      **/
-    @GetMapping("/api/v1/reviews/{gatherArticleId}")
+    @GetMapping("/api/reviews/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, List<ReviewResponse.UserDTO>>>> getParticipatedList (
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username) {
@@ -49,7 +49,7 @@ public class ReviewController {
      * @param username 로그인 사용자 아이디
      * @return 리뷰 보내기가 성공했다면 약속된 SuccessResponse 반환
      **/
-    @PostMapping("/api/v1/reviews/{gatherArticleId}")
+    @PostMapping("/api/reviews/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Void>> sendReview (
             @PathVariable Long gatherArticleId,
             @RequestBody ReviewRequest.SendDTO sendDTO,

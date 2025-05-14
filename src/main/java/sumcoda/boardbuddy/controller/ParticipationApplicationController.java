@@ -36,7 +36,7 @@ public class ParticipationApplicationController {
      * @param gatherArticleId 모집글 ID
      * @param username 참가신청 요청을 보내는 사용자 아이디
      **/
-    @PostMapping("/api/v1/gather-articles/{gatherArticleId}/participation")
+    @PostMapping("/api/gather-articles/{gatherArticleId}/participation")
     public ResponseEntity<ApiResponse<Void>> applyParticipation(@PathVariable Long gatherArticleId, @RequestAttribute String username) {
         participationApplicationService.applyParticipation(gatherArticleId, username);
 
@@ -53,7 +53,7 @@ public class ParticipationApplicationController {
      * @param username 승인 요청을 보내는 모집글 작성자 아이디
      * @param applicantNickname 참가 신청을 했던 사용자의 아이디
      **/
-    @PutMapping("/api/v1/gather-articles/{gatherArticleId}/participation/{participationApplicationId}/approval")
+    @PutMapping("/api/gather-articles/{gatherArticleId}/participation/{participationApplicationId}/approval")
     public ResponseEntity<ApiResponse<Void>> approveParticipationApplication(@PathVariable Long gatherArticleId, @PathVariable Long participationApplicationId, @RequestAttribute String username, @RequestParam String applicantNickname) {
 
         String applicantUsername = participationApplicationService.approveParticipationApplication(gatherArticleId, participationApplicationId, username, applicantNickname);
@@ -77,7 +77,7 @@ public class ParticipationApplicationController {
      * @param username 거절 요청을 보내는 모집글 작성자 아이디
      * @param applicantNickname 참가 신청을 했던 사용자의 아이디
      **/
-    @PutMapping("/api/v1/gather-articles/{gatherArticleId}/participation/{participationApplicationId}/rejection")
+    @PutMapping("/api/gather-articles/{gatherArticleId}/participation/{participationApplicationId}/rejection")
     public ResponseEntity<ApiResponse<Void>> rejectParticipationApplication(@PathVariable Long gatherArticleId, @PathVariable Long participationApplicationId, @RequestAttribute String username, @RequestParam String applicantNickname) {
 
         participationApplicationService.rejectParticipationApplication(gatherArticleId, participationApplicationId, username);
@@ -93,7 +93,7 @@ public class ParticipationApplicationController {
      * @param gatherArticleId 모집글 Id
      * @param username 참가신청을 취소하는 사용자 아이디
      **/
-    @PutMapping("/api/v1/gather-articles/{gatherArticleId}/participation")
+    @PutMapping("/api/gather-articles/{gatherArticleId}/participation")
     public ResponseEntity<ApiResponse<Void>> cancelParticipationApplication(@PathVariable Long gatherArticleId, @RequestAttribute String username) {
 
         Boolean isMemberParticipant = participationApplicationService.cancelParticipationApplication(gatherArticleId, username);
@@ -119,7 +119,7 @@ public class ParticipationApplicationController {
      * @param username 참가 신청 목록 조회 요청을 보내는 모집글 작성자 아이디
      * @return 모집글 참가 신청중인 사용자 목록
      **/
-    @GetMapping("/api/v1/gather-articles/{gatherArticleId}/participation")
+    @GetMapping("/api/gather-articles/{gatherArticleId}/participation")
     public ResponseEntity<ApiResponse<Map<String, List<ParticipationApplicationResponse.InfoDTO>>>> getParticipationAppliedMemberList(@PathVariable Long gatherArticleId, @RequestAttribute String username) {
 
         List<ParticipationApplicationResponse.InfoDTO> participationAppliedMemberList = participationApplicationService.getParticipationAppliedMemberList(gatherArticleId, username);

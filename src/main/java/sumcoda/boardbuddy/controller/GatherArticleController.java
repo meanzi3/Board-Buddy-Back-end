@@ -41,7 +41,7 @@ public class GatherArticleController {
      * @param username          모집글 작성자 아이디
      * @return                  생성된 모집글과 관련된 응답 데이터
      */
-    @PostMapping(value = "/api/v1/gather-articles")
+    @PostMapping(value = "/api/gather-articles")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.CreateDTO>>> createGatherArticle(
             @RequestBody GatherArticleRequest.CreateDTO createRequest,
             @RequestAttribute String username){
@@ -71,7 +71,7 @@ public class GatherArticleController {
      * @param username          사용자 username
      * @return                  조회된 모집글과 관련된 응답 데이터
      */
-    @GetMapping(value = "/api/v1/gather-articles/{gatherArticleId}")
+    @GetMapping(value = "/api/gather-articles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.ReadDTO>>> getGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username) {
@@ -87,7 +87,7 @@ public class GatherArticleController {
      * @param username          사용자 username
      * @return                  수정된 모집글과 관련된 응답 데이터
      */
-    @PutMapping(value = "/api/v1/gather-articles/{gatherArticleId}")
+    @PutMapping(value = "/api/gather-articles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.UpdateDTO>>> updateGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestBody GatherArticleRequest.UpdateDTO updateRequest,
@@ -103,7 +103,7 @@ public class GatherArticleController {
      * @param username          사용자 username
      * @return                  삭제된 모집글과 관련된 응답 데이터
      */
-    @DeleteMapping(value = "/api/v1/gather-articles/{gatherArticleId}")
+    @DeleteMapping(value = "/api/gather-articles/{gatherArticleId}")
     public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.DeleteDTO>>> deleteGatherArticle(
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username){
@@ -117,7 +117,7 @@ public class GatherArticleController {
      * @param username 사용자 username
      * @return 내가 작성한 모집글 리스트
      **/
-    @GetMapping(value = "/api/v1/my/gather-articles")
+    @GetMapping(value = "/api/my/gather-articles")
     public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.GatherArticleInfosDTO>>>> getMyGatherArticles (
             @RequestAttribute String username) {
         log.info("get gather articles is working");
@@ -133,7 +133,7 @@ public class GatherArticleController {
      * @param username 사용자 username
      * @return 참가한 모집글 리스트
      **/
-    @GetMapping(value = "/api/v1/my/participations")
+    @GetMapping(value = "/api/my/participations")
     public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.MyParticipationInfosDTO>>>> getMyParticipations (
             @RequestAttribute String username) {
         log.info("get my participations is working");
@@ -152,7 +152,7 @@ public class GatherArticleController {
      * @param username 사용자 이름
      * @return 모집글 리스트
      */
-    @GetMapping("/api/v1/gather-articles")
+    @GetMapping("/api/gather-articles")
     public ResponseEntity<ApiResponse<GatherArticleResponse.ReadListDTO>> getGatherArticles(
             @RequestParam Integer page,
             @RequestParam(required = false) String status,
@@ -172,7 +172,7 @@ public class GatherArticleController {
      * @param username  사용자 username
      * @return          검색 결과 리스트
      */
-    @GetMapping("/api/v1/gather-articles/search")
+    @GetMapping("/api/gather-articles/search")
     public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.SearchResultDTO>>>> searchArticles(
             @RequestParam String query,
             @RequestAttribute String username) {

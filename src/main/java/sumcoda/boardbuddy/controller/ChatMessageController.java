@@ -1,6 +1,7 @@
 package sumcoda.boardbuddy.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 import static sumcoda.boardbuddy.builder.ResponseBuilder.buildSuccessResponseWithPairKeyData;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ChatMessageController {
@@ -48,7 +50,7 @@ public class ChatMessageController {
      * @param username 요청을 보낸 사용자 아이디
      * @return 채팅방 메세지 내역
      */
-    @GetMapping("/api/v1/chat/rooms/{chatRoomId}/messages")
+    @GetMapping("/api/chat/messages/{chatRoomId}")
     public ResponseEntity<ApiResponse<Map<String, List<ChatMessageResponse.ChatMessageInfoDTO>>>> getChatMessages(
             @PathVariable Long chatRoomId,
             @RequestAttribute String username) {
@@ -57,4 +59,5 @@ public class ChatMessageController {
 
         return buildSuccessResponseWithPairKeyData("chatMessages", chatMessages, "채팅 메세지들의 정보를 성공적으로 조회했습니다.", HttpStatus.OK);
     }
+
 }

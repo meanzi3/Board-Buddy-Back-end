@@ -47,11 +47,16 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
                         chatMessage.messageType,
                         chatMessage.createdAt.as("sentAt")))
                 .from(chatMessage)
-                .leftJoin(chatMessage.member, member)
+                .innerJoin(chatMessage.member, member)
                 .leftJoin(member.profileImage, profileImage)
-                .leftJoin(chatMessage.chatRoom, chatRoom)
-                .where(chatRoom.id.eq(chatRoomId).and(chatMessage.createdAt.after(joinedAt)))
-                .orderBy(chatMessage.createdAt.asc())
+                .where(
+                        chatMessage.chatRoom.id.eq(chatRoomId),
+                        chatMessage.createdAt.after(joinedAt)
+                )
+                .orderBy(
+                        chatMessage.createdAt.asc(),
+                        chatMessage.id.asc()
+                )
                 .fetch();
     }
 

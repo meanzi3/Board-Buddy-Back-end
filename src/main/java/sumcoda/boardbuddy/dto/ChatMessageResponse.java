@@ -7,34 +7,150 @@ import lombok.NoArgsConstructor;
 import sumcoda.boardbuddy.enumerate.MessageType;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ChatMessageResponse {
 
+//    @Getter
+//    @NoArgsConstructor
+//    public static class ChatMessageItemInfoDTO {
+//
+//        private String content;
+//
+//        private String nickname;
+//
+//        private String profileImageS3SavedURL;
+//
+//        private Integer rank;
+//
+//        private MessageType messageType;
+//
+//        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+//        private LocalDateTime sentAt;
+//
+//        @Builder
+//        public ChatMessageItemInfoDTO(String content, String nickname, String profileImageS3SavedURL, Integer rank, MessageType messageType, LocalDateTime sentAt) {
+//            this.content = content;
+//            this.nickname = nickname;
+//            this.profileImageS3SavedURL = profileImageS3SavedURL;
+//            this.rank = rank;
+//            this.messageType = messageType;
+//            this.sentAt = sentAt;
+//        }
+//    }
+
+//    // 성능 개선용(V1)
+//    @Getter
+//    @NoArgsConstructor
+//    public static class ChatMessageItemInfoDTO {
+//
+//        private String content;
+//
+//        private String nickname;
+//
+//        private String profileImageS3SavedURL;
+//
+//        private Integer rank;
+//
+//        private String messageType;
+//
+//        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+//        private LocalDateTime sentAt;
+//
+//        @Builder
+//        public ChatMessageItemInfoDTO(String content, String nickname, String profileImageS3SavedURL, Integer rank, String messageType, LocalDateTime sentAt) {
+//            this.content = content;
+//            this.nickname = nickname;
+//            this.profileImageS3SavedURL = profileImageS3SavedURL;
+//            this.rank = rank;
+//            this.messageType = messageType;
+//            this.sentAt = sentAt;
+//        }
+//    }
+
+    // 성능 개선용(V2)
     @Getter
     @NoArgsConstructor
-    public static class ChatMessageInfoDTO {
+    public static class ChatMessageItemInfoProjectionDTO {
+
+        private Long id;
 
         private String content;
 
         private String nickname;
 
-        private String profileImageS3SavedURL;
+        private String profileImageURL;
 
         private Integer rank;
 
-        private MessageType messageType;
+//        private MessageType messageType;
+
+        private String messageType;
 
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
         private LocalDateTime sentAt;
 
         @Builder
-        public ChatMessageInfoDTO(String content, String nickname, String profileImageS3SavedURL, Integer rank, MessageType messageType, LocalDateTime sentAt) {
+        public ChatMessageItemInfoProjectionDTO(Long id, String content, String nickname, String profileImageURL, Integer rank, String messageType, LocalDateTime sentAt) {
+            this.id = id;
             this.content = content;
             this.nickname = nickname;
-            this.profileImageS3SavedURL = profileImageS3SavedURL;
+            this.profileImageURL = profileImageURL;
             this.rank = rank;
             this.messageType = messageType;
             this.sentAt = sentAt;
+        }
+    }
+
+    // 성능 개선용(V2)
+    @Getter
+    @NoArgsConstructor
+    public static class ChatMessageItemInfoDTO {
+
+        private Long id;
+
+        private String content;
+
+        private String nickname;
+
+        private String profileImageURL;
+
+        private Integer rank;
+
+//        private MessageType messageType;
+
+        private String messageType;
+
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime sentAt;
+
+        @Builder
+        public ChatMessageItemInfoDTO(Long id, String content, String nickname, String profileImageURL, Integer rank, String messageType, LocalDateTime sentAt) {
+            this.id = id;
+            this.content = content;
+            this.nickname = nickname;
+            this.profileImageURL = profileImageURL;
+            this.rank = rank;
+            this.messageType = messageType;
+            this.sentAt = sentAt;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ChatMessagePageInfoDTO {
+
+        private List<ChatMessageItemInfoDTO> dataList;
+
+        private Boolean hasMore;
+
+        private String nextCursor;
+
+        @Builder
+        public ChatMessagePageInfoDTO(List<ChatMessageItemInfoDTO> dataList, Boolean hasMore, String nextCursor) {
+            this.dataList = dataList;
+            this.hasMore = hasMore;
+            this.nextCursor = nextCursor;
         }
     }
 

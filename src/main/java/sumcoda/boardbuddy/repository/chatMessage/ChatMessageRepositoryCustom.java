@@ -2,15 +2,23 @@ package sumcoda.boardbuddy.repository.chatMessage;
 
 import sumcoda.boardbuddy.dto.ChatMessageResponse;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface ChatMessageRepositoryCustom {
 
-    List<ChatMessageResponse.ChatMessageInfoDTO> findMessagesAfterMemberJoinedByChatRoomIdAndUsername(Long chatRoomId, String username);
+    List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findInitialMessagesByChatRoomIdAndUsernameAndJoinedAt(Long chatRoomId, String username, Instant joinedAt);
 
-    Optional<ChatMessageResponse.ChatMessageInfoDTO> findTalkMessageById(Long chatMessageId);
+    List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findNewerMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId);
 
-    Optional<ChatMessageResponse.EnterOrExitMessageInfoDTO> findEnterOrExitMessageById(Long chatMessageId);
+    List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findOlderMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId);
+
+    LocalDateTime findJoinedAtByChatRoomIdAndUsername(Long chatRoomId, String username);
+
+    Optional<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findTalkMessageById(Long chatMessageId);
+
+    Optional<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findEnterOrExitMessageById(Long chatMessageId);
 
 }

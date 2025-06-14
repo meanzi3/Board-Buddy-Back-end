@@ -1,5 +1,4 @@
 package sumcoda.boardbuddy.entity;
-
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +9,14 @@ import sumcoda.boardbuddy.enumerate.MessageType;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class ChatMessage extends BaseTimeEntity {
+@Table(name = "chat_message",
+        indexes = {
+        @Index(
+                name = "idx_chat_message_chat_room_id_created_at_id",
+                columnList = "chat_room_id, created_at, id"
+        )}
+)
+public class ChatMessage extends ChatMessageBaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +28,10 @@ public class ChatMessage extends BaseTimeEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MessageType messageType;
+
+//    // 성능 개선용
+//    @Column(nullable = false)
+//    private String messageType;
 
     // 연관관계 주인
     // 단방향 연관관계

@@ -257,7 +257,7 @@ jobs:
           requirepass ${{ secrets.PROD_REDIS_PASSWORD }}
           EOF
 
-      # 5) env.list, Redis, Spring 설정, Nginx 설정을 한 번에 EC2로 전송
+      # 5) env.list, redis.conf, Spring 설정, Nginx 설정을 한 번에 EC2로 전송
       - name: Transfer config files to EC2
         run: |
           scp -o StrictHostKeyChecking=no \
@@ -268,20 +268,20 @@ jobs:
             nginx.conf \
             ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
 
-      # 6) EC2에 SSH 접속 → Docker 배포 → Nginx 설정 덮어쓰기 → 재시작
+      # 6) SSH → Docker 재배포 → Nginx 설정 반영 → 서비스 재시작
       - name: Pull & Run on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             set -eux
           
-            # ─── Docker 설치/시작 (없으면) ───
+            # ── Docker 설치 및 시작 (생략 시) ──
             if ! command -v docker >/dev/null 2>&1; then
               sudo dnf update -y
               sudo dnf install -y docker
               sudo systemctl enable --now docker
             fi
           
-            # ─── 애플리케이션 컨테이너 최신화 ───
+            # ── 애플리케이션 컨테이너 배포 ──
             echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} \
               | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
@@ -296,26 +296,28 @@ jobs:
               ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
               --spring.config.location=/config/application-common.yml,/config/application-prod.yml
           
-            # ─── Nginx 설치 & 서비스 준비 ───
+            # ── Nginx 설치 및 서비스 활성화 ──
             if ! rpm -q nginx >/dev/null 2>&1; then
               sudo dnf install -y nginx
             fi
             sudo systemctl enable nginx
           
-            # ─── 로그·PID 디렉터리 생성 ───
-            sudo mkdir -p /run/nginx /var/log/nginx /var/cache/nginx
+            # ── 로그·캐시 디렉터리 준비 ──
+            sudo mkdir -p /var/log/nginx /var/cache/nginx
             sudo chown -R nginx:nginx /var/log/nginx /var/cache/nginx
           
-            # ─── 설정 파일 덮어쓰기 ───
-            sudo mv /home/ec2-user/nginx.conf /etc/nginx/nginx.conf
+            # ── Nginx 설정파일(conf.d)으로 배치 ──
+            sudo mkdir -p /etc/nginx/conf.d
+            sudo mv /home/ec2-user/nginx.conf /etc/nginx/conf.d/boardbuddy.conf
           
-            # ─── 문법 검사 & 재시작 ───
+            # ── 설정 문법 검사 & 서비스 재시작 ──
             sudo nginx -t
             sudo systemctl restart nginx
           
-            # ─── Certbot 설치 및 인증서 갱신 ───
+            # ── Certbot 설치 및 인증서 자동 갱신 ──
             sudo dnf install -y certbot python3-certbot-nginx
             sudo certbot renew --nginx --non-interactive --quiet
           
           EOF
+
 

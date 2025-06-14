@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.ChatMessageResponse;
 import sumcoda.boardbuddy.exception.MemberChatRoomRetrievalException;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
      * @version 2.0
      */
     @Override
-    public List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findInitialMessagesByChatRoomIdAndUsernameAndJoinedAt(Long chatRoomId, String username, LocalDateTime joinedAt) {
+    public List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findInitialMessagesByChatRoomIdAndUsernameAndJoinedAt(Long chatRoomId, String username, Instant joinedAt) {
 
         // 1) 최신 N+1개 조회 (DESC)
         return jpaQueryFactory
@@ -41,7 +42,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
                         chatMessage.id,
                         chatMessage.content,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL.as("profileImageURL"),
+                        profileImage.profileImageS3SavedURL,
                         member.rank,
                         chatMessage.messageType,
                         chatMessage.createdAt.as("sentAt")
@@ -70,7 +71,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
      * @version 2.0
      */
     @Override
-    public List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findNewerMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, LocalDateTime joinedAt, LocalDateTime cursorSentAt, Long cursorId) {
+    public List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findNewerMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId) {
 
 
         // afterCursor: (createdAt > cursorSentAt)
@@ -84,7 +85,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
                         chatMessage.id,
                         chatMessage.content,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL.as("profileImageURL"),
+                        profileImage.profileImageS3SavedURL,
                         member.rank,
                         chatMessage.messageType,
                         chatMessage.createdAt.as("sentAt")
@@ -110,7 +111,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
      * @param cursorId 기준 메시지 ID
      * @return cursorSentAt 이후이거나(cursorSentAt == createdAt && id > cursorId)인 메시지 조건
      */
-    private static BooleanExpression afterCursorBooleanExpression(LocalDateTime cursorSentAt, Long cursorId) {
+    private static BooleanExpression afterCursorBooleanExpression(Instant cursorSentAt, Long cursorId) {
         return chatMessage.createdAt.after(cursorSentAt)
                 .or(
                         chatMessage.createdAt.eq(cursorSentAt)
@@ -131,7 +132,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
      * @verison 2.0
      */
     @Override
-    public List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findOlderMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, LocalDateTime joinedAt, LocalDateTime cursorSentAt, Long cursorId) {
+    public List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findOlderMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId) {
 
 
         // beforeCursor: (createdAt < cursorSentAt)
@@ -145,7 +146,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
                         chatMessage.id,
                         chatMessage.content,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL.as("profileImageURL"),
+                        profileImage.profileImageS3SavedURL,
                         member.rank,
                         chatMessage.messageType,
                         chatMessage.createdAt.as("sentAt")
@@ -158,7 +159,9 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
                         chatMessage.createdAt.after(joinedAt),
                         beforeCursor
                 )
-                .orderBy(chatMessage.createdAt.desc(), chatMessage.id.desc())
+                .orderBy(
+                        chatMessage.createdAt.desc(),
+                        chatMessage.id.desc())
                 .limit(CHAT_MESSAGE_PAGE_SIZE + 1)
                 .fetch();
     }
@@ -170,7 +173,8 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
      * @param cursorId 기준 메시지 ID
      * @return cursorSentAt 이전이거나(cursorSentAt == createdAt && id < cursorId)인 메시지 조건
      */
-    private static BooleanExpression beforeCursorBooleanExpression(LocalDateTime cursorSentAt, Long cursorId) {
+
+    private static BooleanExpression beforeCursorBooleanExpression(Instant cursorSentAt, Long cursorId) {
         return chatMessage.createdAt.before(cursorSentAt)
                 .or(
                         chatMessage.createdAt.eq(cursorSentAt)
@@ -253,7 +257,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
                         chatMessage.id,
                         chatMessage.content,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL.as("profileImageURL"),
+                        profileImage.profileImageS3SavedURL,
                         member.rank,
                         chatMessage.messageType,
                         chatMessage.createdAt.as("sentAt")))
@@ -275,7 +279,8 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
         return Optional.ofNullable(jpaQueryFactory.select(Projections.fields(ChatMessageResponse.ChatMessageItemInfoProjectionDTO.class,
                         chatMessage.id,
                         chatMessage.content,
-                        chatMessage.messageType))
+                        chatMessage.messageType,
+                        chatMessage.createdAt.as("sentAt")))
                 .from(chatMessage)
                 .where(chatMessage.id.eq(chatMessageId))
                 .fetchOne());

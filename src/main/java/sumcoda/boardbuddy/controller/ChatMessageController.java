@@ -75,7 +75,7 @@ public class ChatMessageController {
             @PathVariable Long chatRoomId,
             @RequestAttribute String username,
             @RequestParam(name = "direction", defaultValue = "initial") String direction,
-            @RequestParam(required = false) String cursor){
+            @RequestParam(required = false) String cursor) {
 
         PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO> chatMessages = switch (direction) {
             case "newer" -> chatMessageService.findNewerChatMessages(chatRoomId, username, cursor);
@@ -88,32 +88,32 @@ public class ChatMessageController {
         return buildSuccessResponseWithMultiplePairKeyData(chatMessages, "채팅 메세지들의 정보를 성공적으로 조회했습니다.", HttpStatus.OK);
     }
 
-    /**
-     * 채팅방 메세지 내역 조회
-     *
-     * @param chatRoomId 채팅방 Id
-     * @param username   요청을 보낸 사용자 아이디
-     * @return 채팅방 메세지 내역
-     * @version 2.0
-     * @since 1.0
-     */
-    @GetMapping("/api/chat/rooms/{chatRoomId}/messages/test")
-    public ResponseEntity<ApiResponse<PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO>>> getChatMessagesTest(
-            @PathVariable Long chatRoomId,
-            @RequestParam String username,
-            @RequestParam(name = "direction", defaultValue = "initial") String direction,
-            @RequestParam(required = false) String cursor){
-
-        PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO> chatMessages = switch (direction) {
-            case "newer" -> chatMessageService.findNewerChatMessages(chatRoomId, username, cursor);
-
-            case "older" -> chatMessageService.findOlderChatMessages(chatRoomId, username, cursor);
-
-            default -> chatMessageService.findInitialChatMessages(chatRoomId, username);
-        };
-
-        return buildSuccessResponseWithMultiplePairKeyData(chatMessages, "채팅 메세지들의 정보를 성공적으로 조회했습니다.", HttpStatus.OK);
-    }
+//    /**
+//     * 채팅방 메세지 내역 조회
+//     *
+//     * @param chatRoomId 채팅방 Id
+//     * @param username   요청을 보낸 사용자 아이디
+//     * @return 채팅방 메세지 내역
+//     * @version 2.0
+//     * @since 1.0
+//     */
+//    @GetMapping("/api/chat/rooms/{chatRoomId}/messages/test")
+//    public ResponseEntity<ApiResponse<PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO>>> getChatMessagesTest(
+//            @PathVariable Long chatRoomId,
+//            @RequestParam String username,
+//            @RequestParam(name = "direction", defaultValue = "initial") String direction,
+//            @RequestParam(required = false) String cursor) throws JsonProcessingException {
+//
+//        PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO> chatMessages = switch (direction) {
+//            case "newer" -> chatMessageService.findNewerChatMessages(chatRoomId, username, cursor);
+//
+//            case "older" -> chatMessageService.findOlderChatMessages(chatRoomId, username, cursor);
+//
+//            default -> chatMessageService.findInitialChatMessages(chatRoomId, username);
+//        };
+//
+//        return buildSuccessResponseWithMultiplePairKeyData(chatMessages, "채팅 메세지들의 정보를 성공적으로 조회했습니다.", HttpStatus.OK);
+//    }
 
 
 }

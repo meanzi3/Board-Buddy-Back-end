@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.boardbuddy.enumerate.MessageType;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class ChatMessageResponse {
 //
 //        private Integer rank;
 //
+//        // private String messageType;
+//
 //        private MessageType messageType;
 //
 //        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
@@ -30,35 +33,6 @@ public class ChatMessageResponse {
 //
 //        @Builder
 //        public ChatMessageItemInfoDTO(String content, String nickname, String profileImageS3SavedURL, Integer rank, MessageType messageType, LocalDateTime sentAt) {
-//            this.content = content;
-//            this.nickname = nickname;
-//            this.profileImageS3SavedURL = profileImageS3SavedURL;
-//            this.rank = rank;
-//            this.messageType = messageType;
-//            this.sentAt = sentAt;
-//        }
-//    }
-
-//    // 성능 개선용(V1)
-//    @Getter
-//    @NoArgsConstructor
-//    public static class ChatMessageItemInfoDTO {
-//
-//        private String content;
-//
-//        private String nickname;
-//
-//        private String profileImageS3SavedURL;
-//
-//        private Integer rank;
-//
-//        private String messageType;
-//
-//        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-//        private LocalDateTime sentAt;
-//
-//        @Builder
-//        public ChatMessageItemInfoDTO(String content, String nickname, String profileImageS3SavedURL, Integer rank, String messageType, LocalDateTime sentAt) {
 //            this.content = content;
 //            this.nickname = nickname;
 //            this.profileImageS3SavedURL = profileImageS3SavedURL;
@@ -79,23 +53,23 @@ public class ChatMessageResponse {
 
         private String nickname;
 
-        private String profileImageURL;
+        private String profileImageS3SavedURL;
 
         private Integer rank;
 
-//        private MessageType messageType;
+        private MessageType messageType;
 
-        private String messageType;
+        // 성능 개선용
+//        private String messageType;
 
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        private LocalDateTime sentAt;
+        private Instant sentAt;
 
         @Builder
-        public ChatMessageItemInfoProjectionDTO(Long id, String content, String nickname, String profileImageURL, Integer rank, String messageType, LocalDateTime sentAt) {
+        public ChatMessageItemInfoProjectionDTO(Long id, String content, String nickname, String profileImageS3SavedURL, Integer rank, MessageType messageType, Instant sentAt) {
             this.id = id;
             this.content = content;
             this.nickname = nickname;
-            this.profileImageURL = profileImageURL;
+            this.profileImageS3SavedURL = profileImageS3SavedURL;
             this.rank = rank;
             this.messageType = messageType;
             this.sentAt = sentAt;
@@ -113,23 +87,24 @@ public class ChatMessageResponse {
 
         private String nickname;
 
-        private String profileImageURL;
+        private String profileImageS3SavedURL;
 
         private Integer rank;
 
-//        private MessageType messageType;
+        private MessageType messageType;
 
-        private String messageType;
+//        // 성능 개선용
+//        private String messageType;
 
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
         private LocalDateTime sentAt;
 
         @Builder
-        public ChatMessageItemInfoDTO(Long id, String content, String nickname, String profileImageURL, Integer rank, String messageType, LocalDateTime sentAt) {
+        public ChatMessageItemInfoDTO(Long id, String content, String nickname, String profileImageS3SavedURL, Integer rank, MessageType messageType, LocalDateTime sentAt) {
             this.id = id;
             this.content = content;
             this.nickname = nickname;
-            this.profileImageURL = profileImageURL;
+            this.profileImageS3SavedURL = profileImageS3SavedURL;
             this.rank = rank;
             this.messageType = messageType;
             this.sentAt = sentAt;

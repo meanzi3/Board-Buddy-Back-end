@@ -24,10 +24,11 @@ import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.memberChatRoom.MemberChatRoomRepository;
 import sumcoda.boardbuddy.util.ChatMessageUtil;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+import static java.time.ZoneOffset.UTC;
 import static sumcoda.boardbuddy.util.ChatMessageUtil.*;
 
 
@@ -48,6 +49,9 @@ public class ChatMessageService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     private final SimpMessagingTemplate messagingTemplate;
+
+    private final ChatMessageCacheService chatMessageCacheService;
+
 
     /**
      * 메세지 발행 및 채팅방에 메세지 전송
@@ -79,10 +83,10 @@ public class ChatMessageService {
 
         String content = publishDTO.getContent();
 
-//        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, MessageType.TALK, member, chatRoom);
+        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, MessageType.TALK, member, chatRoom);
 
-        // 성능 개선용
-        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, "TALK", member, chatRoom);
+//        // 성능 개선용
+//        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, "TALK", member, chatRoom);ㄷ
         Long chatMessageId = chatMessageRepository.save(chatMessage).getId();
 
         log.info("[DB 저장 완료] 채팅 메시지 ID={} | 내용={}", chatMessageId, publishDTO.getContent());
@@ -149,10 +153,10 @@ public class ChatMessageService {
 
         String content = ChatMessageUtil.buildChatMessageContent(nickname, messageType);
 
-//        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, messageType, member, chatRoom);
+        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, messageType, member, chatRoom);
 
-        // 성능 개선용
-        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, "ENTER", member, chatRoom);
+//        // 성능 개선용
+//        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, "ENTER", member, chatRoom);
 
         Long chatMessageId = chatMessageRepository.save(chatMessage).getId();
 
@@ -186,24 +190,25 @@ public class ChatMessageService {
         // 채팅방 입장 검증
         validateChatRoomAccess(chatRoomId, username);
 
-        LocalDateTime joinedAt = findJoinedAt(chatRoomId, username);
+        Instant joinedAt = findJoinedAt(chatRoomId, username);
 
         // 페이지 조회
         List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> chatMessageItemList =
                 chatMessageRepository.findInitialMessagesByChatRoomIdAndUsernameAndJoinedAt(chatRoomId, username, joinedAt);
 
-        // 2) hasMore 계산 & 실제 목록 추출
+        // hasMore 계산 & 실제 목록 추출
         Boolean hasMore = getHasMore(chatMessageItemList.size());
 
-        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> subChatMessageItemList = getSubChatMessageItemInfoProjectionDTOList(chatMessageItemList, hasMore);
+        // 과거(older) 페이지 네이션을 위한 nextCursor 계산
+        // dataList는 ASC(오래된 -> 최신) 순으로 정렬되어 있으므로,
+        // 가장 오래된 메시지를 기준 커서로 사용함.
+        String nextCursor = getNextCursor(chatMessageItemList, hasMore);
+
+        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> subChatMessageItemList =
+                getSubChatMessageItemInfoProjectionDTOList(chatMessageItemList, hasMore);
 
         // 3) ASC 순서로 통일
         Collections.reverse(subChatMessageItemList);
-
-        // 과거(older) 페이지 네이션을 위한 nextCursor 계산
-        // dataList는 ASC(오래된→최신) 순으로 정렬되어 있으므로,
-        // 가장 오래된 메시지(dataList.get(0))를 기준 커서로 사용함.
-        String nextCursor = getNextCursor(subChatMessageItemList, hasMore, false);
 
         // 클라이언트 제공 형태로 변환
         return convertToChatMessagePageResponse(subChatMessageItemList, hasMore, nextCursor);
@@ -227,11 +232,11 @@ public class ChatMessageService {
         // 채팅방 입장 검증
         validateChatRoomAccess(chatRoomId, username);
 
-        LocalDateTime joinedAt = findJoinedAt(chatRoomId, username);
+        Instant joinedAt = findJoinedAt(chatRoomId, username);
 
         // 커서 파싱
-        Pair<LocalDateTime, Long> parsed = parseCursor(cursor);
-        LocalDateTime cursorSentAt = parsed.getFirst();
+        Pair<Instant, Long> parsed= parseCursor(cursor);
+        Instant cursorSentAt = parsed.getFirst();
         Long cursorId = parsed.getSecond();
 
         // 페이지 조회
@@ -239,13 +244,14 @@ public class ChatMessageService {
                 chatMessageRepository.findNewerMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(
                         chatRoomId, username, joinedAt, cursorSentAt, cursorId);
 
-        // 3) hasMore 계산 & 목록 추출 (ASC 그대로)
+        // hasMore 계산 & 목록 추출 (ASC 그대로)
         Boolean hasMore = getHasMore(chatMessageItemList.size());
 
-        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> subChatMessageItemList = getSubChatMessageItemInfoProjectionDTOList(chatMessageItemList, hasMore);
-
         // nextCursor 생성 (마지막 요소 기준)
-        String nextCursor = getNextCursor(subChatMessageItemList, hasMore, true);
+        String nextCursor = getNextCursor(chatMessageItemList, hasMore);
+
+        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> subChatMessageItemList =
+                getSubChatMessageItemInfoProjectionDTOList(chatMessageItemList, hasMore);
 
         // 클라이언트 제공 형태로 변환
         return convertToChatMessagePageResponse(subChatMessageItemList, hasMore, nextCursor);
@@ -269,11 +275,11 @@ public class ChatMessageService {
         // 채팅방 입장 검증
         validateChatRoomAccess(chatRoomId, username);
 
-        LocalDateTime joinedAt = findJoinedAt(chatRoomId, username);
+        Instant joinedAt = findJoinedAt(chatRoomId, username);
 
         // 커서 파싱
-        Pair<LocalDateTime, Long> parsed = parseCursor(cursor);
-        LocalDateTime cursorSentAt = parsed.getFirst();
+        Pair<Instant, Long> parsed = parseCursor(cursor);
+        Instant cursorSentAt = parsed.getFirst();
         Long cursorId = parsed.getSecond();
 
         // 페이지 조회
@@ -281,15 +287,16 @@ public class ChatMessageService {
                 chatMessageRepository.findOlderMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(
                         chatRoomId, username, joinedAt, cursorSentAt, cursorId);
 
-        // 3) hasMore 계산 & 목록 추출
+        // hasMore 계산 & 목록 추출
         Boolean hasMore = getHasMore(chatMessageItemList.size());
 
-        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> subChatMessageItemList = getSubChatMessageItemInfoProjectionDTOList(chatMessageItemList, hasMore);
+        String nextCursor = getNextCursor(chatMessageItemList, hasMore);
 
-        // 4) ASC 순서로 통일
+        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> subChatMessageItemList =
+                getSubChatMessageItemInfoProjectionDTOList(chatMessageItemList, hasMore);
+
+        // ASC 순서로 통일
         Collections.reverse(subChatMessageItemList);
-
-        String nextCursor = getNextCursor(subChatMessageItemList, hasMore, false);
 
         // 클라이언트 제공 형태로 변환
         return convertToChatMessagePageResponse(subChatMessageItemList, hasMore, nextCursor);
@@ -314,9 +321,6 @@ public class ChatMessageService {
         }
     }
 
-
-
-
     /**
      * 주어진 채팅방 ID와 사용자 이름으로 memberChatRoom 테이블에서 사용자의 입장 시각을 조회
      *
@@ -325,12 +329,12 @@ public class ChatMessageService {
      * @return 사용자가 채팅방에 입장한 시각
      * @throws MemberChatRoomRetrievalException 조회된 입장 시각이 null인 경우 발생
      */
-    private LocalDateTime findJoinedAt(Long chatRoomId, String username) {
+    private Instant findJoinedAt(Long chatRoomId, String username) {
         LocalDateTime joinedAt = chatMessageRepository.findJoinedAtByChatRoomIdAndUsername(chatRoomId, username);
 
         isJoinedAtExists(joinedAt);
 
-        return joinedAt;
+        return joinedAt.toInstant(UTC);
     }
 
     /**

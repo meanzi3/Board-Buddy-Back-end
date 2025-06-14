@@ -159,71 +159,77 @@
 #          EOF
 
 
-name: Build & Deploy Spring Boot to EC2
+name: Deploy Spring Boot APP to Amazon Linux 2023
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build:
-    name: Build & Publish Docker Image
-    runs-on: ubuntu-latest
-
-    steps:
-      # 1) 저장소 코드 체크아웃
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # 2) JDK 21 설치 및 설정 (Gradle 빌드용)
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 21
-
-      # 3) Spring Boot 애플리케이션 빌드 (fat JAR 생성)
-      - name: Build JAR
-        run: ./gradlew clean bootJar -Dspring.profiles.active=common,prod
-
-      # 4) Docker 이미지 빌드 (커밋 SHA 태그 사용)
-      - name: Build Docker image
-        run: |
-          docker build \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:${{ github.sha }} -f Dockerfile .
-
-      # 5) Docker Hub 로그인
-      - name: Docker Login
-        run: |
-          echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} \
-            | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
-      # 6) 이미지 푸시 및 latest 태그로 추가 푸시
-      - name: Push image
-        run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:${{ github.sha }}
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:${{ github.sha }} \
-                     ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
-
   deploy:
-    name: Deploy to EC2
-    runs-on: ubuntu-latest
-    needs: build
+    runs-on: ubuntu-latest   # Runner는 빌드 스크립트 전송만 담당
+
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      PROD_REDIS_HOST: ${{ secrets.PROD_REDIS_HOST }}
+      PROD_REDIS_PORT: ${{ secrets.PROD_REDIS_PORT }}
+      PROD_REDIS_PASSWORD: ${{ secrets.PROD_REDIS_PASSWORD }}
+      PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
+      PROD_DB_USERNAME: ${{ secrets.PROD_DB_USERNAME }}
+      PROD_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+      PROD_AWS_ACCESS_KEY: ${{ secrets.PROD_AWS_ACCESS_KEY }}
+      PROD_AWS_SECRET_KEY: ${{ secrets.PROD_AWS_SECRET_KEY }}
+      PROD_SMS_API_KEY: ${{ secrets.PROD_SMS_API_KEY }}
+      PROD_SMS_API_SECRET: ${{ secrets.PROD_SMS_API_SECRET }}
+      PROD_SMS_SENDER_NUMBER: ${{ secrets.PROD_SMS_SENDER_NUMBER }}
+      EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+      PROD_S3_BUCKET_NAME: ${{ secrets.PROD_S3_BUCKET_NAME }}
 
     steps:
-      # 1) 저장소 코드 및 설정 파일 체크아웃
+      # 1) 리포지토리를 체크아웃
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2) SSH 에이전트 시작 (프라이빗 키 로드)
-      - name: Start SSH agent
+      # 2) JDK 21 설정
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      # 3) Gradle 빌드
+      - name: Build Spring Boot app with Gradle
+        run: ./gradlew build -Dspring.profiles.active=common,prod
+
+      # 4) Docker 이미지 빌드
+      - name: Build Docker image for Spring Boot app
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest -f Dockerfile .
+
+      # 5) Docker에 로그인
+      - name: Docker Login
+        run: echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      # 6) Docker 이미지 푸시
+      - name: Push Docker image for Spring Boot app
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
+
+      # 7) SSH 에이전트 시작
+      - name: Add SSH Key
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # 3) env.list 파일 생성 (프로덕션 환경변수 일괄 설정)
-      - name: Create env.list
+      # 8) env.list 생성
+      - name: Create environment variables file
         run: |
           cat > env.list <<EOF
           SPRING_DATASOURCE_URL=${{ secrets.PROD_DB_URL }}
@@ -247,8 +253,8 @@ jobs:
           SPRING_PROFILES_ACTIVE=common,prod
           EOF
 
-      # 4) redis.conf 파일 생성 (Redis 컨테이너 설정)
-      - name: Create redis.conf
+      # 9) redis.conf 생성
+      - name: Create redis configuration file
         run: |
           cat > redis.conf <<EOF
           bind 0.0.0.0
@@ -257,36 +263,49 @@ jobs:
           requirepass ${{ secrets.PROD_REDIS_PASSWORD }}
           EOF
 
-      # 5) env.list, redis.conf, Spring 설정, Nginx 설정을 한 번에 EC2로 전송
-      - name: Transfer config files to EC2
+      # 10) 파일 전송 (ec2-user@)
+      - name: Transfer files to EC2
         run: |
-          scp -o StrictHostKeyChecking=no \
-            env.list \
-            redis.conf \
-            src/main/resources/application-common.yml \
-            src/main/resources/application-prod.yml \
-            ./nginx.conf \
-            ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
+          scp -o StrictHostKeyChecking=no src/main/resources/application-common.yml ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/application-common.yml
+          scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/application-prod.yml
+          scp -o StrictHostKeyChecking=no env.list ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/env.list
+          scp -o StrictHostKeyChecking=no docker-compose.prod.yml ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/docker-compose.yml
+          scp -o StrictHostKeyChecking=no redis.conf ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/redis.conf
+          scp -o StrictHostKeyChecking=no nginx.conf ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/nginx.conf
 
-      # 6) SSH → Docker 재배포 → Nginx 설정 반영 → 서비스 재시작
-      - name: Pull & Run on EC2
+      # 11) EC2에 SSH 접속 후 배포
+      - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             set -eux
-          
-            # ── Docker 설치 및 시작 (생략 시) ──
+
+            # 11-1) Docker 설치 및 서비스 시작
             if ! command -v docker >/dev/null 2>&1; then
-              sudo dnf update -y
               sudo dnf install -y docker
               sudo systemctl enable --now docker
             fi
-          
-            # ── 애플리케이션 컨테이너 배포 ──
-            echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} \
-              | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
+
+            # 11-2) Docker Hub 로그인
+            echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+            # 11-3) Docker 네트워크 생성
             sudo docker network create spring-boot-app-network || true
-            sudo docker rm -f spring-boot-app || true
+
+            # 11-4) Redis 컨테이너 재시작
+            if sudo docker ps -a -q -f name=redis >/dev/null; then
+              sudo docker rm -f redis
+            fi
+            sudo docker run -d --name redis \
+              --network spring-boot-app-network \
+              -v /home/ec2-user/redis.conf:/usr/local/etc/redis/redis.conf \
+              -p ${{ secrets.PROD_REDIS_PORT }}:6379 \
+              redis:latest redis-server /usr/local/etc/redis/redis.conf
+
+            # 11-5) Spring Boot 애플리케이션 컨테이너 재시작
+            if sudo docker ps -a -q -f name=spring-boot-app >/dev/null; then
+              sudo docker rm -f spring-boot-app
+            fi
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
             sudo docker run -d --name spring-boot-app \
               --env-file /home/ec2-user/env.list \
               -v /home/ec2-user/application-common.yml:/config/application-common.yml \
@@ -295,29 +314,32 @@ jobs:
               -p 8080:8080 \
               ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
               --spring.config.location=/config/application-common.yml,/config/application-prod.yml
-          
-            # ── Nginx 설치 및 서비스 활성화 ──
+
+            # 11-6) Nginx 설치
             if ! rpm -q nginx >/dev/null 2>&1; then
               sudo dnf install -y nginx
             fi
             sudo systemctl enable nginx
-          
-            # ── 로그·캐시 디렉터리 준비 ──
+
+            # 11-7) Nginx 로그·캐시 디렉터리 생성
             sudo mkdir -p /var/log/nginx /var/cache/nginx
             sudo chown -R nginx:nginx /var/log/nginx /var/cache/nginx
-          
-            # ── Nginx 설정파일(conf.d)으로 배치 ──
+
+            # 11-8) Nginx 서버블록만 conf.d에 배치
             sudo mkdir -p /etc/nginx/conf.d
             sudo mv /home/ec2-user/nginx.conf /etc/nginx/conf.d/boardbuddy.conf
-          
-            # ── 설정 문법 검사 & 서비스 재시작 ──
+
+            # 11-9) 설정 문법 검사 & Nginx 재시작
             sudo nginx -t
             sudo systemctl restart nginx
-          
-            # ── Certbot 설치 및 인증서 자동 갱신 ──
+
+            # 11-10) Certbot 설치 및 인증서 갱신
             sudo dnf install -y certbot python3-certbot-nginx
             sudo certbot renew --nginx --non-interactive --quiet
-          
+
+            # 11-11) 컨테이너 상태 확인 및 로그
+            sudo docker ps -a
+            sudo docker logs spring-boot-app
           EOF
 
 

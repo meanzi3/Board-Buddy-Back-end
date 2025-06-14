@@ -274,31 +274,26 @@ jobs:
             nginx.conf \
             ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
 
-      # 11) EC2에 SSH 접속 → Docker 배포 → Nginx 설정 반영 → 재시작
+      # 11) EC2에 SSH 접속 → Docker/Redis/App 배포 → Nginx 설정 반영 → 재시작
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             set -eux
-
-            # 11-a) 메인 nginx.conf 기본값으로 복원 (.rpmnew → nginx.conf)
-            if [ -f /etc/nginx/nginx.conf.rpmnew ]; then
-              sudo mv /etc/nginx/nginx.conf.rpmnew /etc/nginx/nginx.conf
-            fi
-
-            # 11-1) Docker 설치 및 시작
+      
+            ## ── 11-1) Docker 설치 및 서비스 시작 ──
             if ! command -v docker >/dev/null 2>&1; then
               sudo dnf install -y docker
               sudo systemctl enable --now docker
             fi
-
-            # 11-2) Docker Hub 로그인
+      
+            ## ── 11-2) Docker Hub 로그인 ──
             echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} \
               | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
-            # 11-3) Docker 네트워크 생성
+      
+            ## ── 11-3) Docker 네트워크 생성 ──
             sudo docker network create spring-boot-app-network || true
-
-            # 11-4) Redis 컨테이너 재시작
+      
+            ## ── 11-4) Redis 컨테이너 재시작 ──
             if sudo docker ps -a -q -f name=redis >/dev/null; then
               sudo docker rm -f redis
             fi
@@ -307,8 +302,8 @@ jobs:
               -v /home/ec2-user/redis.conf:/usr/local/etc/redis/redis.conf \
               -p ${{ secrets.PROD_REDIS_PORT }}:6379 \
               redis:latest redis-server /usr/local/etc/redis/redis.conf
-
-            # 11-5) Spring Boot 애플리케이션 재시작
+      
+            ## ── 11-5) Spring Boot 애플리케이션 재시작 ──
             if sudo docker ps -a -q -f name=spring-boot-app >/dev/null; then
               sudo docker rm -f spring-boot-app
             fi
@@ -321,27 +316,54 @@ jobs:
               -p 8080:8080 \
               ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
               --spring.config.location=/config/application-common.yml,/config/application-prod.yml
-
-            # 11-6) Nginx 서비스 활성화
+      
+            ## ── 11-6) Nginx 설치 & 서비스 준비 ──
+            if ! rpm -q nginx >/dev/null 2>&1; then
+              sudo dnf install -y nginx
+            fi
             sudo systemctl enable nginx
-
-            # 11-7) 로그·캐시 디렉터리 준비
-            sudo mkdir -p /var/log/nginx /var/cache/nginx
+      
+            ## ── 11-7) 메인 설정 파일을 공식 기본값으로 덮어쓰기 ──
+            # 공식 문서 기준 기본 /etc/nginx/nginx.conf 내용
+            sudo tee /etc/nginx/nginx.conf > /dev/null << 'NGINX_CONF'
+            user nginx;
+            worker_processes auto;
+      
+            error_log /var/log/nginx/error.log warn;
+            pid        /run/nginx.pid;
+      
+            events {
+                worker_connections 1024;
+            }
+      
+            http {
+                include       /etc/nginx/mime.types;
+                default_type  application/octet-stream;
+                sendfile        on;
+                keepalive_timeout 65;
+      
+                # 추가 서버블록들은 아래 폴더에서만 로드됩니다
+                include /etc/nginx/conf.d/*.conf;
+            }
+            NGINX_CONF
+            :contentReference[oaicite:0]{index=0}
+      
+            ## ── 11-8) 로그·캐시 디렉터리 및 conf.d 준비 ──
+            sudo mkdir -p /var/log/nginx /var/cache/nginx /etc/nginx/conf.d
             sudo chown -R nginx:nginx /var/log/nginx /var/cache/nginx
-
-            # 11-8) 커스텀 서버블록만 conf.d에 배치
-            sudo mkdir -p /etc/nginx/conf.d
+      
+            ## ── 11-9) 커스텀 server 블록만 conf.d에 배치 ──
             sudo mv /home/ec2-user/nginx.conf /etc/nginx/conf.d/boardbuddy.conf
-
-            # 11-9) 설정 문법 검사 & Nginx 재시작
+      
+            ## ── 11-10) 문법 검사 & 서비스 재시작 ──
             sudo nginx -t
             sudo systemctl restart nginx
-
-            # 11-10) Certbot 설치 및 인증서 자동 갱신
+      
+            ## ── 11-11) Certbot 설치 및 인증서 자동 갱신 ──
             sudo dnf install -y certbot python3-certbot-nginx
             sudo certbot renew --nginx --non-interactive --quiet
-
-            # 11-11) 컨테이너 상태 확인 및 로그
+      
+            ## ── 11-12) 컨테이너 상태 확인 및 로그 ──
             sudo docker ps -a
             sudo docker logs spring-boot-app
           EOF

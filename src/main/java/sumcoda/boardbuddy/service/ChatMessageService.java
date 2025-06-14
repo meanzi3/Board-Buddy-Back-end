@@ -45,11 +45,7 @@ public class ChatMessageService {
 
     private final MemberChatRoomRepository memberChatRoomRepository;
 
-    private final ApplicationEventPublisher applicationEventPublisher;
-
     private final SimpMessagingTemplate messagingTemplate;
-
-    private final ChatMessageCacheService chatMessageCacheService;
 
 
     /**
@@ -84,8 +80,6 @@ public class ChatMessageService {
 
         ChatMessage chatMessage = ChatMessage.buildChatMessage(content, MessageType.TALK, member, chatRoom);
 
-//        // 성능 개선용
-//        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, "TALK", member, chatRoom);ㄷ
         Long chatMessageId = chatMessageRepository.save(chatMessage).getId();
 
         log.info("[DB 저장 완료] 채팅 메시지 ID={} | 내용={}", chatMessageId, publishDTO.getContent());
@@ -100,8 +94,6 @@ public class ChatMessageService {
         ChatMessageResponse.ChatMessageItemInfoDTO payload = convertPayload(responseChatMessage);
 
         try {
-//            // 메시지 전송 시도 이벤트 발행
-//            applicationEventPublisher.publishEvent(new ChatMessageProcessingStartedEvent());
 
             // 메시지 전송 처리 시간 측정 시작 (나노초 단위)
             long startTime = System.nanoTime();
@@ -112,8 +104,6 @@ public class ChatMessageService {
             // 메시지 전송 처리 시간 측정 종료
             double durationMillis = (System.nanoTime() - startTime) / 1_000_000.0;
 
-//            // 메시지 전송 성공 이벤트 발행
-//            applicationEventPublisher.publishEvent(new ChatMessageProcessingCompletedEvent(durationMillis));
 
         } catch (Exception e) {
             log.error("STOMP 메시지 처리 중 예외 발생: {}", e.getMessage());

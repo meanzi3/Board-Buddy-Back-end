@@ -157,7 +157,7 @@
 #          # Spring Boot 애플리케이션 로그 확인
 #          sudo docker logs spring-boot-app
 #          EOF
-#
+
 
 name: Build & Deploy Spring Boot to EC2
 
@@ -272,6 +272,14 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             set -eux
+          
+            # 6-0) Docker 설치 및 서비스 시작 (없으면 설치)
+            if ! command -v docker >/dev/null 2>&1; then
+              sudo dnf update -y
+              sudo dnf install -y docker
+              sudo systemctl enable --now docker
+            fi
+  
 
             # 6-1) Docker Hub 로그인 (필요 시)
             echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} \
@@ -309,7 +317,6 @@ jobs:
             sudo systemctl restart nginx
           
             # 6-8) Certbot 설치 및 인증서 갱신
-            sudo dnf update -y
             sudo dnf install -y certbot python3-certbot-nginx
             sudo certbot renew --nginx --non-interactive --quiet
           

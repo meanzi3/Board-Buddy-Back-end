@@ -263,35 +263,31 @@ jobs:
           requirepass ${{ secrets.PROD_REDIS_PASSWORD }}
           EOF
 
-      # 10) 파일 전송 (ec2-user@)
+      # 10) 파일을 EC2로 전송
       - name: Transfer files to EC2
         run: |
-          scp -o StrictHostKeyChecking=no src/main/resources/application-common.yml ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/application-common.yml
-          scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/application-prod.yml
-          scp -o StrictHostKeyChecking=no env.list ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/env.list
-          scp -o StrictHostKeyChecking=no docker-compose.prod.yml ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/docker-compose.yml
-          scp -o StrictHostKeyChecking=no redis.conf ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/redis.conf
-          scp -o StrictHostKeyChecking=no nginx.conf ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/nginx.conf
+          scp -o StrictHostKeyChecking=no \
+            env.list \
+            redis.conf \
+            src/main/resources/application-common.yml \
+            src/main/resources/application-prod.yml \
+            nginx.conf \
+            ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
 
-      # 11) EC2에 SSH 접속 후 배포
+      # 11) EC2에 SSH 접속 → Docker 배포 → Nginx 설정 반영 → 재시작
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             set -eux
 
-            # 11-1) Docker 설치 및 서비스 시작
+            # ─── Docker 설치 및 시작 ───
             if ! command -v docker >/dev/null 2>&1; then
               sudo dnf install -y docker
               sudo systemctl enable --now docker
             fi
 
-            # 11-2) Docker Hub 로그인
-            echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
-            # 11-3) Docker 네트워크 생성
+            # ─── Redis 재시작 ───
             sudo docker network create spring-boot-app-network || true
-
-            # 11-4) Redis 컨테이너 재시작
             if sudo docker ps -a -q -f name=redis >/dev/null; then
               sudo docker rm -f redis
             fi
@@ -301,7 +297,7 @@ jobs:
               -p ${{ secrets.PROD_REDIS_PORT }}:6379 \
               redis:latest redis-server /usr/local/etc/redis/redis.conf
 
-            # 11-5) Spring Boot 애플리케이션 컨테이너 재시작
+            # ─── Spring Boot App 재시작 ───
             if sudo docker ps -a -q -f name=spring-boot-app >/dev/null; then
               sudo docker rm -f spring-boot-app
             fi
@@ -315,31 +311,25 @@ jobs:
               ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
               --spring.config.location=/config/application-common.yml,/config/application-prod.yml
 
-            # 11-6) Nginx 설치
+            # ─── Nginx 설치 & 활성화 ───
             if ! rpm -q nginx >/dev/null 2>&1; then
               sudo dnf install -y nginx
             fi
             sudo systemctl enable nginx
 
-            # 11-7) Nginx 로그·캐시 디렉터리 생성
+            # ─── 로그·캐시 디렉터리 준비 ───
             sudo mkdir -p /var/log/nginx /var/cache/nginx
             sudo chown -R nginx:nginx /var/log/nginx /var/cache/nginx
 
-            # 11-8) Nginx 서버블록만 conf.d에 배치
+            # ─── **절대 `/etc/nginx/nginx.conf` 건드리지 말고** ───
             sudo mkdir -p /etc/nginx/conf.d
             sudo mv /home/ec2-user/nginx.conf /etc/nginx/conf.d/boardbuddy.conf
 
-            # 11-9) 설정 문법 검사 & Nginx 재시작
+            # ─── 문법 검사 & 서비스 재시작 ───
             sudo nginx -t
             sudo systemctl restart nginx
 
-            # 11-10) Certbot 설치 및 인증서 갱신
+            # ─── Certbot 설치 & 자동 갱신 ───
             sudo dnf install -y certbot python3-certbot-nginx
             sudo certbot renew --nginx --non-interactive --quiet
-
-            # 11-11) 컨테이너 상태 확인 및 로그
-            sudo docker ps -a
-            sudo docker logs spring-boot-app
           EOF
-
-

@@ -304,19 +304,21 @@ jobs:
               ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
               --spring.config.location=/config/application-common.yml,/config/application-prod.yml
             
-            # 6-6) Nginx 설치 (없으면 설치) 및 서비스 활성화
+            # 6-6) Nginx 설치 및 서비스 활성화
             if ! rpm -q nginx >/dev/null 2>&1; then
-              sudo dnf install -y nginx
+            sudo dnf install -y nginx
             fi
-            sudo systemctl enable --now nginx
+            sudo systemctl enable nginx
             
-            # 6-7) Nginx 설정 복사 및 재시작
-            sudo mv /etc/nginx/nginx.conf{,.bak} || true
-            sudo cp /home/ec2-user/nginx.conf /etc/nginx/nginx.conf
+            # 6-7) 올바른 디렉터리에 설정 복사
+            sudo mkdir -p /etc/nginx/conf.d
+            sudo cp /home/ec2-user/nginx.conf /etc/nginx/conf.d/default.conf
+            
+            # 6-8) 설정 문법 검사 및 재시작
             sudo nginx -t
             sudo systemctl restart nginx
           
-            # 6-8) Certbot 설치 및 인증서 갱신
+            # 6-9) Certbot 설치 및 인증서 갱신
             sudo dnf install -y certbot python3-certbot-nginx
             sudo certbot renew --nginx --non-interactive --quiet
           

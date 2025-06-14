@@ -265,7 +265,7 @@ jobs:
             redis.conf \
             src/main/resources/application-common.yml \
             src/main/resources/application-prod.yml \
-            nginx.conf \
+            ./nginx.conf \
             ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
 
       # 6) SSH → Docker 재배포 → Nginx 설정 반영 → 서비스 재시작

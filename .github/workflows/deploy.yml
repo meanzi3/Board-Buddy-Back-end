@@ -291,9 +291,14 @@ jobs:
 
             # 6-2) 최신 이미지 pull
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
+          
+            # 6-3) Docker 네트워크 생성 (이미 존재하면 에러 무시)
+            sudo docker network create spring-boot-app-network || true
 
-            # 6-3) 기존 컨테이너 삭제 및 새 컨테이너 실행
+            # 6-4) 기존 컨테이너 삭제
             sudo docker rm -f spring-boot-app || true
+            
+            # 6-5) 새 컨테이너 실행
             sudo docker run -d --name spring-boot-app \
               --env-file /home/ec2-user/env.list \
               -v /home/ec2-user/application-common.yml:/config/application-common.yml \
@@ -303,6 +308,6 @@ jobs:
               ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
               --spring.config.location=/config/application-common.yml,/config/application-prod.yml
 
-            # 6-4) Nginx 설정 테스트 및 재시작
+            # 6-6) Nginx 설정 테스트 및 재시작
             sudo nginx -t && sudo systemctl reload nginx
           EOF

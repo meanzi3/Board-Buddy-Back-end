@@ -257,7 +257,7 @@ jobs:
           requirepass ${{ secrets.PROD_REDIS_PASSWORD }}
           EOF
 
-      # 5) env.list, Redis/애플리케이션 설정, Nginx 설정을 한 번에 EC2로 전송
+      # 5) env.list, Redis, Spring 설정, Nginx 설정을 한 번에 EC2로 전송
       - name: Transfer config files to EC2
         run: |
           scp -o StrictHostKeyChecking=no \
@@ -268,34 +268,25 @@ jobs:
             nginx.conf \
             ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
 
-      # 6) EC2에 SSH 접속하여 Docker pull 및 컨테이너 재시작, Nginx 리로드
+      # 6) EC2에 SSH 접속 → Docker 배포 → Nginx 설정 덮어쓰기 → 재시작
       - name: Pull & Run on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             set -eux
           
-            # 6-0) Docker 설치 및 서비스 시작 (없으면 설치)
+            # ─── Docker 설치/시작 (없으면) ───
             if ! command -v docker >/dev/null 2>&1; then
               sudo dnf update -y
               sudo dnf install -y docker
               sudo systemctl enable --now docker
             fi
-  
-
-            # 6-1) Docker Hub 로그인 (필요 시)
+          
+            # ─── 애플리케이션 컨테이너 최신화 ───
             echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} \
               | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
-            # 6-2) 최신 이미지 pull
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
-          
-            # 6-3) Docker 네트워크 생성 (이미 존재하면 에러 무시)
             sudo docker network create spring-boot-app-network || true
-
-            # 6-4) 기존 컨테이너 삭제
             sudo docker rm -f spring-boot-app || true
-            
-            # 6-5) 새 컨테이너 실행
             sudo docker run -d --name spring-boot-app \
               --env-file /home/ec2-user/env.list \
               -v /home/ec2-user/application-common.yml:/config/application-common.yml \
@@ -304,23 +295,27 @@ jobs:
               -p 8080:8080 \
               ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
               --spring.config.location=/config/application-common.yml,/config/application-prod.yml
-            
-            # 6-6) Nginx 설치 및 서비스 활성화
+          
+            # ─── Nginx 설치 & 서비스 준비 ───
             if ! rpm -q nginx >/dev/null 2>&1; then
-            sudo dnf install -y nginx
+              sudo dnf install -y nginx
             fi
             sudo systemctl enable nginx
-            
-            # 6-7) 올바른 디렉터리에 설정 복사
-            sudo mkdir -p /etc/nginx/conf.d
-            sudo cp /home/ec2-user/nginx.conf /etc/nginx/conf.d/default.conf
-            
-            # 6-8) 설정 문법 검사 및 재시작
+          
+            # ─── 로그·PID 디렉터리 생성 ───
+            sudo mkdir -p /run/nginx /var/log/nginx /var/cache/nginx
+            sudo chown -R nginx:nginx /var/log/nginx /var/cache/nginx
+          
+            # ─── 설정 파일 덮어쓰기 ───
+            sudo mv /home/ec2-user/nginx.conf /etc/nginx/nginx.conf
+          
+            # ─── 문법 검사 & 재시작 ───
             sudo nginx -t
             sudo systemctl restart nginx
           
-            # 6-9) Certbot 설치 및 인증서 갱신
+            # ─── Certbot 설치 및 인증서 갱신 ───
             sudo dnf install -y certbot python3-certbot-nginx
             sudo certbot renew --nginx --non-interactive --quiet
           
-            EOF
+          EOF
+

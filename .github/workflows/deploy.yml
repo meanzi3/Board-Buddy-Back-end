@@ -206,18 +206,6 @@ jobs:
                      ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
 
-#        # Spring Boot 애플리케이션을 위한 Docker 이미지를 빌드
-#      - name: Build Docker image for Spring Boot app
-#        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest -f Dockerfile .
-#
-#      # Docker에 로그인
-#      - name: Docker Login
-#        run: echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-#
-#      # Docker 이미지를 푸시
-#      - name: Push Docker image for Spring Boot app
-#        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
-
   deploy:
     name: Deploy to EC2
     runs-on: ubuntu-latest
@@ -307,7 +295,22 @@ jobs:
               -p 8080:8080 \
               ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
               --spring.config.location=/config/application-common.yml,/config/application-prod.yml
-
-            # 6-6) Nginx 설정 테스트 및 재시작
-            sudo nginx -t && sudo systemctl reload nginx
-          EOF
+            
+            # 6-6) Nginx 설치 (없으면 설치) 및 서비스 활성화
+            if ! rpm -q nginx >/dev/null 2>&1; then
+              sudo dnf install -y nginx
+            fi
+            sudo systemctl enable --now nginx
+            
+            # 6-7) Nginx 설정 복사 및 재시작
+            sudo mv /etc/nginx/nginx.conf{,.bak} || true
+            sudo cp /home/ec2-user/nginx.conf /etc/nginx/nginx.conf
+            sudo nginx -t
+            sudo systemctl restart nginx
+          
+            # 6-8) Certbot 설치 및 인증서 갱신
+            sudo dnf update -y
+            sudo dnf install -y certbot python3-certbot-nginx
+            sudo certbot renew --nginx --non-interactive --quiet
+          
+            EOF

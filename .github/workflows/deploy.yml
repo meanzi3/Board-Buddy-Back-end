@@ -262,12 +262,12 @@ jobs:
 
       - name: Transfer files to EC2
         run: |
-          scp -o StrictHostKeyChecking=no application-common.yml ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/application-common.yml
-          scp -o StrictHostKeyChecking=no application-prod.yml   ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/application-prod.yml
-          scp -o StrictHostKeyChecking=no env.list               ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/env.list
+          scp -o StrictHostKeyChecking=no src/main/resources/application-common.yml ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/application-common.yml
+          scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/application-prod.yml
+          scp -o StrictHostKeyChecking=no env.list ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/env.list
           scp -o StrictHostKeyChecking=no docker-compose.prod.yml ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/docker-compose.yml
-          scp -o StrictHostKeyChecking=no redis.conf             ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/redis.conf
-          scp -o StrictHostKeyChecking=no nginx.conf             ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/nginx.conf
+          scp -o StrictHostKeyChecking=no redis.conf ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/redis.conf
+          scp -o StrictHostKeyChecking=no nginx.conf ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/nginx.conf
 
       - name: Deploy to EC2
         run: |

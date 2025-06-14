@@ -280,56 +280,37 @@ jobs:
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             set -eux
 
-            # ─── Docker 설치 및 시작 ───
-            if ! command -v docker >/dev/null 2>&1; then
-              sudo dnf install -y docker
-              sudo systemctl enable --now docker
-            fi
+          # 11-a) 메인 nginx.conf 기본값으로 복원
+          sudo dnf reinstall -y nginx
 
-            # ─── Redis 재시작 ───
-            sudo docker network create spring-boot-app-network || true
-            if sudo docker ps -a -q -f name=redis >/dev/null; then
-              sudo docker rm -f redis
-            fi
-            sudo docker run -d --name redis \
-              --network spring-boot-app-network \
-              -v /home/ec2-user/redis.conf:/usr/local/etc/redis/redis.conf \
-              -p ${{ secrets.PROD_REDIS_PORT }}:6379 \
-              redis:latest redis-server /usr/local/etc/redis/redis.conf
+          # 11-1) Docker 설치 및 시작
+          if ! command -v docker >/dev/null 2>&1; then
+          sudo dnf install -y docker
+          sudo systemctl enable --now docker
+          fi
 
-            # ─── Spring Boot App 재시작 ───
-            if sudo docker ps -a -q -f name=spring-boot-app >/dev/null; then
-              sudo docker rm -f spring-boot-app
-            fi
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
-            sudo docker run -d --name spring-boot-app \
-              --env-file /home/ec2-user/env.list \
-              -v /home/ec2-user/application-common.yml:/config/application-common.yml \
-              -v /home/ec2-user/application-prod.yml:/config/application-prod.yml \
-              --network spring-boot-app-network \
-              -p 8080:8080 \
-              ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
-              --spring.config.location=/config/application-common.yml,/config/application-prod.yml
+          # (이하 Redis, Spring Boot 컨테이너 재시작 생략) …
 
-            # ─── Nginx 설치 & 활성화 ───
-            if ! rpm -q nginx >/dev/null 2>&1; then
-              sudo dnf install -y nginx
-            fi
-            sudo systemctl enable nginx
+          # 11-6) Nginx 설치 및 활성화
+          if ! rpm -q nginx >/dev/null 2>&1; then
+          sudo dnf install -y nginx
+          fi
+          sudo systemctl enable nginx
 
-            # ─── 로그·캐시 디렉터리 준비 ───
-            sudo mkdir -p /var/log/nginx /var/cache/nginx
-            sudo chown -R nginx:nginx /var/log/nginx /var/cache/nginx
+          # 11-7) 로그·캐시 디렉터리 준비
+          sudo mkdir -p /var/log/nginx /var/cache/nginx
+          sudo chown -R nginx:nginx /var/log/nginx /var/cache/nginx
 
-            # ─── **절대 `/etc/nginx/nginx.conf` 건드리지 말고** ───
-            sudo mkdir -p /etc/nginx/conf.d
-            sudo mv /home/ec2-user/nginx.conf /etc/nginx/conf.d/boardbuddy.conf
+          # 11-8) **커스텀 서버블록만** conf.d 에 배치
+          sudo mkdir -p /etc/nginx/conf.d
+          sudo mv /home/ec2-user/nginx.conf /etc/nginx/conf.d/boardbuddy.conf
 
-            # ─── 문법 검사 & 서비스 재시작 ───
-            sudo nginx -t
-            sudo systemctl restart nginx
+          # 11-9) 문법 검사 & 서비스 재시작
+          sudo nginx -t
+          sudo systemctl restart nginx
 
-            # ─── Certbot 설치 & 자동 갱신 ───
-            sudo dnf install -y certbot python3-certbot-nginx
-            sudo certbot renew --nginx --non-interactive --quiet
+          # ─── Certbot 설치 & 자동 갱신 ───
+          sudo dnf install -y certbot python3-certbot-nginx
+          sudo certbot renew --nginx --non-interactive --quiet
+
           EOF

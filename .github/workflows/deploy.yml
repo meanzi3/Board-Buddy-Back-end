@@ -272,49 +272,46 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 ec2-user@${{ env.EC2_PUBLIC_IP }} << 'EOF'
-#            # 1) 시스템 패키지 및 Docker/Nginx 설치
-#            sudo dnf install -y docker nginx epel-release
-#            sudo systemctl enable --now docker nginx
 
-            # 2) Docker 로그인 및 이미지 업데이트
-            sudo docker login -u ${{ env.DOCKERHUB_USERNAME }} -p ${{ env.DOCKERHUB_ACCESS_TOKEN }}
-            sudo docker pull ${{ env.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
+          # Docker 로그인 및 이미지 업데이트
+          sudo docker login -u ${{ env.DOCKERHUB_USERNAME }} -p ${{ env.DOCKERHUB_ACCESS_TOKEN }}
+          sudo docker pull ${{ env.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
 
-            # 3) Docker 네트워크 생성
-            sudo docker network create spring-boot-app-network || true
+          # Docker 네트워크 생성
+          sudo docker network create spring-boot-app-network || true
 
-            # 4) Redis 컨테이너 재시작
-            if sudo docker ps -a -q -f name=redis; then
-              sudo docker stop redis && sudo docker rm redis
-            fi
-            sudo docker run -d --name redis \
-              -v /home/ec2-user/redis.conf:/usr/local/etc/redis/redis.conf \
-              --network spring-boot-app-network \
-              -e REDIS_PASSWORD=${PROD_REDIS_PASSWORD} \
-              -p 6379:6379 redis:latest redis-server /usr/local/etc/redis/redis.conf
+          # Redis 컨테이너 재시작
+          if sudo docker ps -a -q -f name=redis; then
+            sudo docker stop redis && sudo docker rm redis
+          fi
+          sudo docker run -d --name redis \
+            -v /home/ec2-user/redis.conf:/usr/local/etc/redis/redis.conf \
+            --network spring-boot-app-network \
+            -e REDIS_PASSWORD=${PROD_REDIS_PASSWORD} \
+            -p 6379:6379 redis:latest redis-server /usr/local/etc/redis/redis.conf
 
-            # 5) Spring Boot 애플리케이션 컨테이너 재시작
-            if sudo docker ps -a -q -f name=spring-boot-app; then
-              sudo docker stop spring-boot-app && sudo docker rm spring-boot-app
-            fi
-            sudo docker run -d --name spring-boot-app \
-              --env-file /home/ec2-user/env.list \
-              -v /home/ec2-user/application-common.yml:/config/application-common.yml \
-              -v /home/ec2-user/application-prod.yml:/config/application-prod.yml \
-              --network spring-boot-app-network \
-              -p 8080:8080 ${{ env.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
-              --spring.config.location=/config/application-common.yml,/config/application-prod.yml
-          
-            # 6) Nginx 설정 반영
-            sudo mv /home/ec2-user/nginx.conf /etc/nginx/nginx.conf
-            sudo nginx -t
-            sudo systemctl restart nginx
+          # Spring Boot 애플리케이션 컨테이너 재시작
+          if sudo docker ps -a -q -f name=spring-boot-app; then
+            sudo docker stop spring-boot-app && sudo docker rm spring-boot-app
+          fi
+          sudo docker run -d --name spring-boot-app \
+            --env-file /home/ec2-user/env.list \
+            -v /home/ec2-user/application-common.yml:/config/application-common.yml \
+            -v /home/ec2-user/application-prod.yml:/config/application-prod.yml \
+            --network spring-boot-app-network \
+            -p 8080:8080 ${{ env.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
+            --spring.config.location=/config/application-common.yml,/config/application-prod.yml
+        
+          # Nginx 설정 반영
+          sudo mv /home/ec2-user/nginx.conf /etc/nginx/nginx.conf
+          sudo nginx -t
+          sudo systemctl restart nginx
 
-            # 7) Certbot 설치 및 인증서 갱신
-            sudo dnf install -y certbot python3-certbot-nginx
-            sudo certbot renew --nginx --quiet
+          # Certbot 설치 및 인증서 갱신
+          sudo dnf install -y certbot python3-certbot-nginx
+          sudo certbot renew --nginx --quiet
 
-            # 8) 상태 확인
-            sudo docker ps -a
-            sudo docker logs spring-boot-app
+          # 상태 확인
+          sudo docker ps -a
+          sudo docker logs spring-boot-app
           EOF

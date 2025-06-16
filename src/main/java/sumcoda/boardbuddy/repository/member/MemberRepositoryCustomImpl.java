@@ -33,14 +33,37 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .fetchOne());
     }
 
+    /**
+     * @apiNote 현재는 사용률 저조로 기존 메서드 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     */
+//    @Override
+//    public Optional<MemberResponse.ProfileDTO> findMemberDTOByUsername(String username) {
+//        return Optional.ofNullable(jpaQueryFactory
+//                .select(Projections.fields(MemberResponse.ProfileDTO.class,
+//                        member.nickname,
+//                        member.sido,
+//                        member.sgg,
+//                        member.emd,
+//                        member.phoneNumber,
+//                        member.memberType,
+//                        profileImage.profileImageS3SavedURL
+//                ))
+//                .from(member)
+//                .leftJoin(member.profileImage, profileImage)
+//                .where(member.username.eq(username))
+//                .fetchOne());
+//    }
+
+    /**
+     * @apiNote 임시로 활성화된 메서드
+     *          앱 사용률 증가시 비활성화후에 기존 기능 활성화 예정
+     */
     @Override
     public Optional<MemberResponse.ProfileDTO> findMemberDTOByUsername(String username) {
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(MemberResponse.ProfileDTO.class,
                         member.nickname,
-                        member.sido,
-                        member.sgg,
-                        member.emd,
                         member.phoneNumber,
                         member.memberType,
                         profileImage.profileImageS3SavedURL

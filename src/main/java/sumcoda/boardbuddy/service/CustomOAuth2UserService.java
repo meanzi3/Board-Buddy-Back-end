@@ -76,35 +76,69 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         SecureRandom secureRandom = new SecureRandom();
         int randomNumber = 10000000 + secureRandom.nextInt(90000000);
 
+        /**
+         * @apiNote 현재는 사용률 저조로 해당 로직 비활성화된 상태
+         *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+         */
         // 만약 신규 로그인 회원이라면
-        if (findMember == null) {
-            Member member = Member.buildMember(
-                    username,
-                    bCryptPasswordEncoder.encode(oAuth2UserInfo.getEmail()),
-                    oAuth2UserInfo.getName() + randomNumber,
-                    oAuth2UserInfo.getEmail(),
-                    null,
-                    null,
-                    null,
-                    null,
-                    2,
-                    50.0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    null,
-                    null,
-                    0.0,
-                    MemberType.SOCIAL,
-                    Role.USER,
-                    null
-            );
+//        if (findMember == null) {
+//            Member member = Member.buildMember(
+//                    username,
+//                    bCryptPasswordEncoder.encode(oAuth2UserInfo.getEmail()),
+//                    oAuth2UserInfo.getName() + randomNumber,
+//                    oAuth2UserInfo.getEmail(),
+//                    null,
+//                    null,
+//                    null,
+//                    null,
+//                    2,
+//                    50.0,
+//                    0,
+//                    0,
+//                    0,
+//                    0,
+//                    0,
+//                    0,
+//                    0,
+//                    0,
+//                    0,
+//                    null,
+//                    null,
+//                    0.0,
+//                    MemberType.SOCIAL,
+//                    Role.USER,
+//                    null
+//            );
+
+            /**
+             * @apiNote 임시로 활성화된 멤버 생성 로직
+             *          앱 사용률 증가시 비활성화후에 기존 로직 활성화 예정
+             */
+            // 만약 신규 로그인 회원이라면
+            if (findMember == null) {
+                Member member = Member.buildMember(
+                        username,
+                        bCryptPasswordEncoder.encode(oAuth2UserInfo.getEmail()),
+                        oAuth2UserInfo.getName() + randomNumber,
+                        oAuth2UserInfo.getEmail(),
+                        null,
+                        50.0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        null,
+                        null,
+                        0.0,
+                        MemberType.SOCIAL,
+                        Role.USER,
+                        null
+                );
 
             memberRepository.save(member);
 

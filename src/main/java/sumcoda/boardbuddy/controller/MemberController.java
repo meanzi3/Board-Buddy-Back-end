@@ -11,7 +11,6 @@ import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.MemberService;
 
-import java.util.List;
 import java.util.Map;
 
 import static sumcoda.boardbuddy.builder.ResponseBuilder.*;
@@ -103,54 +102,60 @@ public class MemberController {
     }
 
     /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
      * 내 동네 조회 요청 캐치
      *
      * @param username 로그인 사용자 아이디
      * @return 내 동네 조회를 성공했다면 약속된 SuccessResponse 반환
      */
-    @GetMapping("/api/my/neighborhoods")
-    public ResponseEntity<ApiResponse<MemberResponse.MyLocationsDTO>> getMemberNeighborhoods(@RequestAttribute String username) {
-        log.info("getMemberNeighborhoods is working");
-
-        MemberResponse.MyLocationsDTO myLocationsDTO = memberService.getMemberNeighborhoods(username);
-
-        return buildSuccessResponseWithMultiplePairKeyData(myLocationsDTO, "내 동네 조회를 성공하였습니다.", HttpStatus.OK);
-    }
+//    @GetMapping("/api/my/neighborhoods")
+//    public ResponseEntity<ApiResponse<MemberResponse.MyLocationsDTO>> getMemberNeighborhoods(@RequestAttribute String username) {
+//        log.info("getMemberNeighborhoods is working");
+//
+//        MemberResponse.MyLocationsDTO myLocationsDTO = memberService.getMemberNeighborhoods(username);
+//
+//        return buildSuccessResponseWithMultiplePairKeyData(myLocationsDTO, "내 동네 조회를 성공하였습니다.", HttpStatus.OK);
+//    }
 
     /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
      * 내 동네 설정 요청 캐치
      *
      * @param locationDTO 사용자가 입력한 위치 정보
      * @return 내 동네 설정을 성공했다면 약속된 SuccessResponse 반환
      **/
-    @PutMapping("/api/my/neighborhoods")
-    public ResponseEntity<ApiResponse<Map<String, Map<Integer, List<MemberResponse.LocationDTO>>>>> updateMemberNeighborhood(
-            @RequestBody MemberRequest.LocationDTO locationDTO,
-            @RequestAttribute String username) {
-        log.info("updateMemberNeighborhood is working");
-
-        Map<Integer, List<MemberResponse.LocationDTO>> locations = memberService.updateMemberNeighborhood(locationDTO, username);
-
-        return buildSuccessResponseWithPairKeyData("locations", locations, "내 동네 설정을 성공하였습니다.", HttpStatus.OK);
-    }
+//    @PutMapping("/api/my/neighborhoods")
+//    public ResponseEntity<ApiResponse<Map<String, Map<Integer, List<MemberResponse.LocationDTO>>>>> updateMemberNeighborhood(
+//            @RequestBody MemberRequest.LocationDTO locationDTO,
+//            @RequestAttribute String username) {
+//        log.info("updateMemberNeighborhood is working");
+//
+//        Map<Integer, List<MemberResponse.LocationDTO>> locations = memberService.updateMemberNeighborhood(locationDTO, username);
+//
+//        return buildSuccessResponseWithPairKeyData("locations", locations, "내 동네 설정을 성공하였습니다.", HttpStatus.OK);
+//    }
 
     /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
      * 내 반경 설정 요청 캐치
      *
      * @param radiusDTO 사용자가 입력한 반경 정보
      * @param username 로그인 사용자 아이디
      * @return 내 반경 설정을 성공했다면 약속된 SuccessResponse 반환
      **/
-    @PutMapping("/api/my/radius")
-    public ResponseEntity<ApiResponse<Void>> updateMemberRadius(
-            @RequestBody MemberRequest.RadiusDTO radiusDTO,
-            @RequestAttribute String username) {
-        log.info("updateMemberRadius is working");
-
-        memberService.updateMemberRadius(radiusDTO, username);
-
-        return buildSuccessResponseWithoutData("내 반경 설정을 성공하였습니다.", HttpStatus.OK);
-    }
+//    @PutMapping("/api/my/radius")
+//    public ResponseEntity<ApiResponse<Void>> updateMemberRadius(
+//            @RequestBody MemberRequest.RadiusDTO radiusDTO,
+//            @RequestAttribute String username) {
+//        log.info("updateMemberRadius is working");
+//
+//        memberService.updateMemberRadius(radiusDTO, username);
+//
+//        return buildSuccessResponseWithoutData("내 반경 설정을 성공하였습니다.", HttpStatus.OK);
+//    }
 
     /**
      * 프로필 조회 요청 캐치

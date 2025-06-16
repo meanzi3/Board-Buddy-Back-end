@@ -1,7 +1,6 @@
 package sumcoda.boardbuddy.repository.member;
 
 import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.AuthResponse;
@@ -14,9 +13,7 @@ import java.util.Optional;
 
 import static sumcoda.boardbuddy.entity.QBadgeImage.badgeImage;
 import static sumcoda.boardbuddy.entity.QMember.*;
-import static sumcoda.boardbuddy.entity.QNearPublicDistrict.*;
 import static sumcoda.boardbuddy.entity.QProfileImage.*;
-import static sumcoda.boardbuddy.entity.QPublicDistrict.*;
 
 @RequiredArgsConstructor
 public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
@@ -161,28 +158,32 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .fetchOne());
     }
 
-    @Override
-    public List<String> findUsernamesWithGatherArticleInRange(String username, String sido, String sgg, String emd) {
-        return jpaQueryFactory
-                .select(member.username)
-                .from(member)
-                .where(
-                        member.username.ne(username)
-                                .and(
-                                        JPAExpressions
-                                                .selectOne()
-                                                .from(publicDistrict)
-                                                .join(nearPublicDistrict).on(publicDistrict.id.eq(nearPublicDistrict.publicDistrict.id))
-                                                .where(
-                                                        nearPublicDistrict.sido.eq(sido)
-                                                                .and(nearPublicDistrict.sgg.eq(sgg))
-                                                                .and(nearPublicDistrict.emd.eq(emd))
-                                                                .and(member.radius.goe(nearPublicDistrict.radius)) // 반경 조건
-                                                )
-                                                .exists()
-                                )
-                )
-                .fetch();
-    }
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
+     */
+//    @Override
+//    public List<String> findUsernamesWithGatherArticleInRange(String username, String sido, String sgg, String emd) {
+//        return jpaQueryFactory
+//                .select(member.username)
+//                .from(member)
+//                .where(
+//                        member.username.ne(username)
+//                                .and(
+//                                        JPAExpressions
+//                                                .selectOne()
+//                                                .from(publicDistrict)
+//                                                .join(nearPublicDistrict).on(publicDistrict.id.eq(nearPublicDistrict.publicDistrict.id))
+//                                                .where(
+//                                                        nearPublicDistrict.sido.eq(sido)
+//                                                                .and(nearPublicDistrict.sgg.eq(sgg))
+//                                                                .and(nearPublicDistrict.emd.eq(emd))
+//                                                                .and(member.radius.goe(nearPublicDistrict.radius)) // 반경 조건
+//                                                )
+//                                                .exists()
+//                                )
+//                )
+//                .fetch();
+//    }
 
 }

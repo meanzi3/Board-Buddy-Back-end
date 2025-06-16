@@ -32,7 +32,11 @@ public class GatherArticleController {
 
     private final ChatMessageService chatMessageService;
 
-    private final NotificationService notificationService;
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
+     */
+//    private final NotificationService notificationService;
 
     /**
      * 모집글 작성 요청
@@ -59,7 +63,11 @@ public class GatherArticleController {
         // 채팅방 입장 메세지 전송
         chatMessageService.publishEnterOrExitChatMessage(chatRoomAndNicknamePair, MessageType.ENTER);
 
-        notificationService.notifyGatherArticle(gatherArticleId, username);
+        /**
+         * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+         *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
+         */
+//        notificationService.notifyGatherArticle(gatherArticleId, username);
 
         return buildSuccessResponseWithPairKeyData("post", createResponse, "모집글이 업로드 되었습니다", HttpStatus.CREATED);
     }

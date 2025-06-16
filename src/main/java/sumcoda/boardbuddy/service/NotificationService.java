@@ -240,33 +240,35 @@ public class NotificationService {
     }
 
     /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
      * 모집글이 작성되면 해당 모집글 주변에 위치한 사용자에게 알림
      *
      * @param gatherArticleId 해당 모집글 Id
      **/
-    @Transactional
-    public void notifyGatherArticle(Long gatherArticleId, String writtenUsername) {
-
-        GatherArticleResponse.LocationInfoDTO locationInfoDTO = gatherArticleRepository.findLocationInfoDTOById(gatherArticleId)
-                .orElseThrow(() -> new GatherArticleRetrievalException("서버 문제로 해당 모집글의 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
-
-        String sido = locationInfoDTO.getSido();
-        String sgg = locationInfoDTO.getSgg();
-        String emd = locationInfoDTO.getEmd();
-
-        List<String> usernamesWithGatherArticleInRange = memberRepository.findUsernamesWithGatherArticleInRange(writtenUsername, sido, sgg, emd);
-
-        for (String username : usernamesWithGatherArticleInRange) {
-            // 리뷰 요청 메시지를 포맷하여 생성
-            String message = notificationMessageUtil.formatWriteGatherArticleMessage(
-                    getNickname(username),
-                    getTitle(gatherArticleId));
-
-            log.info(message);
-
-            saveNotification(username, message, EventName.WRITE_GATHER_ARTICLE);
-        }
-    }
+//    @Transactional
+//    public void notifyGatherArticle(Long gatherArticleId, String writtenUsername) {
+//
+//        GatherArticleResponse.LocationInfoDTO locationInfoDTO = gatherArticleRepository.findLocationInfoDTOById(gatherArticleId)
+//                .orElseThrow(() -> new GatherArticleRetrievalException("서버 문제로 해당 모집글의 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+//
+//        String sido = locationInfoDTO.getSido();
+//        String sgg = locationInfoDTO.getSgg();
+//        String emd = locationInfoDTO.getEmd();
+//
+//        List<String> usernamesWithGatherArticleInRange = memberRepository.findUsernamesWithGatherArticleInRange(writtenUsername, sido, sgg, emd);
+//
+//        for (String username : usernamesWithGatherArticleInRange) {
+//            // 리뷰 요청 메시지를 포맷하여 생성
+//            String message = notificationMessageUtil.formatWriteGatherArticleMessage(
+//                    getNickname(username),
+//                    getTitle(gatherArticleId));
+//
+//            log.info(message);
+//
+//            saveNotification(username, message, EventName.WRITE_GATHER_ARTICLE);
+//        }
+//    }
 
     /**
      * 유저의 알림을 조회하여 최신순으로 반환하는 메서드

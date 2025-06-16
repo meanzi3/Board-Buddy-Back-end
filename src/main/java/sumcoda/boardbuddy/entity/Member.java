@@ -49,26 +49,42 @@ public class Member {
     // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
     private String phoneNumber;
 
-    // 사용자가 거주하는 oo시, oo도
-    // 일반 로그인 = 회원가입시 설정 가능
-    // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
-    private String sido;
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
+     */
+//    // 사용자가 거주하는 oo시, oo도
+//    // 일반 로그인 = 회원가입시 설정 가능
+//    // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
+//    private String sido;
 
-    // 사용자가 거주하는 oo시, oo군, oo구
-    // 일반 로그인 = 회원가입시 설정 가능
-    // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
-    private String sgg;
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
+     */
+//    // 사용자가 거주하는 oo시, oo군, oo구
+//    // 일반 로그인 = 회원가입시 설정 가능
+//    // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
+//    private String sgg;
 
-    // 사용자가 거주하는 oo읍, oo면, oo동
-    // 일반 로그인 = 회원가입시 설정 가능
-    // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
-    private String emd;
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
+     */
+//    // 사용자가 거주하는 oo읍, oo면, oo동
+//    // 일반 로그인 = 회원가입시 설정 가능
+//    // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
+//    private String emd;
 
-    // 사용자 위치를 기준으로 주변 범위를 조절하기 위한 필드
-    // 일반 로그인 = 회원가입시 설정 가능
-    // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
-    @Column(nullable = false)
-    private Integer radius;
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가 시 다시 활성화될 수 있음
+     */
+//    // 사용자 위치를 기준으로 주변 범위를 조절하기 위한 필드
+//    // 일반 로그인 = 회원가입시 설정 가능
+//    // 소셜 로그인 = 로그인후 마이페이지에서 별도로 설정 필요
+//    @Column(nullable = false)
+//    private Integer radius;
 
     // 사용자의 버디지수
     // 일반 로그인, 소셜 로그인 별도 설정 필요 없음
@@ -171,17 +187,17 @@ public class Member {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "reviewee", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> receiveReviews = new ArrayList<>();
 
+    /**
+     * @apiNote 임시로 활성화된 메서드
+     *          앱 사용률 증가시 비활성화후에 기존 기능 활성화 예정
+     */
     @Builder
-    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberType memberType, Role role, ProfileImage profileImage) {
+    public Member(String username, String password, String nickname, String email, String phoneNumber, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberType memberType, Role role, ProfileImage profileImage) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.sido = sido;
-        this.sgg = sgg;
-        this.emd = emd;
-        this.radius = radius;
         this.buddyScore = buddyScore;
         this.joinCount = joinCount;
         this.monthlyExcellentCount = monthlyExcellentCount;
@@ -200,18 +216,18 @@ public class Member {
         this.assignProfileImage(profileImage);
     }
 
+    /**
+     * @apiNote 임시로 활성화된 메서드
+     *          앱 사용률 증가시 비활성화후에 기존 기능 활성화 예정
+     */
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberType memberType, Role role, ProfileImage profileImage) {
+    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberType memberType, Role role, ProfileImage profileImage) {
         return Member.builder()
                 .username(username)
                 .password(password)
                 .nickname(nickname)
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .sido(sido)
-                .sgg(sgg)
-                .emd(emd)
-                .radius(radius)
                 .buddyScore(buddyScore)
                 .joinCount(joinCount)
                 .monthlyExcellentCount(monthlyExcellentCount)
@@ -230,6 +246,74 @@ public class Member {
                 .profileImage(profileImage)
                 .build();
     }
+
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     */
+//    @Builder
+//    public Member(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberType memberType, Role role, ProfileImage profileImage) {
+//        this.username = username;
+//        this.password = password;
+//        this.nickname = nickname;
+//        this.email = email;
+//        this.phoneNumber = phoneNumber;
+//        this.sido = sido;
+//        this.sgg = sgg;
+//        this.emd = emd;
+//        this.radius = radius;
+//        this.buddyScore = buddyScore;
+//        this.joinCount = joinCount;
+//        this.monthlyExcellentCount = monthlyExcellentCount;
+//        this.totalExcellentCount = totalExcellentCount;
+//        this.monthlyGoodCount = monthlyGoodCount;
+//        this.totalGoodCount = totalGoodCount;
+//        this.monthlyBadCount = monthlyBadCount;
+//        this.totalBadCount = totalBadCount;
+//        this.monthlyNoShowCount = monthlyNoShowCount;
+//        this.monthlySendReviewCount = monthlySendReviewCount;
+//        this.description = description;
+//        this.rank = rank;
+//        this.rankScore = rankScore;
+//        this.memberType = memberType;
+//        this.role = role;
+//        this.assignProfileImage(profileImage);
+//    }
+
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     */
+//    // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
+//    public static Member buildMember(String username, String password, String nickname, String email, String phoneNumber, String sido, String sgg, String emd, Integer radius, Double buddyScore, Integer joinCount, Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount, Integer monthlySendReviewCount, String description, Integer rank, Double rankScore, MemberType memberType, Role role, ProfileImage profileImage) {
+//        return Member.builder()
+//                .username(username)
+//                .password(password)
+//                .nickname(nickname)
+//                .email(email)
+//                .phoneNumber(phoneNumber)
+//                .sido(sido)
+//                .sgg(sgg)
+//                .emd(emd)
+//                .radius(radius)
+//                .buddyScore(buddyScore)
+//                .joinCount(joinCount)
+//                .monthlyExcellentCount(monthlyExcellentCount)
+//                .totalExcellentCount(totalExcellentCount)
+//                .monthlyGoodCount(monthlyGoodCount)
+//                .totalGoodCount(totalGoodCount)
+//                .monthlyBadCount(monthlyBadCount)
+//                .totalBadCount(totalBadCount)
+//                .monthlyNoShowCount(monthlyNoShowCount)
+//                .monthlySendReviewCount(monthlySendReviewCount)
+//                .description(description)
+//                .rank(rank)
+//                .rankScore(rankScore)
+//                .memberType(memberType)
+//                .role(role)
+//                .profileImage(profileImage)
+//                .build();
+//    }
 
     // Member 1 -> 1 ProfileImage
     // 단방향 연관관계 편의 메서드
@@ -318,29 +402,49 @@ public class Member {
         this.description = description;
     }
 
-    public void assignSido(String sido) {
-        this.sido = sido;
-    }
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     */
+//    public void assignSido(String sido) {
+//        this.sido = sido;
+//    }
 
-    public void assignSgg(String sgg) {
-        this.sgg = sgg;
-    }
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     */
+//    public void assignSgg(String sgg) {
+//        this.sgg = sgg;
+//    }
 
-    public void assignEmd(String emd) {
-        this.emd = emd;
-    }
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     */
+//    public void assignEmd(String emd) {
+//        this.emd = emd;
+//    }
 
-    // Member 위치 수정 메서드
-    public void assignLocation(String sido, String sgg, String emd) {
-        this.sido = sido;
-        this.sgg = sgg;
-        this.emd = emd;
-    }
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     */
+//    // Member 위치 수정 메서드
+//    public void assignLocation(String sido, String sgg, String emd) {
+//        this.sido = sido;
+//        this.sgg = sgg;
+//        this.emd = emd;
+//    }
 
-    // Member 반경 수정 메서드
-    public void assignRadius(Integer radius) {
-        this.radius = radius;
-    }
+    /**
+     * @apiNote 현재는 사용률 저조로 기능이 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     */
+//    // Member 반경 수정 메서드
+//    public void assignRadius(Integer radius) {
+//        this.radius = radius;
+//    }
 
     // 각 리뷰 카운트 수정 메서드
     public void assignReviewCount(Integer monthlyExcellentCount, Integer totalExcellentCount, Integer monthlyGoodCount, Integer totalGoodCount, Integer monthlyBadCount, Integer totalBadCount, Integer monthlyNoShowCount) {

@@ -104,19 +104,23 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .map(profileInfosDTO -> profileInfosDTO.toBuilder().badges(badges).build());
     }
 
-    @Override
-    public Optional<MemberResponse.LocationWithRadiusDTO> findLocationWithRadiusDTOByUsername(String username) {
-        return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.fields(MemberResponse.LocationWithRadiusDTO.class,
-                        member.sido,
-                        member.sgg,
-                        member.emd,
-                        member.radius
-                ))
-                .from(member)
-                .where(member.username.eq(username))
-                .fetchOne());
-    }
+    /**
+     * @apiNote 현재는 사용률 저조로 메서드가 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     */
+//    @Override
+//    public Optional<MemberResponse.LocationWithRadiusDTO> findLocationWithRadiusDTOByUsername(String username) {
+//        return Optional.ofNullable(jpaQueryFactory
+//                .select(Projections.fields(MemberResponse.LocationWithRadiusDTO.class,
+//                        member.sido,
+//                        member.sgg,
+//                        member.emd,
+//                        member.radius
+//                ))
+//                .from(member)
+//                .where(member.username.eq(username))
+//                .fetchOne());
+//    }
 
     @Override
     public Optional<MemberResponse.UsernameDTO> findUserNameDTOByUsername(String username) {

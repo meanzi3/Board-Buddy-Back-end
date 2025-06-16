@@ -13,8 +13,8 @@ import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.service.ChatMessageService;
 import sumcoda.boardbuddy.service.ChatRoomService;
 import sumcoda.boardbuddy.service.GatherArticleService;
-import sumcoda.boardbuddy.service.NotificationService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -152,6 +152,8 @@ public class GatherArticleController {
     }
 
     /**
+     * @apiNote 임시 수정된 상태
+     *          위치 관련 코드 제거 필요
      * 모집글 리스트 조회 요청
      *
      * @param page     페이지 번호
@@ -168,12 +170,24 @@ public class GatherArticleController {
             @RequestAttribute String username) {
         log.info("getGatherArticles is working");
 
-        GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(page, status, sort, username);
+        /**
+         * @apiNote 임시 비활성화된 상태
+         *          위치 관련 코드 제거 필요
+         */
+//        GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(page, status, sort, username);
+
+        /**
+         * @apiNote 임시 작성된 상태
+         *          위치 관련 코드 수정후 제거 필요
+         */
+        GatherArticleResponse.ReadListDTO posts = new GatherArticleResponse.ReadListDTO();
 
         return buildSuccessResponseWithMultiplePairKeyData(posts, "모집글 리스트 조회를 성공하였습니다.", HttpStatus.OK);
     }
 
     /**
+     * @apiNote 임시 수정된 상태
+     *          위치 관련 코드 제거 필요
      * 모집글 검색 요청
      *
      * @param query     검색어
@@ -185,7 +199,17 @@ public class GatherArticleController {
             @RequestParam String query,
             @RequestAttribute String username) {
 
-        List<GatherArticleResponse.SearchResultDTO> posts = gatherArticleService.searchArticles(query, username);
+        /**
+         * @apiNote 임시 비활성화된 상태
+         *          위치 관련 코드 제거 필요
+         */
+//        List<GatherArticleResponse.SearchResultDTO> posts = gatherArticleService.searchArticles(query, username);
+
+        /**
+         * @apiNote 임시 작성된 상태
+         *          위치 관련 코드 수정후 제거 필요
+         */
+        List<GatherArticleResponse.SearchResultDTO> posts = new ArrayList<>();
 
         return buildSuccessResponseWithPairKeyData("posts", posts, "모집글 검색에 성공하였습니다.", HttpStatus.OK);
     }

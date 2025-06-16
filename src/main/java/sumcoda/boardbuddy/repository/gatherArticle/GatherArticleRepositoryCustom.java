@@ -1,10 +1,7 @@
 package sumcoda.boardbuddy.repository.gatherArticle;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.entity.Member;
-import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,9 +18,13 @@ public interface GatherArticleRepositoryCustom {
 
     Optional<GatherArticleResponse.IdDTO> findIdDTOById(Long gatherArticleId);
 
-    Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
-            List<String> sidoList, List<String> sggList, List<String> emdList,
-            String status, String sort, MemberGatherArticleRole role, Pageable pageable);
+    /**
+     * @apiNote 임시 비활성화된 상태
+     *          위치 관련 코드 제거 필요
+     */
+//    Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
+//            List<String> sidoList, List<String> sggList, List<String> emdList,
+//            String status, String sort, MemberGatherArticleRole role, Pageable pageable);
 
     Optional<GatherArticleResponse.SummaryInfoDTO> findSimpleInfoByGatherArticleId(Long gatherArticleId);
 
@@ -31,10 +32,18 @@ public interface GatherArticleRepositoryCustom {
 
     Optional<GatherArticleResponse.TitleDTO> findTitleDTOById(Long gatherArticleId);
 
-    Optional<GatherArticleResponse.LocationInfoDTO> findLocationInfoDTOById(Long gatherArticleId);
+    /**
+     * @apiNote 임시 비활성화된 상태
+     *          위치 관련 코드 제거 필요
+     */
+//    Optional<GatherArticleResponse.LocationInfoDTO> findLocationInfoDTOById(Long gatherArticleId);
 
-    List<GatherArticleResponse.SearchResultDTO> findSearchResultDTOByKeyword(
-            List<String> sidoList, List<String> sggList, List<String> emdList, MemberGatherArticleRole role, String keyword);
+    /**
+     * @apiNote 임시 비활성화된 상태
+     *          위치 관련 코드 제거 필요
+     */
+//    List<GatherArticleResponse.SearchResultDTO> findSearchResultDTOByKeyword(
+//            List<String> sidoList, List<String> sggList, List<String> emdList, MemberGatherArticleRole role, String keyword);
 
     Optional<GatherArticleResponse.StatusDTO> findStatusDTOById(Long gatherArticleId);
 

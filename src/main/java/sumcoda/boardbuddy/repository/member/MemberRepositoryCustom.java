@@ -19,7 +19,11 @@ public interface MemberRepositoryCustom {
 
     Optional<MemberResponse.ProfileInfosDTO> findMemberProfileByNickname(String nickname);
 
-    Optional<MemberResponse.LocationWithRadiusDTO> findLocationWithRadiusDTOByUsername(String username);
+    /**
+     * @apiNote 현재는 사용률 저조로 메서드가 비활성화된 상태
+     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     */
+//    Optional<MemberResponse.LocationWithRadiusDTO> findLocationWithRadiusDTOByUsername(String username);
 
     Optional<MemberResponse.UsernameDTO> findUserNameDTOByUsername(String username);
 

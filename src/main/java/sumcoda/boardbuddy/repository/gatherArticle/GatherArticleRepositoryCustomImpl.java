@@ -125,48 +125,52 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .fetchOne());
     }
 
-    @Override
-    public Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
-            List<String> sidoList, List<String> sggList, List<String> emdList,
-            String status, String sort, MemberGatherArticleRole role, Pageable pageable) {
-
-        List<GatherArticleResponse.ReadSliceDTO> results = jpaQueryFactory.select(Projections.fields(
-                        GatherArticleResponse.ReadSliceDTO.class,
-                        gatherArticle.id,
-                        gatherArticle.title,
-                        gatherArticle.description,
-                        Projections.fields(GatherArticleResponse.AuthorSimpleDTO.class,
-                                member.nickname.as("nickname"),
-                                member.rank.as("rank")).as("author"),
-                        gatherArticle.meetingLocation,
-                        gatherArticle.maxParticipants,
-                        gatherArticle.currentParticipants,
-                        gatherArticle.startDateTime,
-                        gatherArticle.endDateTime,
-                        gatherArticle.createdAt,
-                        gatherArticle.gatherArticleStatus.as("status")))
-                .from(gatherArticle)
-                .join(gatherArticle.memberGatherArticles, memberGatherArticle)
-                .join(memberGatherArticle.member, member)
-                .where(
-                        inLocation(sidoList, sggList, emdList),
-                        eqStatus(status),
-                        eqMemberGatherArticleRole(role)
-                )
-                .orderBy(getOrderSpecifiers(sort))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1)
-                .fetch();
-
-        boolean hasNext = false;
-
-        if (results.size() > pageable.getPageSize()) {
-            results.remove(pageable.getPageSize());
-            hasNext = true;
-        }
-
-        return new SliceImpl<>(results, pageable, hasNext);
-    }
+    /**
+     * @apiNote 임시 비활성화된 상태
+     *          위치 관련 코드 제거 필요
+     */
+//    @Override
+//    public Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
+//            List<String> sidoList, List<String> sggList, List<String> emdList,
+//            String status, String sort, MemberGatherArticleRole role, Pageable pageable) {
+//
+//        List<GatherArticleResponse.ReadSliceDTO> results = jpaQueryFactory.select(Projections.fields(
+//                        GatherArticleResponse.ReadSliceDTO.class,
+//                        gatherArticle.id,
+//                        gatherArticle.title,
+//                        gatherArticle.description,
+//                        Projections.fields(GatherArticleResponse.AuthorSimpleDTO.class,
+//                                member.nickname.as("nickname"),
+//                                member.rank.as("rank")).as("author"),
+//                        gatherArticle.meetingLocation,
+//                        gatherArticle.maxParticipants,
+//                        gatherArticle.currentParticipants,
+//                        gatherArticle.startDateTime,
+//                        gatherArticle.endDateTime,
+//                        gatherArticle.createdAt,
+//                        gatherArticle.gatherArticleStatus.as("status")))
+//                .from(gatherArticle)
+//                .join(gatherArticle.memberGatherArticles, memberGatherArticle)
+//                .join(memberGatherArticle.member, member)
+//                .where(
+//                        inLocation(sidoList, sggList, emdList),
+//                        eqStatus(status),
+//                        eqMemberGatherArticleRole(role)
+//                )
+//                .orderBy(getOrderSpecifiers(sort))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize() + 1)
+//                .fetch();
+//
+//        boolean hasNext = false;
+//
+//        if (results.size() > pageable.getPageSize()) {
+//            results.remove(pageable.getPageSize());
+//            hasNext = true;
+//        }
+//
+//        return new SliceImpl<>(results, pageable, hasNext);
+//    }
 
     /**
      * 특정 모집글 Id로 간단한 모집글 정보 조회
@@ -273,66 +277,78 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .fetchOne());
     }
 
-    @Override
-    public Optional<GatherArticleResponse.LocationInfoDTO> findLocationInfoDTOById(Long gatherArticleId) {
-        return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.fields(GatherArticleResponse.LocationInfoDTO.class,
-                        gatherArticle.sido,
-                        gatherArticle.sgg,
-                        gatherArticle.emd
-                ))
-                .from(gatherArticle)
-                .where(gatherArticle.id.eq(gatherArticleId))
-                .fetchOne());
-    }
+    /**
+     * @apiNote 임시 비활성화된 상태
+     *          위치 관련 코드 제거 필요
+     */
+//    @Override
+//    public Optional<GatherArticleResponse.LocationInfoDTO> findLocationInfoDTOById(Long gatherArticleId) {
+//        return Optional.ofNullable(jpaQueryFactory
+//                .select(Projections.fields(GatherArticleResponse.LocationInfoDTO.class,
+//                        gatherArticle.sido,
+//                        gatherArticle.sgg,
+//                        gatherArticle.emd
+//                ))
+//                .from(gatherArticle)
+//                .where(gatherArticle.id.eq(gatherArticleId))
+//                .fetchOne());
+//    }
 
-    @Override
-    public List<GatherArticleResponse.SearchResultDTO> findSearchResultDTOByKeyword(List<String> sidoList, List<String> sggList, List<String> emdList, MemberGatherArticleRole role, String keyword) {
+    /**
+     * @apiNote 임시 비활성화된 상태
+     *          위치 관련 코드 제거 필요
+     */
+//    @Override
+//    public List<GatherArticleResponse.SearchResultDTO> findSearchResultDTOByKeyword(List<String> sidoList, List<String> sggList, List<String> emdList, MemberGatherArticleRole role, String keyword) {
+//
+//        return jpaQueryFactory
+//                .select(Projections.fields(
+//                        GatherArticleResponse.SearchResultDTO.class,
+//                        gatherArticle.id,
+//                        gatherArticle.title,
+//                        gatherArticle.description,
+//                        Projections.fields(GatherArticleResponse.AuthorSimpleDTO.class,
+//                                member.nickname.as("nickname"),
+//                                member.rank.as("rank")).as("author"),
+//                        gatherArticle.meetingLocation,
+//                        gatherArticle.maxParticipants,
+//                        gatherArticle.currentParticipants,
+//                        gatherArticle.startDateTime,
+//                        gatherArticle.endDateTime,
+//                        gatherArticle.createdAt,
+//                        gatherArticle.gatherArticleStatus.as("status")))
+//                .from(gatherArticle)
+//                .join(gatherArticle.memberGatherArticles, memberGatherArticle)
+//                .join(memberGatherArticle.member, member)
+//                .where(
+//                        inLocation(sidoList, sggList, emdList),
+//                        eqMemberGatherArticleRole(role),
+//                        titleOrDescriptionContains(keyword)
+//                )
+//                .orderBy(gatherArticle.id.desc())
+//                .fetch();
+//
+//    }
 
-        return jpaQueryFactory
-                .select(Projections.fields(
-                        GatherArticleResponse.SearchResultDTO.class,
-                        gatherArticle.id,
-                        gatherArticle.title,
-                        gatherArticle.description,
-                        Projections.fields(GatherArticleResponse.AuthorSimpleDTO.class,
-                                member.nickname.as("nickname"),
-                                member.rank.as("rank")).as("author"),
-                        gatherArticle.meetingLocation,
-                        gatherArticle.maxParticipants,
-                        gatherArticle.currentParticipants,
-                        gatherArticle.startDateTime,
-                        gatherArticle.endDateTime,
-                        gatherArticle.createdAt,
-                        gatherArticle.gatherArticleStatus.as("status")))
-                .from(gatherArticle)
-                .join(gatherArticle.memberGatherArticles, memberGatherArticle)
-                .join(memberGatherArticle.member, member)
-                .where(
-                        inLocation(sidoList, sggList, emdList),
-                        eqMemberGatherArticleRole(role),
-                        titleOrDescriptionContains(keyword)
-                )
-                .orderBy(gatherArticle.id.desc())
-                .fetch();
-
-    }
-
-    private BooleanExpression titleOrDescriptionContains(String keyword) {
-        if (keyword == null || keyword.isEmpty()) {
-            return null;
-        }
-
-        // 키워드 공백 제거
-        String keywordWithoutWhiteSpace = keyword.replaceAll("\\s", "");
-
-        // SQL 함수를 사용하여 공백 제거
-        StringTemplate titleTemplate = Expressions.stringTemplate("replace({0}, ' ', '')", gatherArticle.title);
-        StringTemplate descriptionTemplate = Expressions.stringTemplate("replace({0}, ' ', '')", gatherArticle.description);
-
-        return titleTemplate.containsIgnoreCase(keywordWithoutWhiteSpace)
-                .or(descriptionTemplate.containsIgnoreCase(keywordWithoutWhiteSpace));
-    }
+    /**
+     * @apiNote 임시 비활성화된 상태
+     *          위치 관련 코드 제거 필요
+     */
+//    private BooleanExpression titleOrDescriptionContains(String keyword) {
+//        if (keyword == null || keyword.isEmpty()) {
+//            return null;
+//        }
+//
+//        // 키워드 공백 제거
+//        String keywordWithoutWhiteSpace = keyword.replaceAll("\\s", "");
+//
+//        // SQL 함수를 사용하여 공백 제거
+//        StringTemplate titleTemplate = Expressions.stringTemplate("replace({0}, ' ', '')", gatherArticle.title);
+//        StringTemplate descriptionTemplate = Expressions.stringTemplate("replace({0}, ' ', '')", gatherArticle.description);
+//
+//        return titleTemplate.containsIgnoreCase(keywordWithoutWhiteSpace)
+//                .or(descriptionTemplate.containsIgnoreCase(keywordWithoutWhiteSpace));
+//    }
 
     @Override
     public Optional<GatherArticleResponse.StatusDTO> findStatusDTOById(Long gatherArticleId) {

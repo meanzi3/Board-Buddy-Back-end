@@ -146,6 +146,21 @@ public class ChatMessageResponse {
 
     @Getter
     @NoArgsConstructor
+    public static class LatestChatMessageInfoProjectionDTO {
+
+        private String content;
+
+        private Instant sentAt;
+
+        @Builder
+        public LatestChatMessageInfoProjectionDTO(String content, Instant sentAt) {
+            this.content = content;
+            this.sentAt = sentAt;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
     public static class LatestChatMessageInfoDTO {
 
         private String content;

@@ -152,8 +152,7 @@ public class GatherArticleController {
     }
 
     /**
-     * @apiNote 임시 수정된 상태
-     *          위치 관련 코드 제거 필요
+     * @apiNote V1 - 내 동네 반경 n km 기반 모집글 리스트 조회 (현재 미사용, 향후 복원 가능)
      * 모집글 리스트 조회 요청
      *
      * @param page     페이지 번호
@@ -162,56 +161,93 @@ public class GatherArticleController {
      * @param username 사용자 이름
      * @return 모집글 리스트
      */
-    @GetMapping("/api/gather-articles")
-    public ResponseEntity<ApiResponse<GatherArticleResponse.ReadListDTO>> getGatherArticles(
-            @RequestParam Integer page,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String sort,
-            @RequestAttribute String username) {
-        log.info("getGatherArticles is working");
-
-        /**
-         * @apiNote 임시 비활성화된 상태
-         *          위치 관련 코드 제거 필요
-         */
-//        GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(page, status, sort, username);
-
-        /**
-         * @apiNote 임시 작성된 상태
-         *          위치 관련 코드 수정후 제거 필요
-         */
-        GatherArticleResponse.ReadListDTO posts = new GatherArticleResponse.ReadListDTO();
-
-        return buildSuccessResponseWithMultiplePairKeyData(posts, "모집글 리스트 조회를 성공하였습니다.", HttpStatus.OK);
-    }
+//    @GetMapping("/api/gather-articles")
+//    public ResponseEntity<ApiResponse<GatherArticleResponse.ReadListDTO>> getGatherArticles(
+//            @RequestParam Integer page,
+//            @RequestParam(required = false) String status,
+//            @RequestParam(required = false) String sort,
+//            @RequestAttribute String username) {
+//        log.info("getGatherArticles is working");
+//
+//        /**
+//         * @apiNote 임시 비활성화된 상태
+//         *          위치 관련 코드 제거 필요
+//         */
+////        GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticles(page, status, sort, username);
+//
+//        /**
+//         * @apiNote 임시 작성된 상태
+//         *          위치 관련 코드 수정후 제거 필요
+//         */
+//        GatherArticleResponse.ReadListDTO posts = new GatherArticleResponse.ReadListDTO();
+//
+//        return buildSuccessResponseWithMultiplePairKeyData(posts, "모집글 리스트 조회를 성공하였습니다.", HttpStatus.OK);
+//    }
 
     /**
-     * @apiNote 임시 수정된 상태
-     *          위치 관련 코드 제거 필요
+     * @apiNote V1 - 내 동네 반경 n km 기반 모집글 검색 (현재 미사용, 향후 복원 가능)
      * 모집글 검색 요청
      *
      * @param query     검색어
      * @param username  사용자 username
      * @return          검색 결과 리스트
      */
-    @GetMapping("/api/gather-articles/search")
-    public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.SearchResultDTO>>>> searchArticles(
-            @RequestParam String query,
-            @RequestAttribute String username) {
+//    @GetMapping("/api/gather-articles/search")
+//    public ResponseEntity<ApiResponse<Map<String, List<GatherArticleResponse.SearchResultDTO>>>> searchArticles(
+//            @RequestParam String query,
+//            @RequestAttribute String username) {
+//
+//        /**
+//         * @apiNote 임시 비활성화된 상태
+//         *          위치 관련 코드 제거 필요
+//         */
+////        List<GatherArticleResponse.SearchResultDTO> posts = gatherArticleService.searchArticles(query, username);
+//
+//        /**
+//         * @apiNote 임시 작성된 상태
+//         *          위치 관련 코드 수정후 제거 필요
+//         */
+//        List<GatherArticleResponse.SearchResultDTO> posts = new ArrayList<>();
+//
+//        return buildSuccessResponseWithPairKeyData("posts", posts, "모집글 검색에 성공하였습니다.", HttpStatus.OK);
+//    }
 
-        /**
-         * @apiNote 임시 비활성화된 상태
-         *          위치 관련 코드 제거 필요
-         */
-//        List<GatherArticleResponse.SearchResultDTO> posts = gatherArticleService.searchArticles(query, username);
+    /**
+     * @apiNote V2 - 사용자가 지정한 지역 기반 모집글 리스트 조회
+     * 모집글 리스트 조회 요청 (검색 포함)
+     *
+     * @param page      페이지 번호
+     * @param sido      시도
+     * @param sgg       시군구
+     * @param status    모집 상태 (옵션)
+     * @param sort      정렬 기준 (옵션)
+     * @param keyword   검색어
+     * @return          모집글 리스트
+     */
+    @GetMapping("/api/gather-articles")
+    public ResponseEntity<ApiResponse<GatherArticleResponse.ReadListDTO>> getGatherArticlesV2(
+            @RequestParam Integer page,
+            @RequestParam(required = false) String sido,
+            @RequestParam(required = false) String sgg,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String keyword) {
 
-        /**
-         * @apiNote 임시 작성된 상태
-         *          위치 관련 코드 수정후 제거 필요
-         */
-        List<GatherArticleResponse.SearchResultDTO> posts = new ArrayList<>();
+        log.info("getGatherArticlesV2 is working");
+        log.info(keyword);
 
-        return buildSuccessResponseWithPairKeyData("posts", posts, "모집글 검색에 성공하였습니다.", HttpStatus.OK);
+        GatherArticleResponse.ReadListDTO posts = gatherArticleService.getGatherArticlesV2(page, sido, sgg, status, sort, keyword);
+
+        // 검색어가 있고, 결과가 비어 있는 경우 메시지만 다르게
+        if (keyword != null && posts.getPosts().isEmpty()) {
+            return buildSuccessResponseWithMultiplePairKeyData(
+                    posts, "검색 결과가 없습니다.", HttpStatus.OK
+            );
+        }
+
+        return buildSuccessResponseWithMultiplePairKeyData(
+                posts, "모집글 리스트 조회를 성공하였습니다.", HttpStatus.OK
+        );
     }
 }
 

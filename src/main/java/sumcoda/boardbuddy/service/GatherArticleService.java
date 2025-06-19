@@ -2,6 +2,9 @@ package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.*;
@@ -262,8 +265,7 @@ public class GatherArticleService {
     }
 
     /**
-     * @apiNote 임시 비활성화된 상태
-     *          위치 관련 코드 제거 필요
+     * @apiNote V1 - 내 동네 반경 n km 기반 모집글 리스트 조회 (현재 미사용, 향후 복원 가능)
      * 모집글 리스트 조회
      *
      * @param page     페이지 번호
@@ -316,6 +318,59 @@ public class GatherArticleService {
 //    }
 
     /**
+     * @apiNote V2 - 사용자가 지정한 지역 기반 모집글 리스트 조회
+     * 모집글 리스트 조회 (검색 포함)
+     *
+     * @param page      페이지 번호
+     * @param sido      시도
+     * @param sgg       시군구
+     * @param status    모집 상태 (옵션)
+     * @param sort      정렬 기준 (옵션)
+     * @param keyword   검색어
+     * @return          모집글 리스트 DTO
+     */
+    public GatherArticleResponse.ReadListDTO getGatherArticlesV2(
+            Integer page,
+            String sido,
+            String sgg,
+            String status,
+            String sort,
+            String keyword
+    ) {
+
+        // 정렬 기준 검증
+        if (sort != null && !sort.equals(GatherArticleStatus.SOON.getValue())) {
+            throw new GatherArticleSortException("유효하지 않은 정렬 기준입니다.");
+        }
+
+        // 모집글 상태 검증
+        if (status != null && !status.equals(GatherArticleStatus.OPEN.getValue())) {
+            throw new GatherArticleStatusException("유효하지 않은 모집글 상태입니다.");
+        }
+
+        // 검색어 검증
+        if (keyword != null && keyword.length() < 2) {
+            throw new GatherArticleSearchLengthException("검색어는 두 글자 이상이어야 합니다.");
+        }
+
+        // 페이징 정보 생성
+        Pageable pageable = PageRequest.of(page, 10);
+        // AUTHOR 로 필터하기 위한 역할 선언
+        MemberGatherArticleRole role = MemberGatherArticleRole.AUTHOR;
+
+        // 모집글 리스트 조회
+        Slice<GatherArticleResponse.ReadSliceDTO> result = gatherArticleRepository.findReadSliceDTOByLocationV2AndStatusAndSortAndKeyword(
+                sido, sgg, status, sort, keyword, role, pageable);
+
+        // 모집글 리스트 DTO 생성 및 반환
+        return GatherArticleResponse.ReadListDTO.builder()
+                .posts(result.getContent())
+                .last(result.isLast())
+                .build();
+
+    }
+
+    /**
      * 채팅방 정보와 연관된 모집글 간단 정보 조회
      *
      * @param chatRoomId 채팅방 Id
@@ -343,8 +398,7 @@ public class GatherArticleService {
     }
 
     /**
-     * @apiNote 임시 비활성화된 상태
-     *          위치 관련 코드 제거 필요
+     * @apiNote V1 - 내 동네 반경 n km 기반 모집글 검색 (현재 미사용, 향후 복원 가능)
      * 모집글 검색
      * @param keyword   검색어
      * @param username  사용자 username

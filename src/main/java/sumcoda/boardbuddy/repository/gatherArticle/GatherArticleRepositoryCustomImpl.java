@@ -1,5 +1,6 @@
 package sumcoda.boardbuddy.repository.gatherArticle;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -126,8 +127,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
     }
 
     /**
-     * @apiNote 임시 비활성화된 상태
-     *          위치 관련 코드 제거 필요
+     * @apiNote V1 - 내 동네 반경 n km 기반 모집글 리스트 조회 (현재 미사용, 향후 복원 가능)
      */
 //    @Override
 //    public Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationAndStatusAndSort(
@@ -171,6 +171,68 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
 //
 //        return new SliceImpl<>(results, pageable, hasNext);
 //    }
+
+    /**
+     * @apiNote V2 - 사용자가 지정한 지역 기반 모집글 리스트 조회
+     */
+    @Override
+    public Slice<GatherArticleResponse.ReadSliceDTO> findReadSliceDTOByLocationV2AndStatusAndSortAndKeyword(
+            String sido, String sgg,
+            String status, String sort, String keyword, MemberGatherArticleRole role, Pageable pageable) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (sido != null) {
+            builder.and(gatherArticle.sido.eq(sido));
+        }
+
+        if (sgg != null) {
+            builder.and(gatherArticle.sgg.eq(sgg));
+        }
+
+        BooleanExpression keywordCondition = containsKeywordInTitleOrDescription(keyword);
+        if (keywordCondition != null) {
+            builder.and(keywordCondition);
+        }
+
+        List<GatherArticleResponse.ReadSliceDTO> results = jpaQueryFactory
+                .select(Projections.fields(
+                        GatherArticleResponse.ReadSliceDTO.class,
+                        gatherArticle.id,
+                        gatherArticle.title,
+                        gatherArticle.description,
+                        Projections.fields(GatherArticleResponse.AuthorSimpleDTO.class,
+                                member.nickname.as("nickname"),
+                                member.rank.as("rank")).as("author"),
+                        gatherArticle.meetingLocation,
+                        gatherArticle.maxParticipants,
+                        gatherArticle.currentParticipants,
+                        gatherArticle.startDateTime,
+                        gatherArticle.endDateTime,
+                        gatherArticle.createdAt,
+                        gatherArticle.gatherArticleStatus.as("status")))
+                .from(gatherArticle)
+                .join(gatherArticle.memberGatherArticles, memberGatherArticle)
+                .join(memberGatherArticle.member, member)
+                .where(
+                        builder,
+                        eqStatus(status),
+                        eqMemberGatherArticleRole(role)
+                )
+                .orderBy(getOrderSpecifiers(sort))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        boolean hasNext = false;
+
+        if (results.size() > pageable.getPageSize()) {
+            results.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(results, pageable, hasNext);
+    }
 
     /**
      * 특정 모집글 Id로 간단한 모집글 정보 조회
@@ -330,25 +392,21 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
 //
 //    }
 
-    /**
-     * @apiNote 임시 비활성화된 상태
-     *          위치 관련 코드 제거 필요
-     */
-//    private BooleanExpression titleOrDescriptionContains(String keyword) {
-//        if (keyword == null || keyword.isEmpty()) {
-//            return null;
-//        }
-//
-//        // 키워드 공백 제거
-//        String keywordWithoutWhiteSpace = keyword.replaceAll("\\s", "");
-//
-//        // SQL 함수를 사용하여 공백 제거
-//        StringTemplate titleTemplate = Expressions.stringTemplate("replace({0}, ' ', '')", gatherArticle.title);
-//        StringTemplate descriptionTemplate = Expressions.stringTemplate("replace({0}, ' ', '')", gatherArticle.description);
-//
-//        return titleTemplate.containsIgnoreCase(keywordWithoutWhiteSpace)
-//                .or(descriptionTemplate.containsIgnoreCase(keywordWithoutWhiteSpace));
-//    }
+    private BooleanExpression containsKeywordInTitleOrDescription(String keyword) {
+        if (keyword == null || keyword.isEmpty()) {
+            return null;
+        }
+
+        // 키워드 공백 제거
+        String keywordWithoutWhiteSpace = keyword.replaceAll("\\s", "");
+
+        // SQL 함수를 사용하여 공백 제거
+        StringTemplate titleTemplate = Expressions.stringTemplate("replace({0}, ' ', '')", gatherArticle.title);
+        StringTemplate descriptionTemplate = Expressions.stringTemplate("replace({0}, ' ', '')", gatherArticle.description);
+
+        return titleTemplate.containsIgnoreCase(keywordWithoutWhiteSpace)
+                .or(descriptionTemplate.containsIgnoreCase(keywordWithoutWhiteSpace));
+    }
 
     @Override
     public Optional<GatherArticleResponse.StatusDTO> findStatusDTOById(Long gatherArticleId) {

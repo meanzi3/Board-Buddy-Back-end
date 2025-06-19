@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sumcoda.boardbuddy.dto.ChatMessageResponse;
 import sumcoda.boardbuddy.dto.ChatRoomResponse;
+import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.MemberChatRoomResponse;
 import sumcoda.boardbuddy.entity.ChatRoom;
 import sumcoda.boardbuddy.entity.GatherArticle;
@@ -22,6 +24,8 @@ import sumcoda.boardbuddy.repository.member.MemberRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static sumcoda.boardbuddy.util.ChatRoomUtil.convertToChatRoomDetailsDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -131,7 +135,8 @@ public class ChatRoomService {
         if (!isMemberExists) {
             throw new MemberRetrievalException("서버 문제로 사용자의 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
         }
+        List<ChatRoomResponse.ChatRoomDetailsProjectionDTO> chatRoomDetailsListByUsername = chatRoomRepository.findChatRoomDetailsListByUsername(username);
 
-        return chatRoomRepository.findChatRoomDetailsListByUsername(username);
+        return convertToChatRoomDetailsDTO(chatRoomDetailsListByUsername);
     }
 }

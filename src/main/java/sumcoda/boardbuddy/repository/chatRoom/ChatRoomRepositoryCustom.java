@@ -11,5 +11,5 @@ public interface ChatRoomRepositoryCustom {
 
     Optional<ChatRoomResponse.ValidateDTO> findValidateDTOByGatherArticleId(Long gatherArticleId);
 
-    List<ChatRoomResponse.ChatRoomDetailsDTO> findChatRoomDetailsListByUsername(String username);
+    List<ChatRoomResponse.ChatRoomDetailsProjectionDTO> findChatRoomDetailsListByUsername(String username);
 }

@@ -20,19 +20,37 @@ public class ChatRoomResponse {
 
     @Getter
     @NoArgsConstructor
+    public static final class ChatRoomDetailsProjectionDTO {
+
+        private Long chatRoomId;
+
+        private GatherArticleResponse.SimpleInfoProjectionDTO gatherArticleSimpleProjectionInfo;
+
+        private ChatMessageResponse.LatestChatMessageInfoProjectionDTO latestChatMessageInfoProjectionDTO;
+
+        @Builder
+        public ChatRoomDetailsProjectionDTO(Long chatRoomId, GatherArticleResponse.SimpleInfoProjectionDTO gatherArticleSimpleProjectionInfo, ChatMessageResponse.LatestChatMessageInfoProjectionDTO latestChatMessageInfoProjectionDTO) {
+            this.chatRoomId = chatRoomId;
+            this.gatherArticleSimpleProjectionInfo = gatherArticleSimpleProjectionInfo;
+            this.latestChatMessageInfoProjectionDTO = latestChatMessageInfoProjectionDTO;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
     public static final class ChatRoomDetailsDTO {
 
         private Long chatRoomId;
 
         private GatherArticleResponse.SimpleInfoDTO gatherArticleSimpleInfo;
 
-        private ChatMessageResponse.LatestChatMessageInfoDTO latestChatMessageInfo;
+        private ChatMessageResponse.LatestChatMessageInfoDTO latestChatMessageInfoDTO;
 
         @Builder
-        public ChatRoomDetailsDTO(Long chatRoomId, GatherArticleResponse.SimpleInfoDTO gatherArticleSimpleInfo, ChatMessageResponse.LatestChatMessageInfoDTO latestChatMessageInfo) {
+        public ChatRoomDetailsDTO(Long chatRoomId, GatherArticleResponse.SimpleInfoDTO gatherArticleSimpleInfo, ChatMessageResponse.LatestChatMessageInfoDTO latestChatMessageInfoDTO) {
             this.chatRoomId = chatRoomId;
             this.gatherArticleSimpleInfo = gatherArticleSimpleInfo;
-            this.latestChatMessageInfo = latestChatMessageInfo;
+            this.latestChatMessageInfoDTO = latestChatMessageInfoDTO;
         }
     }
 

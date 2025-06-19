@@ -48,22 +48,22 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
      * @return 사용자가 속한 채팅방의 상세 정보 목록
      **/
     @Override
-    public List<ChatRoomResponse.ChatRoomDetailsDTO> findChatRoomDetailsListByUsername(String username) {
+    public List<ChatRoomResponse.ChatRoomDetailsProjectionDTO> findChatRoomDetailsListByUsername(String username) {
         QChatMessage subQueryChatMessage = new QChatMessage("subQueryChatMessage");
         QChatRoom subQueryChatRoom = new QChatRoom("subQueryChatRoom");
         return jpaQueryFactory
-                .select(Projections.fields(ChatRoomResponse.ChatRoomDetailsDTO.class,
+                .select(Projections.fields(ChatRoomResponse.ChatRoomDetailsProjectionDTO.class,
                         chatRoom.id.as("chatRoomId"),
-                        Projections.fields(GatherArticleResponse.SimpleInfoDTO.class,
+                        Projections.fields(GatherArticleResponse.SimpleInfoProjectionDTO.class,
                                 gatherArticle.id.as("gatherArticleId"),
                                 gatherArticle.title,
                                 gatherArticle.meetingLocation,
                                 gatherArticle.currentParticipants
-                        ).as("gatherArticleSimpleInfo"),
-                        Projections.fields(ChatMessageResponse.LatestChatMessageInfoDTO.class,
+                        ).as("gatherArticleSimpleProjectionInfo"),
+                        Projections.fields(ChatMessageResponse.LatestChatMessageInfoProjectionDTO.class,
                                 chatMessage.content,
                                 chatMessage.createdAt.as("sentAt")
-                        ).as("latestChatMessageInfo")
+                        ).as("latestChatMessageInfoProjectionDTO")
                 ))
                 .from(memberChatRoom)
                 .join(memberChatRoom.member, member)

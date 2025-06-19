@@ -260,6 +260,27 @@ public class GatherArticleResponse {
 
     @Getter
     @NoArgsConstructor
+    public static class SimpleInfoProjectionDTO {
+
+        private Long gatherArticleId;
+
+        private String title;
+
+        private String meetingLocation;
+
+        private Integer currentParticipants;
+
+        @Builder
+        public SimpleInfoProjectionDTO(Long gatherArticleId, String title, String meetingLocation, Integer currentParticipants) {
+            this.gatherArticleId = gatherArticleId;
+            this.title = title;
+            this.meetingLocation = meetingLocation;
+            this.currentParticipants = currentParticipants;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
     public static class SimpleInfoDTO {
 
         private Long gatherArticleId;

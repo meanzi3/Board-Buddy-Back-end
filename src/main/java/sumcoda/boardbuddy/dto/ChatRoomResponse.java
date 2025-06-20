@@ -44,13 +44,13 @@ public class ChatRoomResponse {
 
         private GatherArticleResponse.SimpleInfoDTO gatherArticleSimpleInfo;
 
-        private ChatMessageResponse.LatestChatMessageInfoDTO latestChatMessageInfoDTO;
+        private ChatMessageResponse.LatestChatMessageInfoDTO latestChatMessageInfo;
 
         @Builder
-        public ChatRoomDetailsDTO(Long chatRoomId, GatherArticleResponse.SimpleInfoDTO gatherArticleSimpleInfo, ChatMessageResponse.LatestChatMessageInfoDTO latestChatMessageInfoDTO) {
+        public ChatRoomDetailsDTO(Long chatRoomId, GatherArticleResponse.SimpleInfoDTO gatherArticleSimpleInfo, ChatMessageResponse.LatestChatMessageInfoDTO latestChatMessageInfo) {
             this.chatRoomId = chatRoomId;
             this.gatherArticleSimpleInfo = gatherArticleSimpleInfo;
-            this.latestChatMessageInfoDTO = latestChatMessageInfoDTO;
+            this.latestChatMessageInfo = latestChatMessageInfo;
         }
     }
 

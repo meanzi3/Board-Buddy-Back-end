@@ -72,5 +72,3 @@ logging:
         jdbc:
           core:
             JdbcTemplate: DEBUG
-    root: debug
-

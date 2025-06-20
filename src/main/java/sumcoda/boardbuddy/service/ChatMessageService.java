@@ -2,7 +2,6 @@ package sumcoda.boardbuddy.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.util.Pair;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -25,6 +24,7 @@ import sumcoda.boardbuddy.util.ChatMessageUtil;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 import static java.time.ZoneOffset.UTC;
@@ -44,8 +44,6 @@ public class ChatMessageService {
     private final MemberRepository memberRepository;
 
     private final MemberChatRoomRepository memberChatRoomRepository;
-
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -323,7 +321,7 @@ public class ChatMessageService {
 
         isJoinedAtExists(joinedAt);
 
-        return joinedAt.toInstant(UTC);
+        return joinedAt.atZone(ZoneId.of("Asia/Seoul")).toInstant();
     }
 
     /**

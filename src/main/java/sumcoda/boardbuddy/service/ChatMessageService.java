@@ -49,8 +49,6 @@ public class ChatMessageService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final ChatMessageCacheService chatMessageCacheService;
-
 
     /**
      * 메세지 발행 및 채팅방에 메세지 전송

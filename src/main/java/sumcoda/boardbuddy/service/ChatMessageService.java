@@ -17,7 +17,6 @@ import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.exception.*;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
-import sumcoda.boardbuddy.infra.event.*;
 import sumcoda.boardbuddy.repository.chatMessage.ChatMessageRepository;
 import sumcoda.boardbuddy.repository.chatRoom.ChatRoomRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
@@ -85,8 +84,6 @@ public class ChatMessageService {
 
         ChatMessage chatMessage = ChatMessage.buildChatMessage(content, MessageType.TALK, member, chatRoom);
 
-//        // 성능 개선용
-//        ChatMessage chatMessage = ChatMessage.buildChatMessage(content, "TALK", member, chatRoom);ㄷ
         Long chatMessageId = chatMessageRepository.save(chatMessage).getId();
 
         log.info("[DB 저장 완료] 채팅 메시지 ID={} | 내용={}", chatMessageId, publishDTO.getContent());
@@ -101,20 +98,8 @@ public class ChatMessageService {
         ChatMessageResponse.ChatMessageItemInfoDTO payload = convertPayload(responseChatMessage);
 
         try {
-            // 메시지 전송 시도 이벤트 발행
-            applicationEventPublisher.publishEvent(new ChatMessageProcessingStartedEvent());
-
-            // 메시지 전송 처리 시간 측정 시작 (나노초 단위)
-            long startTime = System.nanoTime();
-
             // 채팅방 구독자들에게 메시지 전송 (STOMP SEND)
             messagingTemplate.convertAndSend("/ws/chat/messages/subscription/" + chatRoomId, payload);
-
-            // 메시지 전송 처리 시간 측정 종료
-            double durationMillis = (System.nanoTime() - startTime) / 1_000_000.0;
-
-            // 메시지 전송 성공 이벤트 발행
-            applicationEventPublisher.publishEvent(new ChatMessageProcessingCompletedEvent(durationMillis));
 
         } catch (Exception e) {
             log.error("STOMP 메시지 처리 중 예외 발생: {}", e.getMessage());

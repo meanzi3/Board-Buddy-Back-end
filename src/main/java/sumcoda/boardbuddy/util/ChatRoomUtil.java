@@ -11,28 +11,28 @@ import java.util.List;
 public class ChatRoomUtil {
 
     public static List<ChatRoomResponse.ChatRoomDetailsDTO> convertToChatRoomDetailsDTO(List<ChatRoomResponse.ChatRoomDetailsProjectionDTO> chatRoomDetailsListByUsername) {
-        return chatRoomDetailsListByUsername.stream().map(chatRoomDetailsProjectionDTO -> {
+        return chatRoomDetailsListByUsername.stream().map(chatRoomDetailsProjection -> {
 
-                    GatherArticleResponse.SimpleInfoProjectionDTO gatherArticleSimpleProjectionInfo = chatRoomDetailsProjectionDTO.getGatherArticleSimpleProjectionInfo();
+                    GatherArticleResponse.SimpleInfoProjectionDTO gatherArticleSimpleProjectionInfo = chatRoomDetailsProjection.getGatherArticleSimpleProjectionInfo();
 
-                    GatherArticleResponse.SimpleInfoDTO gatherArticleSimpleInfoDTO = GatherArticleResponse.SimpleInfoDTO.builder()
+                    GatherArticleResponse.SimpleInfoDTO gatherArticleSimpleInfo = GatherArticleResponse.SimpleInfoDTO.builder()
                             .gatherArticleId(gatherArticleSimpleProjectionInfo.getGatherArticleId())
                             .title(gatherArticleSimpleProjectionInfo.getTitle())
                             .meetingLocation(gatherArticleSimpleProjectionInfo.getMeetingLocation())
                             .currentParticipants(gatherArticleSimpleProjectionInfo.getCurrentParticipants())
                             .build();
 
-                    ChatMessageResponse.LatestChatMessageInfoProjectionDTO latestChatMessageInfoProjectionDTO = chatRoomDetailsProjectionDTO.getLatestChatMessageInfoProjectionDTO();
+                    ChatMessageResponse.LatestChatMessageInfoProjectionDTO latestChatMessageInfoProjection = chatRoomDetailsProjection.getLatestChatMessageInfoProjectionDTO();
 
-                    ChatMessageResponse.LatestChatMessageInfoDTO latestChatMessageInfoDTO = ChatMessageResponse.LatestChatMessageInfoDTO.builder()
-                            .content(latestChatMessageInfoProjectionDTO.getContent())
-                            .sentAt(LocalDateTime.ofInstant(latestChatMessageInfoProjectionDTO.getSentAt(), ZoneId.systemDefault()))
+                    ChatMessageResponse.LatestChatMessageInfoDTO latestChatMessageInfo = ChatMessageResponse.LatestChatMessageInfoDTO.builder()
+                            .content(latestChatMessageInfoProjection.getContent())
+                            .sentAt(LocalDateTime.ofInstant(latestChatMessageInfoProjection.getSentAt(), ZoneId.systemDefault()))
                             .build();
 
                     return ChatRoomResponse.ChatRoomDetailsDTO.builder()
-                            .chatRoomId(chatRoomDetailsProjectionDTO.getChatRoomId())
-                            .gatherArticleSimpleInfo(gatherArticleSimpleInfoDTO)
-                            .latestChatMessageInfoDTO(latestChatMessageInfoDTO)
+                            .chatRoomId(chatRoomDetailsProjection.getChatRoomId())
+                            .gatherArticleSimpleInfo(gatherArticleSimpleInfo)
+                            .latestChatMessageInfo(latestChatMessageInfo)
                             .build();
                 })
                 .toList();

@@ -83,7 +83,6 @@ public class ChatMessageService {
         String content = publishDTO.getContent();
 
         ChatMessage chatMessage = ChatMessage.buildChatMessage(content, MessageType.TALK, member, chatRoom);
-
         Long chatMessageId = chatMessageRepository.save(chatMessage).getId();
 
         log.info("[DB 저장 완료] 채팅 메시지 ID={} | 내용={}", chatMessageId, publishDTO.getContent());
@@ -181,7 +180,7 @@ public class ChatMessageService {
         List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> chatMessageItemList =
                 chatMessageRepository.findInitialMessagesByChatRoomIdAndUsernameAndJoinedAt(chatRoomId, username, joinedAt);
 
-        log.info("1. chatMessageItemList.size(): {}", chatMessageItemList.size());
+        log.debug("1. chatMessageItemList.size(): {}", chatMessageItemList.size());
 
         // hasMore 계산 & 실제 목록 추출
         Boolean hasMore = getHasMore(chatMessageItemList.size());
@@ -191,13 +190,13 @@ public class ChatMessageService {
         // 가장 오래된 메시지를 기준 커서로 사용함.
         String nextCursor = getNextCursor(chatMessageItemList, hasMore);
 
-        log.info("2. chatMessageItemList.size(): {}", chatMessageItemList.size());
+        log.debug("2. chatMessageItemList.size(): {}", chatMessageItemList.size());
 
 
         List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> subChatMessageItemList =
                 getSubChatMessageItemInfoProjectionDTOList(chatMessageItemList, hasMore);
 
-        log.info("3. subChatMessageItemList.size(): {}", subChatMessageItemList.size());
+        log.debug("3. subChatMessageItemList.size(): {}", subChatMessageItemList.size());
 
         // 3) ASC 순서로 통일
         Collections.reverse(subChatMessageItemList);

@@ -70,7 +70,7 @@ public class ChatMessageController {
      * @version 2.0
      * @since 1.0
      */
-    @GetMapping("/api/chat/{chatRoomId}/messages")
+    @GetMapping("/api/chat/messages/{chatRoomId}")
     public ResponseEntity<ApiResponse<PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO>>> getChatMessages(
             @PathVariable Long chatRoomId,
             @RequestAttribute String username,

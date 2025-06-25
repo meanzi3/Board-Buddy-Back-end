@@ -9,7 +9,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public enum Province {
 
-    SEOUL("서울", List.of(
+    SEOUL("서울", "서울특별시", List.of(
             District.SEOUL_ALL,
             District.SEOUL_GANGNAM,
             District.SEOUL_GANGDONG,
@@ -38,7 +38,7 @@ public enum Province {
             District.SEOUL_JUNGRANG
     )),
 
-    GYEONGGI("경기", List.of(
+    GYEONGGI("경기", "경기도", List.of(
             District.GYEONGGI_ALL,
             District.GYEONGGI_GAPYEONG,
             District.GYEONGGI_GOYANG_DEOKYANG,
@@ -84,7 +84,7 @@ public enum Province {
             District.GYEONGGI_HWASEONG
     )),
 
-    GANGWON("강원", List.of(
+    GANGWON("강원", "강원특별자치도", List.of(
             District.GANGWON_ALL,
             District.GANGWON_GANGNEUNG,
             District.GANGWON_GOSEONG,
@@ -106,7 +106,7 @@ public enum Province {
             District.GANGWON_HOENGSEONG
     )),
 
-    BUSAN("부산", List.of(
+    BUSAN("부산", "부산광역시", List.of(
             District.BUSAN_ALL,
             District.BUSAN_GANGSEO,
             District.BUSAN_GEUMJEONG,
@@ -126,7 +126,7 @@ public enum Province {
             District.BUSAN_HAEUNDAE
     )),
 
-    DAEGU("대구", List.of(
+    DAEGU("대구", "대구광역시", List.of(
             District.DAEGU_ALL,
             District.DAEGU_NAMGU,
             District.DAEGU_DALSEO,
@@ -138,7 +138,7 @@ public enum Province {
             District.DAEGU_JUNG
     )),
 
-    INCHEON("인천", List.of(
+    INCHEON("인천", "인천광역시", List.of(
             District.INCHEON_ALL,
             District.INCHEON_GANGHWA,
             District.INCHEON_GYEYANG,
@@ -152,7 +152,7 @@ public enum Province {
             District.INCHEON_JUNG
     )),
 
-    GWANGJU("광주", List.of(
+    GWANGJU("광주", "광주광역시", List.of(
             District.GWANGJU_ALL,
             District.GWANGJU_GWANGSAN,
             District.GWANGJU_NAMGU,
@@ -161,7 +161,7 @@ public enum Province {
             District.GWANGJU_SEOGU
     )),
 
-    DAEJEON("대전", List.of(
+    DAEJEON("대전", "대전광역시", List.of(
             District.DAEJEON_ALL,
             District.DAEJEON_DADEOK,
             District.DAEJEON_DONGGU,
@@ -170,7 +170,7 @@ public enum Province {
             District.DAEJEON_JUNG
     )),
 
-    ULSAN("울산", List.of(
+    ULSAN("울산", "울산광역시", List.of(
             District.ULSAN_ALL,
             District.ULSAN_NAMGU,
             District.ULSAN_DONGGU,
@@ -179,11 +179,11 @@ public enum Province {
             District.ULSAN_JUNG
     )),
 
-    SEJONG("세종", List.of(
+    SEJONG("세종", "세종특별자치시", List.of(
             District.SEJONG_ALL
     )),
 
-    CHUNGBUK("충북", List.of(
+    CHUNGBUK("충북", "충청북도", List.of(
             District.CHUNGBUK_ALL,
             District.CHUNGBUK_GOESAN,
             District.CHUNGBUK_DANYANG,
@@ -201,7 +201,7 @@ public enum Province {
             District.CHUNGBUK_CHUNGJU
     )),
 
-    CHUNGNAM("충남", List.of(
+    CHUNGNAM("충남", "충청남도", List.of(
             District.CHUNGNAM_ALL,
             District.CHUNGNAM_GYERYONG,
             District.CHUNGNAM_GONGJU,
@@ -221,7 +221,7 @@ public enum Province {
             District.CHUNGNAM_HONGSEONG
     )),
 
-    JEONBUK("전북", List.of(
+    JEONBUK("전북", "전라북도", List.of(
             District.JEONBUK_ALL,
             District.JEONBUK_GOCHANG,
             District.JEONBUK_GUNSAN,
@@ -240,7 +240,7 @@ public enum Province {
             District.JEONBUK_JINAN
     )),
 
-    JEONNAM("전남", List.of(
+    JEONNAM("전남", "전라남도", List.of(
             District.JEONNAM_ALL,
             District.JEONNAM_GANGJIN,
             District.JEONNAM_GOHEUNG,
@@ -266,7 +266,7 @@ public enum Province {
             District.JEONNAM_HWASUN
     )),
 
-    GYEONGBUK("경북", List.of(
+    GYEONGBUK("경북", "경상북도", List.of(
             District.GYEONGBUK_ALL,
             District.GYEONGBUK_GYEONGSAN,
             District.GYEONGBUK_GYEONGJU,
@@ -294,7 +294,7 @@ public enum Province {
             District.GYEONGBUK_POHANG_BUKGU
     )),
 
-    GYEONGNAM("경남", List.of(
+    GYEONGNAM("경남", "경상남도", List.of(
             District.GYEONGNAM_ALL,
             District.GYEONGNAM_GEOJE,
             District.GYEONGNAM_GEACHANG,
@@ -320,13 +320,13 @@ public enum Province {
             District.GYEONGNAM_HAPCHEON
     )),
 
-    JEJU("제주", List.of(
+    JEJU("제주", "제주특별자치도", List.of(
             District.JEJU_ALL,
             District.JEJU_SEOGWIPO,
             District.JEJU_JEJU
     ));
 
-    private final String name;
-
+    private final String name; // 축양형 명칭 (서울, 경기 등)
+    private final String officialName; // 공식 행정구역 명칭 (서울특별시, 경기도 등)
     private final List<District> districts;
 }

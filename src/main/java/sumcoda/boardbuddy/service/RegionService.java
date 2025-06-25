@@ -15,11 +15,11 @@ public class RegionService {
     /**
      * 전체 시/도 목록을 조회
      *
-     * @return List<ProvinceDto> 시도 코드(code)와 한글명(name) 리스트
+     * @return List<ProvinceDto> 시도 코드(code)와 축약형 명칭(name), 공식 행정구역 명칭(officialName) 리스트
      */
     public List<RegionResponse.ProvinceDTO> getProvinceList() {
         return Stream.of(Province.values())
-                .map(p -> new RegionResponse.ProvinceDTO(p.name(), p.getName()))
+                .map(p -> new RegionResponse.ProvinceDTO(p.name(), p.getName(), p.getOfficialName()))
                 .collect(Collectors.toList());
     }
 

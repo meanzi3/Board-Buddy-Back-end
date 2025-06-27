@@ -20,14 +20,18 @@ public class InitializerConfig {
 
     private final BadgeImageService badgeImageService;
 
-    @Bean
-    public ApplicationRunner initializer() {
-        return args -> {
-            memberService.createAdminAccount();
-            memberService.createInitTestAccounts();
-            badgeImageService.assignBadgesToInitTestMembers(YearMonth.now().minusMonths(1));
-        };
-    }
+    /**
+     * admin, test 계정 생성
+     * @return
+     */
+//    @Bean
+//    public ApplicationRunner initializer() {
+//        return args -> {
+//            memberService.createAdminAccount();
+//            memberService.createInitTestAccounts();
+//            badgeImageService.assignBadgesToInitTestMembers(YearMonth.now().minusMonths(1));
+//        };
+//    }
 
     @PostConstruct
     public void setTimeZone(){

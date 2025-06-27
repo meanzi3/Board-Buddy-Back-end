@@ -17,6 +17,7 @@ import org.springframework.data.domain.SliceImpl;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.entity.QMember;
 import sumcoda.boardbuddy.entity.QMemberGatherArticle;
+import sumcoda.boardbuddy.entity.QParticipationApplication;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
@@ -286,7 +287,8 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
     public GatherArticleResponse.ReadDTO findGatherArticleReadDTOByGatherArticleId(Long gatherArticleId, Long memberId) {
 
         // 현재 사용자의 참여 상태를 위한 서브쿼리
-        QMemberGatherArticle currentUserParticipation = new QMemberGatherArticle("currentUserParticipation");
+        QMemberGatherArticle current = new QMemberGatherArticle("current");
+        QParticipationApplication pa = new QParticipationApplication("pa");
 
         return jpaQueryFactory
                 .select(Projections.fields(
@@ -312,20 +314,25 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.createdAt,
                         gatherArticle.gatherArticleStatus.as("status"),
                         new CaseBuilder()
-                                .when(currentUserParticipation.isNull())
-                                .then(Expressions.constant(ParticipationApplicationStatus.NONE))
-                                .when(currentUserParticipation.participationApplication.isNull())
-                                .then(Expressions.constant(ParticipationApplicationStatus.NONE))
-                                .otherwise(currentUserParticipation.participationApplication.participationApplicationStatus).as("participationApplicationStatus")
+                                .when(current.id.isNull()).then(ParticipationApplicationStatus.NONE)
+                                .when(pa.id.isNull()).then(ParticipationApplicationStatus.NONE)
+                                .otherwise(pa.participationApplicationStatus)
+                                .as("participationApplicationStatus")
                 ))
                 .from(gatherArticle)
                 .leftJoin(gatherArticle.memberGatherArticles, memberGatherArticle)
+                // 작성자만 가져옴
+                    .on(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
                 .leftJoin(memberGatherArticle.member, member)
                 .leftJoin(member.profileImage, profileImage)
-                .leftJoin(currentUserParticipation).on(currentUserParticipation.gatherArticle.eq(gatherArticle).and(currentUserParticipation.member.id.eq(memberId)))
-                .where(gatherArticle.id.eq(gatherArticleId)
-                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
-                        .and(memberGatherArticle.member.eq(member)))
+
+                .leftJoin(current)
+                .on(current.gatherArticle.eq(gatherArticle)
+                        .and(current.member.id.eq(memberId)))
+
+                .leftJoin(current.participationApplication, pa)
+
+                .where(gatherArticle.id.eq(gatherArticleId))
                 .fetchOne();
     }
 

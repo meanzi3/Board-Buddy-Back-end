@@ -319,13 +319,18 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                                 .otherwise(currentUserParticipation.participationApplication.participationApplicationStatus).as("participationApplicationStatus")
                 ))
                 .from(gatherArticle)
+                // 작성자만 author DTO 에 채우도록 join 조건을 on() 으로 이동
+                .leftJoin(gatherArticle.memberGatherArticles, memberGatherArticle).on(
+                        memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)
+                )
                 .leftJoin(gatherArticle.memberGatherArticles, memberGatherArticle)
                 .leftJoin(memberGatherArticle.member, member)
                 .leftJoin(member.profileImage, profileImage)
                 .leftJoin(currentUserParticipation).on(currentUserParticipation.gatherArticle.eq(gatherArticle).and(currentUserParticipation.member.id.eq(memberId)))
                 .where(gatherArticle.id.eq(gatherArticleId)
-                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
-                        .and(memberGatherArticle.member.eq(member)))
+//                        .and(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
+//                        .and(memberGatherArticle.member.eq(member))
+                )
                 .fetchOne();
     }
 

@@ -37,7 +37,9 @@ public interface GatherArticleRepositoryCustom {
 
     Optional<GatherArticleResponse.SummaryInfoDTO> findSimpleInfoByGatherArticleId(Long gatherArticleId);
 
-    GatherArticleResponse.ReadDTO findGatherArticleReadDTOByGatherArticleId(Long gatherArticleId, Long memberId);
+    GatherArticleResponse.DetailedInfoDTO findGatherArticleDetailedInfoDTOByGatherArticleId(Long gatherArticleId);
+
+    GatherArticleResponse.ParticipationApplicationStatusDTO findParticipationApplicationStatusDTOByGatherArticleIdAndUsername(Long gatherArticleId, String username);
 
     Optional<GatherArticleResponse.TitleDTO> findTitleDTOById(Long gatherArticleId);
 

@@ -75,16 +75,32 @@ public class GatherArticleController {
     /**
      * 모집글 조회 요청
      *
-     * @param gatherArticleId   조회 요청 모집글 id
-     * @param username          사용자 username
-     * @return                  조회된 모집글과 관련된 응답 데이터
+     * @param gatherArticleId 조회 요청 모집글 ID
+     * @return 조회된 모집글과 관련된 응답 데이터
      */
     @GetMapping(value = "/api/gather-articles/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.ReadDTO>>> getGatherArticle(
-            @PathVariable Long gatherArticleId,
-            @RequestAttribute String username) {
-        GatherArticleResponse.ReadDTO readResponse = gatherArticleService.getGatherArticle(gatherArticleId, username);
-        return buildSuccessResponseWithPairKeyData("post", readResponse, "성공적으로 조회되었습니다.", HttpStatus.OK);
+    public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.DetailedInfoDTO>>> getGatherArticle(
+            @PathVariable Long gatherArticleId) {
+
+        GatherArticleResponse.DetailedInfoDTO gatherArticleDetailedInfo = gatherArticleService.getGatherArticle(gatherArticleId);
+
+        return buildSuccessResponseWithPairKeyData("post", gatherArticleDetailedInfo, "모집글 상세 정보를 성공적으로 조회 하였습니다.", HttpStatus.OK);
+    }
+
+    /**
+     * 모집글 참가 신청 현황 조회
+     *
+     * @param gatherArticleId 조회 요청 모집글 ID
+     * @param username 사용자 username
+     * @return 모집글에 대한 요청을 보낸 사용자의 참가 신청 현황
+     */
+    @GetMapping(value = "/api/gather-articles/{gatherArticleId}/participation-status")
+    public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.ParticipationApplicationStatusDTO>>> getParticipationApplicationStatus(
+            @PathVariable Long gatherArticleId, @RequestAttribute String username) {
+
+        GatherArticleResponse.ParticipationApplicationStatusDTO readResponse = gatherArticleService.getParticipationApplicationStatus(gatherArticleId, username);
+
+        return buildSuccessResponseWithPairKeyData("post", readResponse, "모집글 참가 신청 현황을 성공적으로 조회 하였습니다.", HttpStatus.OK);
     }
 
     /**

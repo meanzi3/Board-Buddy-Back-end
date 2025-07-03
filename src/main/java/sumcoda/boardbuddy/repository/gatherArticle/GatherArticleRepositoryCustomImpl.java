@@ -1,13 +1,13 @@
 package sumcoda.boardbuddy.repository.gatherArticle;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringTemplate;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +31,7 @@ import java.util.Optional;
 import static sumcoda.boardbuddy.entity.QGatherArticle.gatherArticle;
 import static sumcoda.boardbuddy.entity.QMember.member;
 import static sumcoda.boardbuddy.entity.QMemberGatherArticle.memberGatherArticle;
+import static sumcoda.boardbuddy.entity.QParticipationApplication.participationApplication;
 import static sumcoda.boardbuddy.entity.QProfileImage.profileImage;
 
 @Slf4j
@@ -283,22 +284,25 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
         return orderSpecifiers.toArray(new OrderSpecifier<?>[0]);
     }
 
+    /**
+     * 특정 모집글의 상세 정보를 조회
+     *
+     * @param gatherArticleId 조회할 모집글의 ID
+     * @return 모집글 상세 정보를 담은 DetailedInfoDTO 객체
+     */
     @Override
-    public GatherArticleResponse.ReadDTO findGatherArticleReadDTOByGatherArticleId(Long gatherArticleId, Long memberId) {
-
-        // 현재 사용자의 참여 상태를 위한 서브쿼리
-        QMemberGatherArticle current = new QMemberGatherArticle("current");
-        QParticipationApplication pa = new QParticipationApplication("pa");
+    public GatherArticleResponse.DetailedInfoDTO findGatherArticleDetailedInfoDTOByGatherArticleId(Long gatherArticleId) {
 
         return jpaQueryFactory
                 .select(Projections.fields(
-                        GatherArticleResponse.ReadDTO.class,
+                        GatherArticleResponse.DetailedInfoDTO.class,
                         gatherArticle.title,
                         gatherArticle.description,
-                        Projections.fields(GatherArticleResponse.AuthorDTO.class,
+                        Projections.fields(
+                                GatherArticleResponse.AuthorDTO.class,
                                 member.nickname.as("nickname"),
                                 member.rank.as("rank"),
-                                member.profileImage.profileImageS3SavedURL.as("profileImageS3SavedURL"),
+                                profileImage.profileImageS3SavedURL.as("profileImageS3SavedURL"),
                                 member.description.as("description")
                         ).as("author"),
                         gatherArticle.sido,
@@ -312,28 +316,56 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.gatherArticleStatus.as("status"),
-                        new CaseBuilder()
-                                .when(current.id.isNull()).then(ParticipationApplicationStatus.NONE)
-                                .when(pa.id.isNull()).then(ParticipationApplicationStatus.NONE)
-                                .otherwise(pa.participationApplicationStatus)
-                                .as("participationApplicationStatus")
+                        gatherArticle.gatherArticleStatus.as("status")
                 ))
                 .from(gatherArticle)
-                .leftJoin(gatherArticle.memberGatherArticles, memberGatherArticle)
-                // 작성자만 가져옴
-                    .on(memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR))
-                .leftJoin(memberGatherArticle.member, member)
+                // 모집글 작성자는 반드시 있으므로 inner join
+                .innerJoin(gatherArticle.memberGatherArticles, memberGatherArticle)
+                .innerJoin(memberGatherArticle.member, member)
+                // 프로필 이미지는 선택적이므로 left join
                 .leftJoin(member.profileImage, profileImage)
+                .where(
+                        gatherArticle.id.eq(gatherArticleId),
+                        memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)
+                        )
+                .fetchOne();
+    }
 
-                .leftJoin(current)
-                .on(current.gatherArticle.eq(gatherArticle)
-                        .and(current.member.id.eq(memberId)))
-
-                .leftJoin(current.participationApplication, pa)
-
+    /**
+     * 특정 모집글에 대한 사용자의 참여 신청 상태를 조회
+     *
+     * @param gatherArticleId 조회할 모집글의 ID
+     * @param username 조회할 사용자의 username
+     * @return 참여 신청 상태를 담은 ParticipationApplicationStatusDTO 객체
+     */
+    @Override
+    public GatherArticleResponse.ParticipationApplicationStatusDTO findParticipationApplicationStatusDTOByGatherArticleIdAndUsername(Long gatherArticleId, String username) {
+        return jpaQueryFactory
+                .select(Projections.fields(GatherArticleResponse.ParticipationApplicationStatusDTO.class,
+                        participationApplicationStatusExpression(participationApplication)
+                ))
+                .from(gatherArticle)
+                // 모집글은 무조건 조회되어야 하고 참가 신청 기록이 없으면 NULL(NONE)으로 조회
+                .leftJoin(gatherArticle.memberGatherArticles, memberGatherArticle)
+                // username에 해당하는 memberGatherArticle 레코드만 조회
+                .on(memberGatherArticle.member.username.eq(username))
+                .leftJoin(memberGatherArticle.member, member)
+                .leftJoin(memberGatherArticle.participationApplication, participationApplication)
                 .where(gatherArticle.id.eq(gatherArticleId))
                 .fetchOne();
+    }
+
+    /**
+     * participationApplication이 없으면 NONE, 있으면 실제 상태를 반환하는 표현식을 반환
+     *
+     * @param participationApplication QParticipationApplication 타입의 참가 신청 엔티티
+     * @return ParticipationApplicationStatus를 계산하는 Expression
+     */
+    public static Expression<ParticipationApplicationStatus> participationApplicationStatusExpression(
+            QParticipationApplication participationApplication) {
+        return new CaseBuilder()
+                .when(participationApplication.id.isNull()).then(ParticipationApplicationStatus.NONE)
+                .otherwise(participationApplication.participationApplicationStatus);
     }
 
     @Override

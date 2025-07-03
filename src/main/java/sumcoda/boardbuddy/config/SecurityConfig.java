@@ -3,6 +3,7 @@ package sumcoda.boardbuddy.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -111,7 +112,16 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/oauth2/**",
                                 "/api/login/oauth2/code/**",
-                                "/api/auth/locations/search"
+                                "/api/board-cafes",
+                                "/api/regions/**",
+                                "/api/rankings"
+                        ).permitAll()
+                        .requestMatchers(
+                                // 동일한 URL 요청에 대해서 GET 요청만 permitAll()
+                                HttpMethod.GET,
+                                "/api/gather-articles",
+                                "/api/gather-articles/{gatherArticleId}",
+                                "/api/gather-articles/{gatherArticleId}/comments"
                         ).permitAll()
                         // 단순히 로그인한 인증 여부만 확인
 //                        .anyRequest().authenticated()
@@ -150,7 +160,7 @@ public class SecurityConfig {
                         .failureHandler(oAuth2AuthenticationFailureHandler));
 
         http.logout(auth -> auth
-                .logoutUrl("/api/v1/auth/logout")
+                .logoutUrl("/api/auth/logout")
                 .logoutSuccessHandler(customLogoutSuccessHandler)
                 .deleteCookies("JSESSIONID"));
 

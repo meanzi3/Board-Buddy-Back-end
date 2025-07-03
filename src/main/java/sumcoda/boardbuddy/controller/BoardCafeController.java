@@ -30,18 +30,16 @@ public class BoardCafeController {
      * @param x 경도
      * @param y 위도
      * @param radius 반경 (단위: 미터)
-     * @param username 사용자 이름
      * @return 보드게임 카페 리스트
      */
     @GetMapping("/api/board-cafes")
     public ResponseEntity<ApiResponse<Map<String, List<BoardCafeResponse.InfoDTO>>>> getBoardCafes(
             @RequestParam Double x,
             @RequestParam Double y,
-            @RequestParam Integer radius,
-            @RequestAttribute String username) {
+            @RequestParam Integer radius) {
         log.info("getBoardCafes is working");
 
-        List<BoardCafeResponse.InfoDTO> cafes = boardCafeService.getBoardCafes(x, y, radius, username);
+        List<BoardCafeResponse.InfoDTO> cafes = boardCafeService.getBoardCafes(x, y, radius);
 
         return buildSuccessResponseWithPairKeyData("cafes", cafes, "보드 게임 카페 조회를 성공하였습니다.", HttpStatus.OK);
     }

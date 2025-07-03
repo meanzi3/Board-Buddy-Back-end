@@ -54,16 +54,14 @@ public class CommentController {
      * 댓글 조회 요청
      *
      * @param gatherArticleId 모집글 ID
-     * @param username        사용자 이름
      * @return 댓글 리스트 응답
      */
     @GetMapping("/api/gather-articles/{gatherArticleId}/comments")
     public ResponseEntity<ApiResponse<Map<String, List<CommentResponse.InfoDTO>>>> getComments(
-            @PathVariable Long gatherArticleId,
-            @RequestAttribute String username) {
+            @PathVariable Long gatherArticleId) {
         log.info("getComments is working");
 
-        List<CommentResponse.InfoDTO> comments = commentService.getComments(gatherArticleId, username);
+        List<CommentResponse.InfoDTO> comments = commentService.getComments(gatherArticleId);
 
         return buildSuccessResponseWithPairKeyData("comments", comments, "댓글 조회를 성공하였습니다.", HttpStatus.OK);
     }

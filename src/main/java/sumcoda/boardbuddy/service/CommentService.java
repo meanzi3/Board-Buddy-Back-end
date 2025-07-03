@@ -84,15 +84,9 @@ public class CommentService {
      * 댓글 조회
      *
      * @param gatherArticleId 모집글 ID
-     * @param username        사용자 이름
      * @return 댓글 리스트
      */
-    public List<CommentResponse.InfoDTO> getComments(Long gatherArticleId, String username) {
-
-        // 멤버 검증
-        if (!memberRepository.existsByUsername(username)) {
-            throw new MemberRetrievalException("서버 문제로 사용자의 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
-        }
+    public List<CommentResponse.InfoDTO> getComments(Long gatherArticleId) {
 
         // 모집글 검증
         GatherArticleResponse.IdDTO idDTO = gatherArticleRepository.findIdDTOById(gatherArticleId)

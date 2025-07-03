@@ -115,21 +115,42 @@ public class GatherArticleService {
     }
 
     /**
-     * 모집글 조회
-     * @param gatherArticleId, username
-     * @return
+     * 모집글 상세 조회
+     * @param gatherArticleId 모집글 ID
+     * @return 모집글 상세 정보
      */
-    public GatherArticleResponse.ReadDTO getGatherArticle(Long gatherArticleId, String username) {
+    public GatherArticleResponse.DetailedInfoDTO getGatherArticle(Long gatherArticleId) {
 
         // 존재하는 모집글인지 확인
-        GatherArticleResponse.IdDTO gatherArticleIdDTO = gatherArticleRepository.findIdDTOById(gatherArticleId)
-                .orElseThrow(() -> new GatherArticleNotFoundException("존재하지 않는 모집글입니다."));
+        boolean isGatherArticleExists = gatherArticleRepository.existsById(gatherArticleId);
+        if (!isGatherArticleExists) {
+            throw new GatherArticleNotFoundException("존재하지 않는 모집글입니다.");
+        }
+
+        return gatherArticleRepository.findGatherArticleDetailedInfoDTOByGatherArticleId(gatherArticleId);
+    }
+
+    /**
+     * 모집글 참가 신청 현황 조회
+     * @param gatherArticleId 모집글 ID
+     * @param username 사용자 username
+     * @return 모집글에 대한 요청을 보낸 사용자의 참가 신청 현황
+     */
+    public GatherArticleResponse.ParticipationApplicationStatusDTO getParticipationApplicationStatus(Long gatherArticleId, String username) {
+
+        // 존재하는 모집글인지 확인
+        boolean isGatherArticleExists = gatherArticleRepository.existsById(gatherArticleId);
+        if (!isGatherArticleExists) {
+            throw new GatherArticleNotFoundException("존재하지 않는 모집글입니다.");
+        }
 
         // 사용자 검증
-        MemberResponse.IdDTO memberIdDTO = memberRepository.findIdDTOByUsername(username)
-                .orElseThrow(() -> new MemberRetrievalException("유효하지 않은 사용자입니다."));
+        Boolean IsUserExists = memberRepository.existsByUsername(username);
+        if (!IsUserExists){
+            throw new MemberRetrievalException("유효하지 않은 사용자입니다.");
+        }
 
-        return gatherArticleRepository.findGatherArticleReadDTOByGatherArticleId(gatherArticleIdDTO.getId(), memberIdDTO.getId());
+        return gatherArticleRepository.findParticipationApplicationStatusDTOByGatherArticleIdAndUsername(gatherArticleId, username);
     }
 
     /**

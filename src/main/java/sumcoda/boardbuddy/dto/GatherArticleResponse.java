@@ -68,7 +68,7 @@ public class GatherArticleResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class ReadDTO {
+    public static class DetailedInfoDTO {
         private String title;
         private String description;
         private GatherArticleResponse.AuthorDTO author;
@@ -87,12 +87,11 @@ public class GatherArticleResponse {
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
         private LocalDateTime createdAt;
         private GatherArticleStatus status;
-        private ParticipationApplicationStatus participationApplicationStatus;
 
         @Builder
-        public ReadDTO(String title, String description, AuthorDTO author, String sido, String sgg, String emd, String meetingLocation, Double x, Double y,
-                       Integer maxParticipants, Integer currentParticipants, LocalDateTime startDateTime,
-                       LocalDateTime endDateTime, LocalDateTime createdAt, GatherArticleStatus status, ParticipationApplicationStatus participationApplicationStatus) {
+        public DetailedInfoDTO(String title, String description, AuthorDTO author, String sido, String sgg, String emd, String meetingLocation, Double x, Double y,
+                               Integer maxParticipants, Integer currentParticipants, LocalDateTime startDateTime,
+                               LocalDateTime endDateTime, LocalDateTime createdAt, GatherArticleStatus status) {
             this.title = title;
             this.description = description;
             this.author = author;
@@ -108,9 +107,19 @@ public class GatherArticleResponse {
             this.endDateTime = endDateTime;
             this.createdAt = createdAt;
             this.status = status;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ParticipationApplicationStatusDTO {
+
+        private ParticipationApplicationStatus participationApplicationStatus;
+
+        @Builder
+        public ParticipationApplicationStatusDTO(ParticipationApplicationStatus participationApplicationStatus) {
             this.participationApplicationStatus = participationApplicationStatus;
         }
-
     }
 
     @Getter

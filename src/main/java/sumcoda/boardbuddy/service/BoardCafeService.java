@@ -29,15 +29,9 @@ public class BoardCafeService {
      * @param x 경도
      * @param y 위도
      * @param radius 반경 (단위: 미터)
-     * @param username 사용자 이름
      * @return 보드게임 카페 리스트
      */
-    public List<BoardCafeResponse.InfoDTO> getBoardCafes(Double x, Double y, Integer radius , String username) {
-
-        // 유저 검증
-        if (username == null) {
-            throw new MemberRetrievalException("보드 게임 카페 찾기 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
-        }
+    public List<BoardCafeResponse.InfoDTO> getBoardCafes(Double x, Double y, Integer radius) {
 
         // 반경 검증
         if (radius < MIN_RADIUS || radius > MAX_RADIUS) {

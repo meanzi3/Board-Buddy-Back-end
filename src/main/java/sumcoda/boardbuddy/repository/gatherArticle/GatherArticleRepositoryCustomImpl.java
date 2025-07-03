@@ -365,7 +365,8 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
             QParticipationApplication participationApplication) {
         return new CaseBuilder()
                 .when(participationApplication.id.isNull()).then(ParticipationApplicationStatus.NONE)
-                .otherwise(participationApplication.participationApplicationStatus);
+                .otherwise(participationApplication.participationApplicationStatus)
+                .as("participationApplicationStatus");
     }
 
     @Override

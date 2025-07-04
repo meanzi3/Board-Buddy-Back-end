@@ -12,6 +12,7 @@ import sumcoda.boardbuddy.exception.gatherArticle.job.GatherArticleScheduleExecu
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.service.NotificationService;
 
+@DisallowConcurrentExecution    // 중복 실행 방지
 @RequiredArgsConstructor
 @Slf4j
 @Component

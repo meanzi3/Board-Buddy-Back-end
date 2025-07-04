@@ -11,7 +11,7 @@
 
 ## 배포 주소
 
-> 🔗 [BoardBuddy](https://m.boardbuddyapp.com)
+> 🔗 [BoardBuddy](https://m.boardbuddi.com/)
 
 <br><br>
 

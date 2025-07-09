@@ -1,163 +1,3 @@
-#name: Deploy Spring Boot APP to Amazon Linux 2023
-#
-#on:
-#  push:
-#    branches:
-#      - main
-#
-#jobs:
-#  deploy:
-#    runs-on: ubuntu-latest   # Runner는 빌드 스크립트 전송만 담당
-#
-#    env:
-#      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-#      DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-#      PROD_REDIS_HOST: ${{ secrets.PROD_REDIS_HOST }}
-#      PROD_REDIS_PORT: ${{ secrets.PROD_REDIS_PORT }}
-#      PROD_REDIS_PASSWORD: ${{ secrets.PROD_REDIS_PASSWORD }}
-#      PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
-#      PROD_DB_USERNAME: ${{ secrets.PROD_DB_USERNAME }}
-#      PROD_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
-#      PROD_AWS_ACCESS_KEY: ${{ secrets.PROD_AWS_ACCESS_KEY }}
-#      PROD_AWS_SECRET_KEY: ${{ secrets.PROD_AWS_SECRET_KEY }}
-#      PROD_SMS_API_KEY: ${{ secrets.PROD_SMS_API_KEY }}
-#      PROD_SMS_API_SECRET: ${{ secrets.PROD_SMS_API_SECRET }}
-#      PROD_SMS_SENDER_NUMBER: ${{ secrets.PROD_SMS_SENDER_NUMBER }}
-#      EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}
-#      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-#      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }} >> env.list
-#      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }} >> env.list
-#      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }} >> env.list
-#      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }} >> env.list
-#      KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }} >> env.list
-#      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }} >> env.list
-#      PROD_S3_BUCKET_NAME: ${{ secrets.PROD_S3_BUCKET_NAME }} >> env.list
-#
-#    steps:
-#      # 리포지토리를 체크아웃
-#      - name: Checkout repository
-#        uses: actions/checkout@v3
-#
-#      # Spring Boot 애플리케이션을 위한 JDK 21을 설정
-#      - name: Set up JDK 21
-#        uses: actions/setup-java@v2
-#        with:
-#          java-version: '21'
-#          distribution: 'temurin'
-#
-#      # Gradle을 사용하여 Spring Boot 애플리케이션을 빌드
-#      - name: Build Spring Boot app with Gradle
-#        run: ./gradlew build -Dspring.profiles.active=common,prod
-#
-#      # Spring Boot 애플리케이션을 위한 Docker 이미지를 빌드
-#      - name: Build Docker image for Spring Boot app
-#        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest -f Dockerfile .
-#
-#      # Docker에 로그인
-#      - name: Docker Login
-#        run: echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-#
-#      # Docker 이미지를 푸시
-#      - name: Push Docker image for Spring Boot app
-#        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
-#
-#      # SSH 키를 설정
-#      - name: Add SSH Key
-#        uses: webfactory/ssh-agent@v0.5.3
-#        with:
-#          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-#
-#      # 환경 변수 파일을 생성
-#      - name: Create environment variables file
-#        run: |
-#          echo SPRING_DATASOURCE_URL=${{ secrets.PROD_DB_URL }} > env.list
-#          echo SPRING_DATASOURCE_USERNAME=${{ secrets.PROD_DB_USERNAME }} >> env.list
-#          echo SPRING_DATASOURCE_PASSWORD=${{ secrets.PROD_DB_PASSWORD }} >> env.list
-#          echo SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${{ secrets.PROD_AWS_ACCESS_KEY }} >> env.list
-#          echo SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY=${{ secrets.PROD_AWS_SECRET_KEY }} >> env.list
-#          echo SPRING_DATA_REDIS_HOST=${{ secrets.PROD_REDIS_HOST }} >> env.list
-#          echo SPRING_DATA_REDIS_PORT=${{ secrets.PROD_REDIS_PORT }} >> env.list
-#          echo SPRING_DATA_REDIS_PASSWORD=${{ secrets.PROD_REDIS_PASSWORD }} >> env.list
-#          echo SPRING_COOL_SMS_API_KEY=${{ secrets.PROD_SMS_API_KEY }} >> env.list
-#          echo SPRING_COOL_SMS_API_SECRET=${{ secrets.PROD_SMS_API_SECRET }} >> env.list
-#          echo SPRING_COOL_SMS_SENDER_NUMBER=${{ secrets.PROD_SMS_SENDER_NUMBER }} >> env.list
-#          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} >> env.list
-#          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} >> env.list
-#          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} >> env.list
-#          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} >> env.list
-#          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} >> env.list
-#          echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} >> env.list
-#          echo SPRING_CLOUD_AWS_S3_BUCKET_NAME=${{ secrets.PROD_S3_BUCKET_NAME }} >> env.list
-#          echo SPRING_PROFILES_ACTIVE=common,prod >> env.list
-#
-#      # Redis 설정 파일 생성
-#      - name: Create redis configuration file
-#        run: |
-#          echo "bind 0.0.0.0" > redis.conf
-#          echo "protected-mode no" >> redis.conf
-#          echo "port 6379" >> redis.conf
-#          echo "requirepass ${{ secrets.PROD_REDIS_PASSWORD }}" >> redis.conf
-#
-#      # 파일을 EC2로 전송
-#      - name: Transfer files to EC2
-#        run: |
-#          scp -o StrictHostKeyChecking=no src/main/resources/application-common.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-common.yml
-#          scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-prod.yml
-#          scp -o StrictHostKeyChecking=no env.list ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/env.list
-#          scp -o StrictHostKeyChecking=no docker-compose.prod.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/docker-compose.yml
-#          scp -o StrictHostKeyChecking=no redis.conf ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/redis.conf
-#          scp -o StrictHostKeyChecking=no default.conf ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/default.conf
-#
-#      # EC2에 배포
-#      - name: Deploy to EC2
-#        run: |
-#          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-#          sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-#          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
-#
-#          # Docker 네트워크를 생성
-#          sudo docker network create spring-boot-app-network || true
-#
-#          # Redis 컨테이너를 실행
-#          if [ $(sudo docker ps -a -q -f name=redis) ]; then
-#              sudo docker stop redis
-#              sudo docker rm redis
-#          fi
-#          sudo docker run -d --name redis \
-#            -v /home/ubuntu/redis.conf:/usr/local/etc/redis/redis.conf \
-#            --network spring-boot-app-network \
-#            -e PROD_REDIS_PASSWORD=${PROD_REDIS_PASSWORD} \
-#            -p 6379:6379 redis:latest redis-server /usr/local/etc/redis/redis.conf
-#
-#          # Spring Boot 애플리케이션 컨테이너를 실행
-#          if [ $(sudo docker ps -a -q -f name=spring-boot-app) ]; then
-#              sudo docker stop spring-boot-app
-#              sudo docker rm spring-boot-app
-#          fi
-#          sudo docker run -d --name spring-boot-app \
-#            --env-file /home/ubuntu/env.list \
-#            -v /home/ubuntu/application-common.yml:/config/application-common.yml \
-#            -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
-#            --network spring-boot-app-network \
-#            -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
-#            --spring.config.location=/config/application-common.yml,/config/application-prod.yml
-#
-#          # Nginx 설정 파일 복사 및 Nginx 재시작
-#          sudo cp /home/ubuntu/default.conf /etc/nginx/sites-available/default
-#          sudo nginx -t
-#          sudo systemctl restart nginx
-#
-#          # Certbot 설치 및 인증서 갱신
-#          sudo apt update
-#          sudo apt install certbot python3-certbot-nginx -y
-#          sudo certbot renew --nginx
-#
-#          # 컨테이너 상태 확인
-#          sudo docker ps -a
-#          # Spring Boot 애플리케이션 로그 확인
-#          sudo docker logs spring-boot-app
-#          EOF
-
 name: Deploy Spring Boot APP to Amazon Linux 2023
 
 on:
@@ -168,37 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-    env:
-      # DockerHub
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-      # Database
-      PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
-      PROD_DB_USERNAME: ${{ secrets.PROD_DB_USERNAME }}
-      PROD_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
-      # Redis
-      PROD_REDIS_HOST: ${{ secrets.PROD_REDIS_HOST }}
-      PROD_REDIS_PORT: ${{ secrets.PROD_REDIS_PORT }}
-      PROD_REDIS_PASSWORD: ${{ secrets.PROD_REDIS_PASSWORD }}
-      # AWS / S3
-      PROD_AWS_ACCESS_KEY: ${{ secrets.PROD_AWS_ACCESS_KEY }}
-      PROD_AWS_SECRET_KEY: ${{ secrets.PROD_AWS_SECRET_KEY }}
-      PROD_S3_BUCKET_NAME: ${{ secrets.PROD_S3_BUCKET_NAME }}
-      # SMS
-      PROD_SMS_API_KEY: ${{ secrets.PROD_SMS_API_KEY }}
-      PROD_SMS_API_SECRET: ${{ secrets.PROD_SMS_API_SECRET }}
-      PROD_SMS_SENDER_NUMBER: ${{ secrets.PROD_SMS_SENDER_NUMBER }}
-      # OAuth 클라이언트
-      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
-      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
-      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
-      # EC2 접속 정보
-      EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     steps:
       - name: Checkout repository
@@ -214,68 +23,68 @@ jobs:
         run: ./gradlew build -Dspring.profiles.active=common,prod
 
       - name: Build Docker image
-        run: docker build -t ${{ env.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest -f Dockerfile .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest -f Dockerfile .
 
       - name: Docker Login
-        run: echo ${{ env.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ env.DOCKERHUB_USERNAME }} --password-stdin
+        run: echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Push Docker image
-        run: docker push ${{ env.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
 
       - name: Add SSH Key
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ env.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Create environment variables file
         run: |
           cat > env.list <<EOF
-          SPRING_DATASOURCE_URL=${{ env.PROD_DB_URL }}
-          SPRING_DATASOURCE_USERNAME=${{ env.PROD_DB_USERNAME }}
-          SPRING_DATASOURCE_PASSWORD=${{ env.PROD_DB_PASSWORD }}
-          SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${{ env.PROD_AWS_ACCESS_KEY }}
-          SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY=${{ env.PROD_AWS_SECRET_KEY }}
-          SPRING_CLOUD_AWS_S3_BUCKET_NAME=${{ env.PROD_S3_BUCKET_NAME }}
-          SPRING_DATA_REDIS_HOST=${{ env.PROD_REDIS_HOST }}
-          SPRING_DATA_REDIS_PORT=${{ env.PROD_REDIS_PORT }}
-          SPRING_DATA_REDIS_PASSWORD=${{ env.PROD_REDIS_PASSWORD }}
-          SPRING_COOL_SMS_API_KEY=${{ env.PROD_SMS_API_KEY }}
-          SPRING_COOL_SMS_API_SECRET=${{ env.PROD_SMS_API_SECRET }}
-          SPRING_COOL_SMS_SENDER_NUMBER=${{ env.PROD_SMS_SENDER_NUMBER }}
-          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_NAVER_CLIENT_ID=${{ env.NAVER_CLIENT_ID }}
-          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_NAVER_CLIENT_SECRET=${{ env.NAVER_CLIENT_SECRET }}
-          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
-          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=${{ env.GOOGLE_CLIENT_SECRET }}
-          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_ID=${{ env.KAKAO_CLIENT_ID }}
-          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${{ env.KAKAO_CLIENT_SECRET }}
+          SPRING_DATASOURCE_URL=${{ secrets.PROD_DB_URL }}
+          SPRING_DATASOURCE_USERNAME=${{ secrets.PROD_DB_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+          SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${{ secrets.PROD_AWS_ACCESS_KEY }}
+          SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY=${{ secrets.PROD_AWS_SECRET_KEY }}
+          SPRING_CLOUD_AWS_S3_BUCKET_NAME=${{ secrets.PROD_S3_BUCKET_NAME }}
+          SPRING_DATA_REDIS_HOST=${{ secrets.PROD_REDIS_HOST }}
+          SPRING_DATA_REDIS_PORT=${{ secrets.PROD_REDIS_PORT }}
+          SPRING_DATA_REDIS_PASSWORD=${{ secrets.PROD_REDIS_PASSWORD }}
+          SPRING_COOL_SMS_API_KEY=${{ secrets.PROD_SMS_API_KEY }}
+          SPRING_COOL_SMS_API_SECRET=${{ secrets.PROD_SMS_API_SECRET }}
+          SPRING_COOL_SMS_SENDER_NUMBER=${{ secrets.PROD_SMS_SENDER_NUMBER }}
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
           SPRING_PROFILES_ACTIVE=common,prod
           EOF
 
       - name: Create Redis configuration
         run: |
           cat > redis.conf <<EOF
-          bind 0.0.0.0
+          bind ${{ secrets.PROD_REDIS_BIND_PORT }}
+          port ${{ secrets.PROD_REDIS_PORT }}
+          requirepass ${{ secrets.PROD_REDIS_PASSWORD }}
           protected-mode no
-          port 6379
-          requirepass ${{ env.PROD_REDIS_PASSWORD }}
           EOF
 
       - name: Transfer files to EC2
         run: |
-          scp -o StrictHostKeyChecking=no src/main/resources/application-common.yml ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/application-common.yml
-          scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/application-prod.yml
-          scp -o StrictHostKeyChecking=no env.list ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/env.list
-          scp -o StrictHostKeyChecking=no docker-compose.prod.yml ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/docker-compose.yml
-          scp -o StrictHostKeyChecking=no redis.conf ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/redis.conf
-          scp -o StrictHostKeyChecking=no default.conf ec2-user@${{ env.EC2_PUBLIC_IP }}:/home/ec2-user/default.conf
+          scp -o StrictHostKeyChecking=no src/main/resources/application-common.yml ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/application-common.yml
+          scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/application-prod.yml
+          scp -o StrictHostKeyChecking=no env.list ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/env.list
+          scp -o StrictHostKeyChecking=no docker-compose.prod.yml ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/docker-compose.yml
+          scp -o StrictHostKeyChecking=no redis.conf ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/redis.conf
+          scp -o StrictHostKeyChecking=no default.conf ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/default.conf
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 ec2-user@${{ env.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
 
           # Docker 로그인 및 이미지 업데이트
-          sudo docker login -u ${{ env.DOCKERHUB_USERNAME }} -p ${{ env.DOCKERHUB_ACCESS_TOKEN }}
-          sudo docker pull ${{ env.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
+          sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest
 
           # Docker 네트워크 생성
           sudo docker network create spring-boot-app-network || true
@@ -299,7 +108,7 @@ jobs:
             -v /home/ec2-user/application-common.yml:/config/application-common.yml \
             -v /home/ec2-user/application-prod.yml:/config/application-prod.yml \
             --network spring-boot-app-network \
-            -p 8080:8080 ${{ env.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
+            -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/boardbuddy:backend-latest \
             --spring.config.location=/config/application-common.yml,/config/application-prod.yml
         
           # Nginx 설정 반영

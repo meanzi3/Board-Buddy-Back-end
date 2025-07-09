@@ -71,7 +71,7 @@ jobs:
         run: |
           set -o allexport
           source nginx.env.list
-          envsubst < default.conf.template > default.conf
+          envsubst < nginx.template.conf > default.conf
 
       - name: Create Redis configuration
         run: |

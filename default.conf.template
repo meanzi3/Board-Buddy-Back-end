@@ -13,8 +13,8 @@ server {
     listen 443 ssl;
     server_name boardbuddi.com www.boardbuddi.com;
 
-    ssl_certificate /etc/letsencrypt/live/boardbuddi.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/boardbuddi.com/privkey.pem;
+    ssl_certificate ${NGINX_SSL_CERT_PATH};
+    ssl_certificate_key ${NGINX_SSL_KEY_PATH};
 
     # 중복 설정 제거(/etc/letsencrypt/options-ssl-default.conf 경로의 파일에 이미 작성됨)
     # ssl_protocols TLSv1.2 TLSv1.3; # 안전하지 않은 구식 프로토콜을 차단하여 서버와 클라이언트 간의 연결이 최신 보안 표준을 따름

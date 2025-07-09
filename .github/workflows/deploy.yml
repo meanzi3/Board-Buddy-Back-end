@@ -36,7 +36,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Create environment variables file
+      - name: Create Spring APP environment variables file
         run: |
           cat > env.list <<EOF
           SPRING_DATASOURCE_URL=${{ secrets.PROD_DB_URL }}
@@ -59,6 +59,19 @@ jobs:
           SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
           SPRING_PROFILES_ACTIVE=common,prod
           EOF
+
+      - name: Create nginx environment variables file
+        run: |
+          cat > nginx.env.list <<EOF
+          NGINX_SSL_CERT_PATH=${{ secrets.NGINX_SSL_CERT_PATH }}
+          NGINX_SSL_KEY_PATH=${{ secrets.NGINX_SSL_KEY_PATH }}
+          EOF
+
+      - name: Render nginx config
+        run: |
+          set -o allexport
+          source nginx.env.list
+          envsubst < default.conf.template > default.conf
 
       - name: Create Redis configuration
         run: |

@@ -4,14 +4,13 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.AuthResponse;
-import sumcoda.boardbuddy.dto.BadgeImageResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
 import sumcoda.boardbuddy.entity.Member;
 
 import java.util.List;
 import java.util.Optional;
 
-import static sumcoda.boardbuddy.entity.QBadgeImage.badgeImage;
 import static sumcoda.boardbuddy.entity.QMember.*;
 import static sumcoda.boardbuddy.entity.QProfileImage.*;
 
@@ -66,7 +65,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                         member.nickname,
                         member.phoneNumber,
                         member.memberType,
-                        profileImage.profileImageS3SavedURL
+                        profileImage.s3SavedObjectName
                 ))
                 .from(member)
                 .leftJoin(member.profileImage, profileImage)
@@ -79,7 +78,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         return jpaQueryFactory
                 .select(Projections.fields(MemberResponse.RankingsDTO.class,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL
+                        profileImage.s3SavedObjectName
                 ))
                 .from(member)
                 .leftJoin(member.profileImage, profileImage)
@@ -98,21 +97,10 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Optional<MemberResponse.ProfileInfosDTO> findMemberProfileByNickname(String nickname) {
-        List<BadgeImageResponse.BadgeImageInfosDTO> badges = jpaQueryFactory.select(
-                Projections.fields(BadgeImageResponse.BadgeImageInfosDTO.class,
-                        badgeImage.badgeImageS3SavedURL,
-                        badgeImage.badgeYearMonth))
-                .from(badgeImage)
-                .leftJoin(badgeImage.member, member)
-                .where(member.nickname.eq(nickname))
-                .orderBy(badgeImage.id.desc())
-                .limit(3)
-                .fetch();
-
+    public Optional<MemberProfileProjection> findMemberProfileByNickname(String nickname) {
         return Optional.ofNullable(jpaQueryFactory
-                        .select(Projections.fields(MemberResponse.ProfileInfosDTO.class,
-                                profileImage.profileImageS3SavedURL,
+                        .select(Projections.constructor(MemberProfileProjection.class,
+                                profileImage.s3SavedObjectName,
                                 member.description,
                                 member.rank,
                                 member.buddyScore,
@@ -123,8 +111,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                         .from(member)
                         .leftJoin(member.profileImage, profileImage)
                         .where(member.nickname.eq(nickname))
-                        .fetchOne())
-                .map(profileInfosDTO -> profileInfosDTO.toBuilder().badges(badges).build());
+                        .fetchOne());
     }
 
     /**

@@ -27,4 +27,19 @@ public class BadgeImageRepositoryCustomImpl implements BadgeImageRepositoryCusto
                 .orderBy(badgeImage.id.desc())
                 .fetch();
     }
+
+    @Override
+    public List<BadgeImageInfoProjection> findTop3BadgeImagesByNickname(String nickname) {
+        return jpaQueryFactory
+                .select(
+                        Projections.constructor(BadgeImageInfoProjection.class,
+                                badgeImage.s3SavedObjectName,
+                                badgeImage.badgeYearMonth))
+                .from(badgeImage)
+                .leftJoin(badgeImage.member, member)
+                .where(member.nickname.eq(nickname))
+                .orderBy(badgeImage.id.desc())
+                .limit(3)
+                .fetch();
+    }
 }

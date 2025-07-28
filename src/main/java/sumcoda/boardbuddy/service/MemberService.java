@@ -1,26 +1,18 @@
 package sumcoda.boardbuddy.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import sumcoda.boardbuddy.dto.*;
 import sumcoda.boardbuddy.entity.Member;
-import sumcoda.boardbuddy.entity.ProfileImage;
 import sumcoda.boardbuddy.enumerate.MemberType;
 import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.exception.member.*;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
-import sumcoda.boardbuddy.repository.ProfileImageRepository;
-import sumcoda.boardbuddy.util.FileStorageUtil;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -35,20 +27,12 @@ public class MemberService {
 
     private final GatherArticleRepository gatherArticleRepository;
 
-    private final ProfileImageRepository profileImageRepository;
-
 //    private final NearPublicDistrictService nearPublicDistrictService;
 
 //    private final PublicDistrictRedisService publicDistrictRedisService;
 
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    private final AmazonS3Client amazonS3Client;
-
-    // S3에 등록된 버킷 이름
-    @Value("${spring.cloud.aws.s3.bucket-name}")
-    private String bucketName;
 
     /**
      * 아이디 중복검사
@@ -617,108 +601,4 @@ public class MemberService {
 //        // 멤버의 반경 업데이트
 //        member.assignRadius(radiusDTO.getRadius());
 //    }
-
-    /**
-     * 프로필 조회 요청 캐치
-     *
-     * @param nickname 유저 닉네임
-     * @return 해당 닉네임의 유저 프로필
-     **/
-    public MemberResponse.ProfileInfosDTO getMemberProfileByNickname(String nickname) {
-
-        if (nickname == null) {
-            throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
-        }
-
-        return memberRepository.findMemberProfileByNickname(nickname)
-                .orElseThrow(() -> new MemberRetrievalException("프로필을 조회할 수 없습니다. 관리자에게 문의하세요."));
-    }
-
-    /**
-     * 프로필 수정 요청 캐치
-     *
-     * @param username 유저 아이디
-     * @param updateProfileDTO 수정할 정보가 담겨있는 DTO
-     * @param profileImageFile 수정할 프로필 이미지 파일
-     **/
-    @Transactional
-    public void updateProfile(String username, MemberRequest.UpdateProfileDTO updateProfileDTO, MultipartFile profileImageFile) {
-        // 유저 아이디로 조회
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberRetrievalException("유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
-
-        // 닉네임이 null이 아니면 업데이트
-        if (updateProfileDTO.getNickname() != null) {
-            member.assignNickname(updateProfileDTO.getNickname());
-        }
-
-        // 비밀번호가 null이 아니면 암호화 후 업데이트
-        if (updateProfileDTO.getPassword() != null && !updateProfileDTO.getPassword().isEmpty()) {
-            member.assignPassword(bCryptPasswordEncoder.encode(updateProfileDTO.getPassword()));
-        }
-
-        // 핸드폰 번호가 null이 아니면 업데이트
-        if (updateProfileDTO.getPhoneNumber() != null) {
-            member.assignPhoneNumber(updateProfileDTO.getPhoneNumber());
-        }
-
-        // 자기소개가 null이 아니면 업데이트
-        if (updateProfileDTO.getDescription() != null) {
-            member.assignDescription(updateProfileDTO.getDescription());
-        }
-
-        if (profileImageFile == null || profileImageFile.isEmpty()) {
-            member.assignProfileImage(null);
-        } else {
-            // 이미지 파일 형식 검증
-            String contentType = profileImageFile.getContentType();
-            if (contentType != null && !contentType.startsWith("image")) {
-                throw new InvalidFileFormatException("지원되지 않는 파일 형식입니다.");
-            }
-            try {
-                FileDTO fileDTO = FileStorageUtil.saveFile(profileImageFile);
-                File file = fileDTO.getFile();
-
-                // 프로필 이미지 로컬 저장 시 필요
-//                String profileImageUrl = FileStorageUtil.getLocalStoreDir(fileDTO.getSavedFilename());
-//
-//                ProfileImage newProfileImage = ProfileImage.buildProfileImage(
-//                        fileDTO.getOriginalFilename(),
-//                        fileDTO.getSavedFilename(),
-//                        profileImageUrl
-//                );
-//
-//                profileImageRepository.save(newProfileImage);
-//                member.assignProfileImage(newProfileImage);
-//
-//                file.delete();
-
-                 // 프로필 이미지 S3 저장 시 필요
-                ProfileImage existingProfileImage = member.getProfileImage();
-
-                // 기존 프로필 이미지가 있다면 S3에서 삭제
-                if (existingProfileImage != null) {
-                    amazonS3Client.deleteObject(bucketName, existingProfileImage.getSavedFilename());
-                }
-
-                amazonS3Client.putObject(bucketName, fileDTO.getSavedFilename(), file);
-
-                String awsS3URL = amazonS3Client.getUrl(bucketName, fileDTO.getSavedFilename()).toString();
-
-                ProfileImage newProfileImage = ProfileImage.buildProfileImage(
-                        fileDTO.getOriginalFilename(),
-                        fileDTO.getSavedFilename(),
-                        awsS3URL
-                );
-
-                profileImageRepository.save(newProfileImage);
-                member.assignProfileImage(newProfileImage);
-
-                file.delete();
-
-            } catch (IOException e) {
-                throw new ProfileImageSaveException("프로필 이미지를 저장하는 동안 오류가 발생했습니다.");
-            }
-        }
-    }
 }

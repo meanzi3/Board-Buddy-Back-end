@@ -52,8 +52,4 @@ public class MemberExceptionHandler {
         return buildFailureResponse(e.getMessage(),HttpStatus.UNSUPPORTED_MEDIA_TYPE);
     }
 
-    @ExceptionHandler(ProfileImageSaveException.class)
-    public ResponseEntity<ApiResponse<Void>> handleProfileImageSaveException(ProfileImageSaveException e) {
-        return buildErrorResponse(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

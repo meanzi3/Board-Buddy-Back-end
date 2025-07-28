@@ -8,6 +8,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.*;
+import sumcoda.boardbuddy.dto.fetch.GatherArticleAuthorProjection;
+import sumcoda.boardbuddy.dto.fetch.GatherArticleDetailedInfoProjection;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
@@ -30,6 +32,9 @@ import sumcoda.boardbuddy.util.GatherArticleValidationUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static sumcoda.boardbuddy.util.GatherArticleUtil.*;
+import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -50,7 +55,7 @@ public class GatherArticleService {
 
     /**
      * @apiNote 현재는 사용률 저조로 비활성화된 상태
-     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     * 추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
      */
 //    private final PublicDistrictRepository publicDistrictRepository;
 
@@ -58,24 +63,24 @@ public class GatherArticleService {
 
     private final GatherArticleStatusUpdateSchedulingService gatherArticleStatusUpdateSchedulingService;
 
+    private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
+
+
     /**
      * @apiNote 현재는 사용률 저조로 비활성화된 상태
-     *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
+     * 추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
      */
 //    private final PublicDistrictRedisService publicDistrictRedisService;
 
-    private static final int PAGE_SIZE = 15;
-
-    private static final int GATHER_ARTICLE_MINIMUM_SEARCH_LENGTH = 2;
-
     /**
      * 모집글 작성
+     *
      * @param createRequest
      * @param username
      * @return
      */
     @Transactional
-    public GatherArticleResponse.CreateDTO createGatherArticle(GatherArticleRequest.CreateDTO createRequest, String username){
+    public GatherArticleResponse.CreateDTO createGatherArticle(GatherArticleRequest.CreateDTO createRequest, String username) {
 
         // 사용자 검증
         Member member = memberRepository.findByUsername(username)
@@ -116,10 +121,11 @@ public class GatherArticleService {
 
     /**
      * 모집글 상세 조회
+     *
      * @param gatherArticleId 모집글 ID
      * @return 모집글 상세 정보
      */
-    public GatherArticleResponse.DetailedInfoDTO getGatherArticle(Long gatherArticleId) {
+    public GatherArticleDetailedInfoDTO getGatherArticleDetailedInfo(Long gatherArticleId) {
 
         // 존재하는 모집글인지 확인
         boolean isGatherArticleExists = gatherArticleRepository.existsById(gatherArticleId);
@@ -127,8 +133,21 @@ public class GatherArticleService {
             throw new GatherArticleNotFoundException("존재하지 않는 모집글입니다.");
         }
 
-        return gatherArticleRepository.findGatherArticleDetailedInfoDTOByGatherArticleId(gatherArticleId);
+        GatherArticleDetailedInfoProjection infoProjection = gatherArticleRepository.findGatherArticleDetailedInfoByGatherArticleId(gatherArticleId)
+                .orElseThrow(() -> new GatherArticleRetrievalException("해당 모집글의 상세 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        GatherArticleAuthorProjection authorProjection = gatherArticleRepository.findGatherArticleAuthorByGatherArticleId(gatherArticleId)
+                .orElseThrow(() -> new GatherArticleAuthorRetrievalException("해당 모집글의 작성자 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        String profileImageS3SavedPath = buildProfileImageS3RequestKey(authorProjection.s3SavedObjectName());
+
+        String profileImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3SavedPath);
+
+        GatherArticleAuthorDTO gatherArticleAuthorDTO = convertGatherArticleAuthorDTO(authorProjection, profileImageSignedURL);
+
+        return convertGatherArticleDetailedInfoDTO(infoProjection, gatherArticleAuthorDTO);
     }
+
 
     /**
      * 모집글 참가 신청 현황 조회
@@ -150,7 +169,8 @@ public class GatherArticleService {
             throw new MemberRetrievalException("유효하지 않은 사용자입니다.");
         }
 
-        return gatherArticleRepository.findParticipationApplicationStatusDTOByGatherArticleIdAndUsername(gatherArticleId, username);
+        return gatherArticleRepository.findParticipationApplicationStatusDTOByGatherArticleIdAndUsername(gatherArticleId, username)
+                .orElseThrow(() -> new MemberGatherArticleRetrievalException("모집글에 대한 유저의 참가 신청 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
     }
 
     /**

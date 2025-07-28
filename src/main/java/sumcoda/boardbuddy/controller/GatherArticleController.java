@@ -6,6 +6,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sumcoda.boardbuddy.dto.GatherArticleDetailedInfoDTO;
 import sumcoda.boardbuddy.dto.GatherArticleRequest;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
@@ -14,7 +15,6 @@ import sumcoda.boardbuddy.service.ChatMessageService;
 import sumcoda.boardbuddy.service.ChatRoomService;
 import sumcoda.boardbuddy.service.GatherArticleService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -79,10 +79,10 @@ public class GatherArticleController {
      * @return 조회된 모집글과 관련된 응답 데이터
      */
     @GetMapping(value = "/api/gather-articles/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<Map<String, GatherArticleResponse.DetailedInfoDTO>>> getGatherArticle(
+    public ResponseEntity<ApiResponse<Map<String, GatherArticleDetailedInfoDTO>>> getGatherArticleDetailedInfo(
             @PathVariable Long gatherArticleId) {
 
-        GatherArticleResponse.DetailedInfoDTO gatherArticleDetailedInfo = gatherArticleService.getGatherArticle(gatherArticleId);
+        GatherArticleDetailedInfoDTO gatherArticleDetailedInfo = gatherArticleService.getGatherArticleDetailedInfo(gatherArticleId);
 
         return buildSuccessResponseWithPairKeyData("post", gatherArticleDetailedInfo, "모집글 상세 정보를 성공적으로 조회 하였습니다.", HttpStatus.OK);
     }

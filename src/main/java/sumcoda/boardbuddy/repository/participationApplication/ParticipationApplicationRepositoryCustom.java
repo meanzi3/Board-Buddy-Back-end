@@ -1,6 +1,7 @@
 package sumcoda.boardbuddy.repository.participationApplication;
 
 import sumcoda.boardbuddy.dto.ParticipationApplicationResponse;
+import sumcoda.boardbuddy.dto.fetch.ParticipationApplicationInfoProjection;
 import sumcoda.boardbuddy.entity.ParticipationApplication;
 
 import java.util.List;
@@ -10,7 +11,7 @@ public interface ParticipationApplicationRepositoryCustom {
 
     Boolean existsByGatherArticleIdAndUsername(Long gatherArticleId, String username);
 
-    Optional<ParticipationApplication> findByGatherArticleIdAndMemberUsername(Long gatherArticleId, String username);
+    Optional<ParticipationApplication> findByGatherArticleIdAndUsername(Long gatherArticleId, String username);
 
-    List<ParticipationApplicationResponse.InfoDTO> findParticipationAppliedMemberByGatherArticleId(Long gatherArticleId);
+    List<ParticipationApplicationInfoProjection> findParticipationAppliedMemberByGatherArticleId(Long gatherArticleId);
 }

@@ -1,4 +1,4 @@
-package sumcoda.boardbuddy.exception.member;
+package sumcoda.boardbuddy.exception.profileImage;
 
 public class ProfileImageSaveException extends RuntimeException {
     public ProfileImageSaveException(String message) {

@@ -28,14 +28,20 @@ spring:
   cloud:
     aws:
       s3:
-        bucket-name: ${PROD_S3_BUCKET_NAME}
-      stack:
-        auto: false
-      region:
-        static: ap-northeast-2
-      credentials:
-        access-key: ${PROD_AWS_ACCESS_KEY}
-        secret-key: ${PROD_AWS_SECRET_KEY}
+        bucket:
+          name: ${PROD_S3_BUCKET_NAME}
+          region: ${PROD_S3_BUCKET_REGION}
+        stack:
+          auto: false
+
+      cloud-front:
+        domain: ${PROD_CLOUD_FRONT_DOMAIN}
+        key-pair-id: ${PROD_CLOUD_FRONT_KEY_PAIR_ID}
+        private-key: ${PROD_CLOUD_FRONT_PRIVATE_KEY}
+        url-expiration-minutes: ${PROD_CLOUD_FRONT_URL_EXPIRATION_MINUTES}
+
+
+
 
   cool-sms:
     api-key: ${PROD_SMS_API_KEY}
@@ -56,3 +62,4 @@ server:
         secure: true
         http-only: true
         same-site: lax
+

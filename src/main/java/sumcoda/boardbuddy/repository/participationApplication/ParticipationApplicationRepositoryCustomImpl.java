@@ -3,7 +3,7 @@ package sumcoda.boardbuddy.repository.participationApplication;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import sumcoda.boardbuddy.dto.ParticipationApplicationResponse;
+import sumcoda.boardbuddy.dto.fetch.ParticipationApplicationInfoProjection;
 import sumcoda.boardbuddy.entity.ParticipationApplication;
 import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
 
@@ -35,7 +35,7 @@ public class ParticipationApplicationRepositoryCustomImpl implements Participati
     }
 
     @Override
-    public Optional<ParticipationApplication> findByGatherArticleIdAndMemberUsername(Long gatherArticleId, String username) {
+    public Optional<ParticipationApplication> findByGatherArticleIdAndUsername(Long gatherArticleId, String username) {
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(participationApplication)
                 .leftJoin(participationApplication.memberGatherArticle, memberGatherArticle)
@@ -46,12 +46,12 @@ public class ParticipationApplicationRepositoryCustomImpl implements Participati
     }
 
     @Override
-    public List<ParticipationApplicationResponse.InfoDTO> findParticipationAppliedMemberByGatherArticleId(Long gatherArticleId) {
+    public List<ParticipationApplicationInfoProjection> findParticipationAppliedMemberByGatherArticleId(Long gatherArticleId) {
         return jpaQueryFactory
-                .select(Projections.fields(ParticipationApplicationResponse.InfoDTO.class,
+                .select(Projections.constructor(ParticipationApplicationInfoProjection.class,
                         participationApplication.id,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL
+                        profileImage.s3SavedObjectName
                 ))
                 .from(participationApplication)
                 .leftJoin(participationApplication.memberGatherArticle, memberGatherArticle)
@@ -59,7 +59,7 @@ public class ParticipationApplicationRepositoryCustomImpl implements Participati
                 .leftJoin(memberGatherArticle.member, member)
                 .leftJoin(member.profileImage, profileImage)
                 .where(gatherArticle.id.eq(gatherArticleId)
-                    .and(participationApplication.participationApplicationStatus.eq(ParticipationApplicationStatus.PENDING))
+                        .and(participationApplication.participationApplicationStatus.eq(ParticipationApplicationStatus.PENDING))
                 )
                 .fetch();
     }

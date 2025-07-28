@@ -17,29 +17,40 @@ public class ProfileImage {
 
     // 원본 파일명
     @Column(nullable = false)
-    private String originalFilename;
+    private String originalFileName;
 
-    // UUID 를 활용하여 구성된 파일 이름
+    // UUID 를 활용하여 구성된 S3에 저장되는 이름
     @Column(nullable = false)
-    private String savedFilename;
+    private String s3SavedObjectName;
 
-    // 이미지에 대한 URL 정보를 DB에서 찾을때 활용
-    @Column(nullable = false)
-    private String profileImageS3SavedURL;
+    // 양방향 연관관계
+    @OneToOne(mappedBy = "profileImage")
+    private Member member;
+
 
     @Builder
-    public ProfileImage(String originalFilename, String savedFilename, String profileImageS3SavedURL) {
-        this.originalFilename = originalFilename;
-        this.savedFilename = savedFilename;
-        this.profileImageS3SavedURL = profileImageS3SavedURL;
+    public ProfileImage(String originalFileName, String s3SavedObjectName) {
+        this.originalFileName = originalFileName;
+        this.s3SavedObjectName = s3SavedObjectName;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static ProfileImage buildProfileImage(String originalFilename, String savedFilename, String profileImageS3SavedURL) {
+    public static ProfileImage buildProfileImage(String originalFileName, String s3SavedObjectName) {
         return ProfileImage.builder()
-                .originalFilename(originalFilename)
-                .savedFilename(savedFilename)
-                .profileImageS3SavedURL(profileImageS3SavedURL)
+                .originalFileName(originalFileName)
+                .s3SavedObjectName(s3SavedObjectName)
                 .build();
+    }
+
+    // ProfileImage 1 <-> 1 Member
+    // 양방향 연관관계 편의 메서드
+    public void assignMember(Member member) {
+        if (this.member != null) {
+            this.member.assignProfileImage(null);
+        }
+        this.member = member;
+        if (member != null && member.getProfileImage() != this) {
+            member.assignProfileImage(this);
+        }
     }
 }

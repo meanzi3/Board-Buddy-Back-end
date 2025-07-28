@@ -192,4 +192,21 @@ public class GatherArticle extends BaseTimeEntity {
     public void assignGatherArticleStatus(GatherArticleStatus gatherArticleStatus) {
         this.gatherArticleStatus = gatherArticleStatus;
     }
+
+    /**
+     * 모집글 상태 확인, 업데이트
+     * @param newParticipantsCount 기존 모집글 참가 인원에 1명을 더한 참가 인원
+     */
+    public void updateGatherArticleStatusBasedOnParticipants(Integer newParticipantsCount) {
+
+        GatherArticleStatus newStatus =
+                newParticipantsCount >= this.maxParticipants
+                        ? GatherArticleStatus.CLOSED
+                        : GatherArticleStatus.OPEN;
+
+        // 상태가 바뀌어야 하는 상황에만 업데이트 수행
+        if (this.gatherArticleStatus != newStatus) {
+            this.assignGatherArticleStatus(newStatus);
+        }
+    }
 }

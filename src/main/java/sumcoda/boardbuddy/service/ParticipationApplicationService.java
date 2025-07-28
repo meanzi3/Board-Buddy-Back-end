@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.MemberResponse;
-import sumcoda.boardbuddy.dto.ParticipationApplicationResponse;
+import sumcoda.boardbuddy.dto.ParticipationApplicationInfoDTO;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
 import sumcoda.boardbuddy.entity.ParticipationApplication;
-import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 import sumcoda.boardbuddy.enumerate.ParticipationApplicationStatus;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleAccessDeniedException;
@@ -27,6 +26,9 @@ import sumcoda.boardbuddy.repository.participationApplication.ParticipationAppli
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static sumcoda.boardbuddy.util.ParticipationApplicationUtil.convertParticipationApplicationInfoDTO;
+import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -39,6 +41,9 @@ public class ParticipationApplicationService {
     private final MemberGatherArticleRepository memberGatherArticleRepository;
 
     private final ParticipationApplicationRepository participationApplicationRepository;
+
+    private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
+
 
     /**
      * 모집글 참가 신청 처리
@@ -57,7 +62,7 @@ public class ParticipationApplicationService {
         Boolean isParticipationApplicationExists = participationApplicationRepository.existsByGatherArticleIdAndUsername(gatherArticleId, username);
         // 이미 해당 모집글에 참가신청한 이력이 있는지 확인
         if (isMemberGatherArticleExists && isParticipationApplicationExists) {
-            ParticipationApplication participationApplication = participationApplicationRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, username)
+            ParticipationApplication participationApplication = participationApplicationRepository.findByGatherArticleIdAndUsername(gatherArticleId, username)
                     .orElseThrow(() -> new ParticipationApplicationRetrievalException("서버 문제로 참가 신청 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
             // 해당 모집글에 이미 참가 확정이 되었는지 확인
@@ -172,7 +177,7 @@ public class ParticipationApplicationService {
         gatherArticle.assignCurrentParticipants(newParticipantsCount);
 
         // 모집글 상태 확인, 업데이트
-        updateGatherArticleStatusBasedOnParticipants(gatherArticle, newParticipantsCount);
+        gatherArticle.updateGatherArticleStatusBasedOnParticipants(newParticipantsCount);
 
         MemberResponse.UsernameDTO userNameDTO = memberRepository.findUsernameDTOByNickname(applicantNickname).orElseThrow(() -> new MemberNotFoundException("참가 승인할 사용자의 정보를 찾을 수 없습니다."));
 
@@ -248,7 +253,7 @@ public class ParticipationApplicationService {
         MemberGatherArticle memberGatherArticle = memberGatherArticleRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, username)
                 .orElseThrow(() -> new MemberGatherArticleRetrievalException("서버 문제로 해당 모집글 관련한 사용자의 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        ParticipationApplication participationApplication = participationApplicationRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, username)
+        ParticipationApplication participationApplication = participationApplicationRepository.findByGatherArticleIdAndUsername(gatherArticleId, username)
                 .orElseThrow(() -> new ParticipationApplicationRetrievalException("서버 문제로 참가 신청 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
         // 참가 신청이 이미 취소된 경우 확인
@@ -282,10 +287,8 @@ public class ParticipationApplicationService {
             gatherArticle.assignCurrentParticipants(newParticipantsCount);
 
             // 모집글 상태 확인, 업데이트
-            updateGatherArticleStatusBasedOnParticipants(gatherArticle, newParticipantsCount);
+            gatherArticle.updateGatherArticleStatusBasedOnParticipants(newParticipantsCount);
         }
-
-
 
         return isMemberParticipant;
     }
@@ -297,7 +300,7 @@ public class ParticipationApplicationService {
      * @param username 참가 신청 목록을 조회하는 모집글 작성자 아이디
      * @return 모집글의 모든 참가 신청 목록
      **/
-    public List<ParticipationApplicationResponse.InfoDTO> getParticipationAppliedMemberList(Long gatherArticleId, String username) {
+    public List<ParticipationApplicationInfoDTO> getParticipationAppliedMemberList(Long gatherArticleId, String username) {
         // 모집글 조회
         boolean isGatherArticleExists = gatherArticleRepository.existsById(gatherArticleId);
         if (!isGatherArticleExists) {
@@ -312,25 +315,14 @@ public class ParticipationApplicationService {
         }
 
         // 참가 신청 현황 조회
-        return participationApplicationRepository.findParticipationAppliedMemberByGatherArticleId(gatherArticleId);
-    }
+        return participationApplicationRepository.findParticipationAppliedMemberByGatherArticleId(gatherArticleId).stream()
+                .map(projection -> {
+                    String profileImageS3SavedPath = buildProfileImageS3RequestKey(projection.s3SavedObjectName());
 
-    /**
-     * 모집글 상태 확인, 업데이트
-     * @param gatherArticle
-     */
-    private void updateGatherArticleStatusBasedOnParticipants(GatherArticle gatherArticle, Integer newParticipantsCount) {
-        GatherArticleStatus newStatus;
+                    String profileImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3SavedPath);
 
-        if (newParticipantsCount >= gatherArticle.getMaxParticipants()) {
-            newStatus = GatherArticleStatus.CLOSED;
-        } else {
-            newStatus = GatherArticleStatus.OPEN;
-        }
-
-        // 상태가 바뀌어야 하는 상황에만 업데이트 수행
-        if (gatherArticle.getGatherArticleStatus() != newStatus) {
-            gatherArticle.assignGatherArticleStatus(newStatus);
-        }
+                    return convertParticipationApplicationInfoDTO(projection, profileImageSignedURL);
+                })
+                .toList();
     }
 }

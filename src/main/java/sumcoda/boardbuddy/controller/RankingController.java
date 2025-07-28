@@ -1,12 +1,11 @@
 package sumcoda.boardbuddy.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.dto.MemberRankingDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.RankingService;
 
@@ -27,8 +26,9 @@ public class RankingController {
      * @return TOP3 리스트를 조회하여 약속된 SuccessResponse 반환
      */
     @GetMapping("/api/rankings")
-    public ResponseEntity<ApiResponse<Map<String, List<MemberResponse.RankingsDTO>>>> getTop3Rankings() {
-        List<MemberResponse.RankingsDTO> rankingsDTO = rankingService.getTop3Rankings();
-        return buildSuccessResponseWithPairKeyData("rankings", rankingsDTO,"랭킹 조회에 성공했습니다.", HttpStatus.OK);
+    public ResponseEntity<ApiResponse<Map<String, List<MemberRankingDTO>>>> getTop3Rankings() {
+        List<MemberRankingDTO> memberRankingDTO = rankingService.getTop3Rankings();
+
+        return buildSuccessResponseWithPairKeyData("rankings", memberRankingDTO,"랭킹 조회에 성공했습니다.", HttpStatus.OK);
     }
 }

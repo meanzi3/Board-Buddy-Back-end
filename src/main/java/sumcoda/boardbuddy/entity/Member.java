@@ -315,10 +315,16 @@ public class Member {
 //                .build();
 //    }
 
-    // Member 1 -> 1 ProfileImage
-    // 단방향 연관관계 편의 메서드
+    // Member 1 <-> 1 ProfileImage
+    // 양방향 연관관계 편의 메서드
     public void assignProfileImage(ProfileImage profileImage) {
+        if (this.profileImage != null) {
+            this.profileImage.assignMember(null);
+        }
         this.profileImage = profileImage;
+        if (profileImage != null && profileImage.getMember() != this) {
+            profileImage.assignMember(this);
+        }
     }
 
     // Member 1 <-> N MemberGatherArticle

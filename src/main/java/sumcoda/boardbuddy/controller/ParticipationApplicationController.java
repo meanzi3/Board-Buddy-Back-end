@@ -5,7 +5,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sumcoda.boardbuddy.dto.ParticipationApplicationResponse;
+import sumcoda.boardbuddy.dto.ParticipationApplicationInfoDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.service.ChatMessageService;
@@ -120,9 +120,9 @@ public class ParticipationApplicationController {
      * @return 모집글 참가 신청중인 사용자 목록
      **/
     @GetMapping("/api/gather-articles/{gatherArticleId}/participation")
-    public ResponseEntity<ApiResponse<Map<String, List<ParticipationApplicationResponse.InfoDTO>>>> getParticipationAppliedMemberList(@PathVariable Long gatherArticleId, @RequestAttribute String username) {
+    public ResponseEntity<ApiResponse<Map<String, List<ParticipationApplicationInfoDTO>>>> getParticipationAppliedMemberList(@PathVariable Long gatherArticleId, @RequestAttribute String username) {
 
-        List<ParticipationApplicationResponse.InfoDTO> participationAppliedMemberList = participationApplicationService.getParticipationAppliedMemberList(gatherArticleId, username);
+        List<ParticipationApplicationInfoDTO> participationAppliedMemberList = participationApplicationService.getParticipationAppliedMemberList(gatherArticleId, username);
 
         return buildSuccessResponseWithPairKeyData("participationAppliedMemberList", participationAppliedMemberList, "해당 모집글의 참가 신청 목록을 성공적으로 조회했습니다.", HttpStatus.OK);
     }

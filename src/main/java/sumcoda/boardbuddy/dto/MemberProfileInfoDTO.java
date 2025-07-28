@@ -1,0 +1,28 @@
+package sumcoda.boardbuddy.dto;
+
+import lombok.Builder;
+
+import java.util.List;
+
+@Builder
+public record MemberProfileInfoDTO(
+
+        String profileImageSignedURL,
+
+        String description,
+
+        Integer rank,
+
+        Double buddyScore,
+
+        List<BadgeImageInfoDTO> badges,
+
+        Integer joinCount,
+
+        Integer totalExcellentCount,
+
+        Integer totalGoodCount,
+
+        Integer totalBadCount
+) {
+}

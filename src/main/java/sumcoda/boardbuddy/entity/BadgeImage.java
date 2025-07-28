@@ -17,11 +17,7 @@ public class BadgeImage {
 
     // 원본 파일명
     @Column(nullable = false)
-    private String originalFilename;
-
-    // 이미지에 대한 URL 정보를 DB에서 찾을때 활용
-    @Column(nullable = false)
-    private String badgeImageS3SavedURL;
+    private String s3SavedObjectName;
 
     // 뱃지 발급 연월 정보
     @Column(nullable = false)
@@ -34,18 +30,16 @@ public class BadgeImage {
     private Member member;
 
     @Builder
-    public BadgeImage(String originalFilename, String badgeImageS3SavedURL, String badgeYearMonth, Member member) {
-        this.originalFilename = originalFilename;
-        this.badgeImageS3SavedURL = badgeImageS3SavedURL;
+    public BadgeImage(String s3SavedObjectName, String badgeYearMonth, Member member) {
+        this.s3SavedObjectName = s3SavedObjectName;
         this.badgeYearMonth = badgeYearMonth;
         this.assignMember(member);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 않고 해당 메서드를 활용하여 엔티티 생성
-    public static BadgeImage buildBadgeImage(String originalFilename, String badgeImageS3SavedURL, String badgeYearMonth, Member member) {
+    public static BadgeImage buildBadgeImage(String s3SavedObjectName, String badgeYearMonth, Member member) {
         return BadgeImage.builder()
-                .originalFilename(originalFilename)
-                .badgeImageS3SavedURL(badgeImageS3SavedURL)
+                .s3SavedObjectName(s3SavedObjectName)
                 .badgeYearMonth(badgeYearMonth)
                 .member(member)
                 .build();

@@ -147,10 +147,7 @@ public class ProfileService {
                     String s3DeleteRequestKey = buildProfileImageS3RequestKey(profileImageSavedObjectName);
 
                     // DeleteObjectRequest 생성
-                    DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(s3DeleteRequestKey)
-                            .build();
+                    DeleteObjectRequest deleteObjectRequest = buildDeleteObjectRequest(bucketName, s3DeleteRequestKey);
 
                     s3Client.deleteObject(deleteObjectRequest);
 
@@ -167,15 +164,11 @@ public class ProfileService {
                 String s3PutRequestKey = buildProfileImageS3RequestKey(s3SavedObjectName);
 
                 // PutObjectRequest 생성
-                PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(s3PutRequestKey)
-                        .contentType(profileImageFile.getContentType())   // (Optional) Content-Type 설정
-                        .build();
+                PutObjectRequest putObjectRequest = buildPutObjectRequest(profileImageFile, bucketName, s3PutRequestKey);
 
+                RequestBody requestBody = convertRequestBody(profileImageFile);
                 // S3에 업로드
-                s3Client.putObject(putObjectRequest, RequestBody.fromBytes(profileImageFile.getBytes()));
-
+                s3Client.putObject(putObjectRequest, requestBody);
 
                 // 새로운 프로필 이미지 생성
                 ProfileImage newProfileImage = ProfileImage.buildProfileImage(
@@ -187,12 +180,9 @@ public class ProfileService {
 
                 profileImageRepository.save(newProfileImage);
 
-
             } catch (IOException e) {
                 throw new ProfileImageSaveException("프로필 이미지를 저장하는 동안 오류가 발생했습니다.");
             }
         }
     }
-
-
 }

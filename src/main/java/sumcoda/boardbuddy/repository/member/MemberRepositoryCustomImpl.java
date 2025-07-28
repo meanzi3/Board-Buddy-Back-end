@@ -7,6 +7,7 @@ import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
 import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
+import sumcoda.boardbuddy.dto.fetch.MemberRankingProjection;
 import sumcoda.boardbuddy.entity.Member;
 
 import java.util.List;
@@ -75,11 +76,11 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public List<MemberResponse.RankingsDTO> findTop3RankingMembers() {
+    public List<MemberRankingProjection> findTop3RankingMembers() {
         return jpaQueryFactory
-                .select(Projections.constructor(MemberResponse.RankingsDTO.class,
+                .select(Projections.constructor(MemberRankingProjection.class,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL
+                        profileImage.s3SavedObjectName
                 ))
                 .from(member)
                 .leftJoin(member.profileImage, profileImage)

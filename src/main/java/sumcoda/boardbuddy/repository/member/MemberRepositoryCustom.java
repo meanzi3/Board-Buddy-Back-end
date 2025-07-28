@@ -4,6 +4,7 @@ import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
 import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
 import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
+import sumcoda.boardbuddy.dto.fetch.MemberRankingProjection;
 import sumcoda.boardbuddy.entity.Member;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface MemberRepositoryCustom {
 
     Optional<MemberAuthProfileProjection> findMemberAuthProfileByUsername(String username);
 
-    List<MemberResponse.RankingsDTO> findTop3RankingMembers();
+    List<MemberRankingProjection> findTop3RankingMembers();
 
     List<Member> findAllOrderedByRankScore();
 

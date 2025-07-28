@@ -9,20 +9,6 @@ import java.util.Map;
 
 public class MemberResponse {
 
-
-    @Getter
-    @NoArgsConstructor
-    public static class RankingsDTO {
-        private String nickname;
-        private String profileImageS3SavedURL;
-
-        @Builder
-        public RankingsDTO(String nickname, String profileImageS3SavedURL) {
-            this.nickname = nickname;
-            this.profileImageS3SavedURL = profileImageS3SavedURL;
-        }
-    }
-
     @Getter
     @NoArgsConstructor
     public static class LocationWithRadiusDTO {

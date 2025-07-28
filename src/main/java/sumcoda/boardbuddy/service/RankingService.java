@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.dto.MemberRankingDTO;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.RankScorePoints;
 import sumcoda.boardbuddy.repository.MemberJdbcRepository;
@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
+import static sumcoda.boardbuddy.util.RankingUtil.*;
 
 @Service
 @Slf4j
@@ -38,17 +41,28 @@ public class RankingService {
 
     private final BadgeImageService badgeImageService;
 
-    private static final int TOP_RANK_COUNT = 3;
+    private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
 
 
     /**
-     * 랭킹 조회
-     * @return TOP3 RankingsDTO list
+     * 랭킹 TOP3 조회
+     * @return TOP3 MemberRankingDTO 리스트
      */
-    public List<MemberResponse.RankingsDTO> getTop3Rankings(){
+    public List<MemberRankingDTO> getTop3Rankings(){
 
-        return memberRepository.findTop3RankingMembers();
+        return memberRepository.findTop3RankingMembers().stream()
+                .map(projection -> {
+
+                    String profileImageS3SavedPath = buildProfileImageS3RequestKey(projection.s3SavedObjectName());
+
+                    String profileImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3SavedPath);
+
+                    return convertMemberRankingDTO(projection, profileImageSignedURL);
+
+                })
+                .toList();
     }
+
 
     /**
     * 랭킹 집계 - 매월 1일 00시 스케줄링

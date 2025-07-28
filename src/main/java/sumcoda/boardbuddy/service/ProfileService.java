@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static sumcoda.boardbuddy.util.BadgeImageUtil.*;
+import static sumcoda.boardbuddy.util.MemberProfileUtil.convertMemberProfileInfoDTO;
 import static sumcoda.boardbuddy.util.ProfileImageUtil.*;
 
 @Slf4j
@@ -86,7 +87,7 @@ public class ProfileService {
 
         String profileImageSignedUrl = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3RequestKey);
 
-        return convertBadgeImageInfoDTO(memberProfileProjection, badgeImageInfoDTOList, profileImageSignedUrl);
+        return convertMemberProfileInfoDTO(memberProfileProjection, badgeImageInfoDTOList, profileImageSignedUrl);
     }
 
     /**

@@ -2,6 +2,7 @@ package sumcoda.boardbuddy.repository.member;
 
 import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
 import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
 import sumcoda.boardbuddy.entity.Member;
 
@@ -12,7 +13,7 @@ public interface MemberRepositoryCustom {
 
     Optional<AuthResponse.ProfileDTO> findAuthDTOByUsername(String username);
 
-    Optional<MemberResponse.ProfileDTO> findMemberDTOByUsername(String username);
+    Optional<MemberAuthProfileProjection> findMemberAuthProfileByUsername(String username);
 
     List<MemberResponse.RankingsDTO> findTop3RankingMembers();
 

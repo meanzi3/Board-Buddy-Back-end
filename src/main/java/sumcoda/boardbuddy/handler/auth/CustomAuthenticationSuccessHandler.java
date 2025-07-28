@@ -12,14 +12,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import sumcoda.boardbuddy.dto.MemberResponse;
-import sumcoda.boardbuddy.enumerate.MemberType;
+import sumcoda.boardbuddy.dto.MemberAuthProfileDTO;
+import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
 import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
+import sumcoda.boardbuddy.service.CloudFrontSignedUrlService;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static sumcoda.boardbuddy.util.MemberProfileUtil.convertMemberAuthProfileDTO;
+import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
 
 @Slf4j
 @Component
@@ -27,6 +31,9 @@ import java.util.Map;
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final MemberRepository memberRepository;
+
+    private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         log.info("success handler is working");
@@ -44,26 +51,21 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         log.info("login user name : " + username);
 
-        MemberResponse.ProfileDTO profileDTO = memberRepository.findMemberDTOByUsername(username).orElseThrow(() ->
+        MemberAuthProfileProjection projection = memberRepository.findMemberAuthProfileByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
 
-        profileDTO = MemberResponse.ProfileDTO
-                .builder()
-                .nickname(profileDTO.getNickname())
-                .sido(profileDTO.getSido())
-                .sgg(profileDTO.getSgg())
-                .emd(profileDTO.getEmd())
-                .isPhoneNumberVerified(profileDTO.getPhoneNumber() != null)
-                .memberType(profileDTO.getMemberType())
-                .profileImageS3SavedURL(profileDTO.getProfileImageS3SavedURL())
-                .build();
+        String profileImageS3SavedPath = buildProfileImageS3RequestKey(projection.s3SavedObjectName());
+
+        String profileImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3SavedPath);
+
+        MemberAuthProfileDTO memberAuthProfileDTO = convertMemberAuthProfileDTO(projection, profileImageSignedURL);
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         responseData.put("status", "success");
-        responseData.put("data", Map.of("profileDTO", profileDTO));
+        responseData.put("data", Map.of("memberAuthProfileDTO", memberAuthProfileDTO));
         responseData.put("message", "로그인에 성공하였습니다.");
 
         objectMapper.writeValue(response.getWriter(), responseData);

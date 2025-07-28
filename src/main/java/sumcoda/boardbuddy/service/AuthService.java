@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.AuthRequest;
 import sumcoda.boardbuddy.dto.AuthResponse;
-import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.dto.MemberAuthProfileDTO;
+import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
 import sumcoda.boardbuddy.exception.auth.InvalidPasswordException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationAttemptExceededException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
@@ -19,6 +20,9 @@ import sumcoda.boardbuddy.repository.SmsCertificationRepository;
 import sumcoda.boardbuddy.util.SmsCertificationUtil;
 
 import java.security.SecureRandom;
+
+import static sumcoda.boardbuddy.util.MemberProfileUtil.convertMemberAuthProfileDTO;
+import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +36,9 @@ public class AuthService {
     private final MemberRepository memberRepository;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
+
 
     /**
      * 사용자가 입력한 휴대폰 번호로 6자리 인증번호 전송
@@ -76,7 +83,9 @@ public class AuthService {
             incrementAttemptCount(phoneNumber);
             throw new SMSCertificationNumberMismatchException("입력하신 인증번호가 일치하지 않습니다.");
         }
+
         smsCertificationRepository.removeSMSCertification(phoneNumber);
+
         smsCertificationRepository.resetAttemptCount(phoneNumber);
     }
 
@@ -118,6 +127,7 @@ public class AuthService {
      **/
     public boolean isCertificationNumberMatching(AuthRequest.ValidateSMSCertificationDTO validateSMSCertificationDTO) {
         String phoneNumber = validateSMSCertificationDTO.getPhoneNumber();
+
         return !isCertificationNumberExpired(phoneNumber) &&
                 smsCertificationRepository.getSMSCertification(phoneNumber)
                         .equals(validateSMSCertificationDTO.getCertificationNumber());
@@ -129,21 +139,15 @@ public class AuthService {
      * @param username 로그인 사용자 아이디
      * @return 사용자가 로그인한 상태라면 해당 사용자의 프로필 반환 아니라면 null 반환
      **/
-    public MemberResponse.ProfileDTO isAuthenticated(String username) {
-
-        MemberResponse.ProfileDTO profileDTO = memberRepository.findMemberDTOByUsername(username).orElseThrow(() ->
+    public MemberAuthProfileDTO checkMemberAuthenticationStatus(String username) {
+        MemberAuthProfileProjection projection = memberRepository.findMemberAuthProfileByUsername(username).orElseThrow(() ->
                 new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        return MemberResponse.ProfileDTO
-                .builder()
-                .nickname(profileDTO.getNickname())
-                .sido(profileDTO.getSido())
-                .sgg(profileDTO.getSgg())
-                .emd(profileDTO.getEmd())
-                .isPhoneNumberVerified(profileDTO.getPhoneNumber() != null)
-                .memberType(profileDTO.getMemberType())
-                .profileImageS3SavedURL(profileDTO.getProfileImageS3SavedURL())
-                .build();
+        String profileImageS3SavedPath = buildProfileImageS3RequestKey(projection.s3SavedObjectName());
+
+        String profileImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3SavedPath);
+
+        return convertMemberAuthProfileDTO(projection, profileImageSignedURL);
     }
 
     /**

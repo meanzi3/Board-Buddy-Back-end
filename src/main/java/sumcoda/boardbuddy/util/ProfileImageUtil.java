@@ -1,11 +1,6 @@
 package sumcoda.boardbuddy.util;
 
 
-import sumcoda.boardbuddy.dto.BadgeImageInfoDTO;
-import sumcoda.boardbuddy.dto.MemberProfileInfoDTO;
-import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
-
-import java.util.List;
 import java.util.UUID;
 
 public final class ProfileImageUtil {
@@ -16,28 +11,6 @@ public final class ProfileImageUtil {
     private ProfileImageUtil() {
         /* 유틸 클래스라 인스턴스화 금지 */
     }
-
-    /**
-     * Projection 객체를 BadgeImageInfoDTO 객체로 변환
-     *
-     * @param projectionDTO DB에서 조회된 BadgeImageInfoProjectionDTO 리스트
-     * @param signedUrl CloudFront Signed URL 생성 서비스
-     * @return BadgeImageInfoDTO 객체
-     */
-    public static MemberProfileInfoDTO convertBadgeImageInfoDTO(MemberProfileProjection projectionDTO, List<BadgeImageInfoDTO> badgeImageInfoDTOList, String signedUrl) {
-        return MemberProfileInfoDTO.builder()
-                .profileImageSignedURL(signedUrl)
-                .description(projectionDTO.description())
-                .rank(projectionDTO.rank())
-                .buddyScore(projectionDTO.buddyScore())
-                .badges(badgeImageInfoDTOList)
-                .joinCount(projectionDTO.joinCount())
-                .totalExcellentCount(projectionDTO.totalExcellentCount())
-                .totalGoodCount(projectionDTO.totalGoodCount())
-                .totalBadCount(projectionDTO.totalBadCount())
-                .build();
-    }
-
 
     /**
      * 주어진 프로필 이미지 이름으로 프로필 이미지 요청 키를 생성

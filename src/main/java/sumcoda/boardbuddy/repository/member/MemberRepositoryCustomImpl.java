@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
 import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
 import sumcoda.boardbuddy.entity.Member;
 
@@ -37,9 +38,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
      *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
      */
 //    @Override
-//    public Optional<MemberResponse.ProfileDTO> findMemberDTOByUsername(String username) {
+//    public Optional<MemberResponse.MemberAuthProfileDTO> findMemberDTOByUsername(String username) {
 //        return Optional.ofNullable(jpaQueryFactory
-//                .select(Projections.fields(MemberResponse.ProfileDTO.class,
+//                .select(Projections.fields(MemberResponse.MemberAuthProfileDTO.class,
 //                        member.nickname,
 //                        member.sido,
 //                        member.sgg,
@@ -59,9 +60,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
      *          앱 사용률 증가시 비활성화후에 기존 기능 활성화 예정
      */
     @Override
-    public Optional<MemberResponse.ProfileDTO> findMemberDTOByUsername(String username) {
+    public Optional<MemberAuthProfileProjection> findMemberAuthProfileByUsername(String username) {
         return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.fields(MemberResponse.ProfileDTO.class,
+                .select(Projections.constructor(MemberAuthProfileProjection.class,
                         member.nickname,
                         member.phoneNumber,
                         member.memberType,
@@ -76,9 +77,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     @Override
     public List<MemberResponse.RankingsDTO> findTop3RankingMembers() {
         return jpaQueryFactory
-                .select(Projections.fields(MemberResponse.RankingsDTO.class,
+                .select(Projections.constructor(MemberResponse.RankingsDTO.class,
                         member.nickname,
-                        profileImage.s3SavedObjectName
+                        profileImage.profileImageS3SavedURL
                 ))
                 .from(member)
                 .leftJoin(member.profileImage, profileImage)

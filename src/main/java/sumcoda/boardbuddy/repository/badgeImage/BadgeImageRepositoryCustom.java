@@ -1,9 +1,10 @@
 package sumcoda.boardbuddy.repository.badgeImage;
 
-import sumcoda.boardbuddy.dto.BadgeImageResponse;
+import sumcoda.boardbuddy.dto.fetch.BadgeImageInfoProjection;
 
 import java.util.List;
 
 public interface BadgeImageRepositoryCustom {
-    List<BadgeImageResponse.BadgeImageInfosDTO> findBadgeImagesByNickname(String nickname);
+
+    List<BadgeImageInfoProjection> findBadgeImagesByNickname(String nickname);
 }

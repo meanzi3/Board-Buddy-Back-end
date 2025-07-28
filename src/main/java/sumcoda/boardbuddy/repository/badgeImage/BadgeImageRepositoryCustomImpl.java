@@ -3,7 +3,7 @@ package sumcoda.boardbuddy.repository.badgeImage;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import sumcoda.boardbuddy.dto.BadgeImageResponse;
+import sumcoda.boardbuddy.dto.fetch.BadgeImageInfoProjection;
 
 import java.util.List;
 
@@ -16,9 +16,10 @@ public class BadgeImageRepositoryCustomImpl implements BadgeImageRepositoryCusto
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<BadgeImageResponse.BadgeImageInfosDTO> findBadgeImagesByNickname(String nickname) {
-        return jpaQueryFactory.select(Projections.fields(BadgeImageResponse.BadgeImageInfosDTO.class,
-                        badgeImage.badgeImageS3SavedURL,
+    public List<BadgeImageInfoProjection> findBadgeImagesByNickname(String nickname) {
+        return jpaQueryFactory
+                .select(Projections.constructor(BadgeImageInfoProjection.class,
+                        badgeImage.s3SavedObjectName,
                         badgeImage.badgeYearMonth))
                 .from(badgeImage)
                 .leftJoin(badgeImage.member, member)

@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import sumcoda.boardbuddy.dto.BadgeImageResponse;
+import sumcoda.boardbuddy.dto.BadgeImageInfoDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.BadgeImageService;
 
@@ -30,10 +30,10 @@ public class BadgeImageController {
      * @return 뱃지 리스트
      **/
     @GetMapping(value = "/api/badges/{nickname}")
-    public ResponseEntity<ApiResponse<Map<String, List<BadgeImageResponse.BadgeImageInfosDTO>>>> getBadges (@PathVariable String nickname) {
+    public ResponseEntity<ApiResponse<Map<String, List<BadgeImageInfoDTO>>>> getBadges(@PathVariable String nickname) {
         log.info("get badges is working");
 
-        List<BadgeImageResponse.BadgeImageInfosDTO> badgeImageListDTOs = badgeImageService.getBadges(nickname);
+        List<BadgeImageInfoDTO> badgeImageListDTOs = badgeImageService.getBadges(nickname);
 
         return buildSuccessResponseWithPairKeyData("badges", badgeImageListDTOs,"뱃지가 조회되었습니다.", HttpStatus.OK);
     }

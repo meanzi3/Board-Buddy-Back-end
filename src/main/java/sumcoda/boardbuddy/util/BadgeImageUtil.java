@@ -26,12 +26,12 @@ public final class BadgeImageUtil {
      * Projection 객체를 BadgeImageInfoDTO 객체로 변환
      *
      * @param projection DB에서 조회된 BadgeImageInfoProjectionDTO 리스트
-     * @param signedUrl CloudFront Signed URL 생성 서비스
+     * @param badgeImageSignedURL 생성된 CloudFront Signed URL
      * @return BadgeImageInfoDTO 객체
      */
-    public static BadgeImageInfoDTO convertBadgeImageInfoDTO(BadgeImageInfoProjection projection, String signedUrl) {
+    public static BadgeImageInfoDTO convertBadgeImageInfoDTO(BadgeImageInfoProjection projection, String badgeImageSignedURL) {
         return BadgeImageInfoDTO.builder()
-                .badgeImageSignedURL(signedUrl)
+                .badgeImageSignedURL(badgeImageSignedURL)
                 .badgeYearMonth(projection.badgeYearMonth())
                 .build();
     }

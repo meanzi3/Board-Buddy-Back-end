@@ -37,7 +37,6 @@ public class BadgeImageService {
      * @return 뱃지 이미지 URL 리스트
      **/
     public List<BadgeImageInfoDTO> getBadges(String nickname) {
-
         if (nickname == null) {
             throw new MemberRetrievalException("뱃지 조회 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
         }
@@ -58,9 +57,9 @@ public class BadgeImageService {
 
                     String badgeImageS3SavedPath = buildBadgeImageS3RequestKey(projectionDTO.s3SavedObjectName());
 
-                    String signedUrl = cloudFrontSignedUrlService.generateSignedUrl(badgeImageS3SavedPath);
+                    String badgeImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(badgeImageS3SavedPath);
 
-                    return convertBadgeImageInfoDTO(projectionDTO, signedUrl);
+                    return convertBadgeImageInfoDTO(projectionDTO, badgeImageSignedURL);
                 })
                 .toList();
     }

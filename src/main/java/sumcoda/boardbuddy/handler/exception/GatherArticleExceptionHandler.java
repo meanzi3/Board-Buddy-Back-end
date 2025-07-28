@@ -43,6 +43,11 @@ public class GatherArticleExceptionHandler {
     return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
+  @ExceptionHandler(GatherArticleAuthorRetrievalException.class)
+  public ResponseEntity<ApiResponse<Void>> handleGatherArticleAuthorRetrievalException(GatherArticleAuthorRetrievalException e) {
+    return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
   // 유효하지 않은 정렬 기준 예외 처리 핸들러
   @ExceptionHandler(GatherArticleSortException.class)
   public ResponseEntity<ApiResponse<Void>> handleGatherArticleSortException(GatherArticleSortException e) {

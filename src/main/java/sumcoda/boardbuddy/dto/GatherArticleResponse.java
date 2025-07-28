@@ -68,50 +68,6 @@ public class GatherArticleResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class DetailedInfoDTO {
-        private String title;
-        private String description;
-        private GatherArticleResponse.AuthorDTO author;
-        private String sido;
-        private String sgg;
-        private String emd;
-        private String meetingLocation;
-        private Double x;
-        private Double y;
-        private Integer maxParticipants;
-        private Integer currentParticipants;
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        private LocalDateTime startDateTime;
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        private LocalDateTime endDateTime;
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        private LocalDateTime createdAt;
-        private GatherArticleStatus status;
-
-        @Builder
-        public DetailedInfoDTO(String title, String description, AuthorDTO author, String sido, String sgg, String emd, String meetingLocation, Double x, Double y,
-                               Integer maxParticipants, Integer currentParticipants, LocalDateTime startDateTime,
-                               LocalDateTime endDateTime, LocalDateTime createdAt, GatherArticleStatus status) {
-            this.title = title;
-            this.description = description;
-            this.author = author;
-            this.sido = sido;
-            this.sgg = sgg;
-            this.emd = emd;
-            this.meetingLocation = meetingLocation;
-            this.x = x;
-            this.y = y;
-            this.maxParticipants = maxParticipants;
-            this.currentParticipants = currentParticipants;
-            this.startDateTime = startDateTime;
-            this.endDateTime = endDateTime;
-            this.createdAt = createdAt;
-            this.status = status;
-        }
-    }
-
-    @Getter
-    @NoArgsConstructor
     public static class ParticipationApplicationStatusDTO {
 
         private ParticipationApplicationStatus participationApplicationStatus;
@@ -120,24 +76,6 @@ public class GatherArticleResponse {
         public ParticipationApplicationStatusDTO(ParticipationApplicationStatus participationApplicationStatus) {
             this.participationApplicationStatus = participationApplicationStatus;
         }
-    }
-
-    @Getter
-    @NoArgsConstructor
-    public static class AuthorDTO {
-        private String nickname;
-        private Integer rank;
-        private String profileImageS3SavedURL;
-        private String description;
-
-        @Builder
-        public AuthorDTO(String nickname, Integer rank, String profileImageS3SavedURL, String description) {
-            this.nickname = nickname;
-            this.rank = rank;
-            this.profileImageS3SavedURL = profileImageS3SavedURL;
-            this.description = description;
-        }
-
     }
 
     @Getter

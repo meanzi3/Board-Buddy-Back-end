@@ -3,6 +3,8 @@ package sumcoda.boardbuddy.repository.gatherArticle;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.dto.fetch.GatherArticleAuthorProjection;
+import sumcoda.boardbuddy.dto.fetch.GatherArticleDetailedInfoProjection;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
@@ -37,9 +39,11 @@ public interface GatherArticleRepositoryCustom {
 
     Optional<GatherArticleResponse.SummaryInfoDTO> findSimpleInfoByGatherArticleId(Long gatherArticleId);
 
-    GatherArticleResponse.DetailedInfoDTO findGatherArticleDetailedInfoDTOByGatherArticleId(Long gatherArticleId);
+    Optional<GatherArticleDetailedInfoProjection> findGatherArticleDetailedInfoByGatherArticleId(Long gatherArticleId);
 
-    GatherArticleResponse.ParticipationApplicationStatusDTO findParticipationApplicationStatusDTOByGatherArticleIdAndUsername(Long gatherArticleId, String username);
+    Optional<GatherArticleAuthorProjection> findGatherArticleAuthorByGatherArticleId(Long gatherArticleId);
+
+    Optional<GatherArticleResponse.ParticipationApplicationStatusDTO> findParticipationApplicationStatusDTOByGatherArticleIdAndUsername(Long gatherArticleId, String username);
 
     Optional<GatherArticleResponse.TitleDTO> findTitleDTOById(Long gatherArticleId);
 

@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.dto.fetch.GatherArticleAuthorProjection;
+import sumcoda.boardbuddy.dto.fetch.GatherArticleDetailedInfoProjection;
 import sumcoda.boardbuddy.entity.QMember;
 import sumcoda.boardbuddy.entity.QMemberGatherArticle;
 import sumcoda.boardbuddy.entity.QParticipationApplication;
@@ -288,23 +290,14 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
      * 특정 모집글의 상세 정보를 조회
      *
      * @param gatherArticleId 조회할 모집글의 ID
-     * @return 모집글 상세 정보를 담은 DetailedInfoDTO 객체
+     * @return 모집글 상세 정보를 담은 GatherArticleDetailedInfoDTO 객체
      */
     @Override
-    public GatherArticleResponse.DetailedInfoDTO findGatherArticleDetailedInfoDTOByGatherArticleId(Long gatherArticleId) {
-
-        return jpaQueryFactory
-                .select(Projections.fields(
-                        GatherArticleResponse.DetailedInfoDTO.class,
+    public Optional<GatherArticleDetailedInfoProjection> findGatherArticleDetailedInfoByGatherArticleId(Long gatherArticleId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.constructor(GatherArticleDetailedInfoProjection.class,
                         gatherArticle.title,
                         gatherArticle.description,
-                        Projections.fields(
-                                GatherArticleResponse.AuthorDTO.class,
-                                member.nickname.as("nickname"),
-                                member.rank.as("rank"),
-                                profileImage.profileImageS3SavedURL.as("profileImageS3SavedURL"),
-                                member.description.as("description")
-                        ).as("author"),
                         gatherArticle.sido,
                         gatherArticle.sgg,
                         gatherArticle.emd,
@@ -316,7 +309,21 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                         gatherArticle.startDateTime,
                         gatherArticle.endDateTime,
                         gatherArticle.createdAt,
-                        gatherArticle.gatherArticleStatus.as("status")
+                        gatherArticle.gatherArticleStatus
+                ))
+                .from(gatherArticle)
+                .where(gatherArticle.id.eq(gatherArticleId))
+                .fetchOne());
+    }
+
+    @Override
+    public Optional<GatherArticleAuthorProjection> findGatherArticleAuthorByGatherArticleId(Long gatherArticleId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.constructor(GatherArticleAuthorProjection.class,
+                        member.nickname,
+                        member.rank,
+                        profileImage.s3SavedObjectName,
+                        member.description
                 ))
                 .from(gatherArticle)
                 // 모집글 작성자는 반드시 있으므로 inner join
@@ -327,8 +334,8 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .where(
                         gatherArticle.id.eq(gatherArticleId),
                         memberGatherArticle.memberGatherArticleRole.eq(MemberGatherArticleRole.AUTHOR)
-                        )
-                .fetchOne();
+                )
+                .fetchOne());
     }
 
     /**
@@ -339,8 +346,8 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
      * @return 참여 신청 상태를 담은 ParticipationApplicationStatusDTO 객체
      */
     @Override
-    public GatherArticleResponse.ParticipationApplicationStatusDTO findParticipationApplicationStatusDTOByGatherArticleIdAndUsername(Long gatherArticleId, String username) {
-        return jpaQueryFactory
+    public Optional<GatherArticleResponse.ParticipationApplicationStatusDTO> findParticipationApplicationStatusDTOByGatherArticleIdAndUsername(Long gatherArticleId, String username) {
+        return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(GatherArticleResponse.ParticipationApplicationStatusDTO.class,
                         participationApplicationStatusExpression(participationApplication)
                 ))
@@ -352,7 +359,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
                 .leftJoin(memberGatherArticle.member, member)
                 .leftJoin(memberGatherArticle.participationApplication, participationApplication)
                 .where(gatherArticle.id.eq(gatherArticleId))
-                .fetchOne();
+                .fetchOne());
     }
 
     /**

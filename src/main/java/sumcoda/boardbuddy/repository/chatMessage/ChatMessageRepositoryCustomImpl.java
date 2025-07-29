@@ -4,7 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import sumcoda.boardbuddy.dto.ChatMessageResponse;
+import sumcoda.boardbuddy.dto.fetch.ChatMessageItemInfoProjection;
 import sumcoda.boardbuddy.exception.MemberChatRoomRetrievalException;
 
 import java.time.Instant;
@@ -33,16 +33,16 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
      * @version 2.0
      */
     @Override
-    public List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findInitialMessagesByChatRoomIdAndUsernameAndJoinedAt(Long chatRoomId, String username, Instant joinedAt) {
+    public List<ChatMessageItemInfoProjection> findInitialMessagesByChatRoomIdAndUsernameAndJoinedAt(Long chatRoomId, String username, Instant joinedAt) {
 
         // 1) 최신 N+1개 조회 (DESC)
         return jpaQueryFactory
-                .select(Projections.fields(
-                        ChatMessageResponse.ChatMessageItemInfoProjectionDTO.class,
+                .select(Projections.constructor(
+                        ChatMessageItemInfoProjection.class,
                         chatMessage.id,
                         chatMessage.content,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL,
+                        profileImage.s3SavedObjectName,
                         member.rank,
                         chatMessage.messageType,
                         chatMessage.createdAt.as("sentAt")
@@ -71,7 +71,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
      * @version 2.0
      */
     @Override
-    public List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findNewerMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId) {
+    public List<ChatMessageItemInfoProjection> findNewerMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId) {
 
 
         // afterCursor: (createdAt > cursorSentAt)
@@ -80,12 +80,12 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
         BooleanExpression afterCursor = afterCursorBooleanExpression(cursorSentAt, cursorId);
 
         return jpaQueryFactory
-                .select(Projections.fields(
-                        ChatMessageResponse.ChatMessageItemInfoProjectionDTO.class,
+                .select(Projections.constructor(
+                        ChatMessageItemInfoProjection.class,
                         chatMessage.id,
                         chatMessage.content,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL,
+                        profileImage.s3SavedObjectName,
                         member.rank,
                         chatMessage.messageType,
                         chatMessage.createdAt.as("sentAt")
@@ -132,7 +132,7 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
      * @verison 2.0
      */
     @Override
-    public List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findOlderMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId) {
+    public List<ChatMessageItemInfoProjection> findOlderMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId) {
 
 
         // beforeCursor: (createdAt < cursorSentAt)
@@ -141,12 +141,12 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
         BooleanExpression beforeCursor = beforeCursorBooleanExpression(cursorSentAt, cursorId);
 
         return jpaQueryFactory
-                .select(Projections.fields(
-                        ChatMessageResponse.ChatMessageItemInfoProjectionDTO.class,
+                .select(Projections.constructor(
+                        ChatMessageItemInfoProjection.class,
                         chatMessage.id,
                         chatMessage.content,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL,
+                        profileImage.s3SavedObjectName,
                         member.rank,
                         chatMessage.messageType,
                         chatMessage.createdAt.as("sentAt")
@@ -246,18 +246,18 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
 //    }
 
     /**
-     * 특정 메시지 ID에 해당하는 대화 메시지 조회
+     * 특정 메시지 ID에 해당하는 채팅 메시지 조회
      *
      * @param chatMessageId 채팅 메시지 ID
-     * @return 특정 메시지 ID에 해당하는 대화 메시지 정보
+     * @return 특정 메시지 ID에 해당하는 채팅 메시지 정보
      **/
     @Override
-    public Optional<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findTalkMessageById(Long chatMessageId) {
-        return Optional.ofNullable(jpaQueryFactory.select(Projections.fields(ChatMessageResponse.ChatMessageItemInfoProjectionDTO.class,
+    public Optional<ChatMessageItemInfoProjection> findChatMessageById(Long chatMessageId) {
+        return Optional.ofNullable(jpaQueryFactory.select(Projections.constructor(ChatMessageItemInfoProjection.class,
                         chatMessage.id,
                         chatMessage.content,
                         member.nickname,
-                        profileImage.profileImageS3SavedURL,
+                        profileImage.s3SavedObjectName,
                         member.rank,
                         chatMessage.messageType,
                         chatMessage.createdAt.as("sentAt")))
@@ -268,22 +268,5 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
                 .fetchOne());
     }
 
-    /**
-     * 특정 메시지 ID에 해당하는 입장/퇴장 메시지 조회
-     *
-     * @param chatMessageId 채팅 메시지 ID
-     * @return 특정 메시지 ID에 해당하는 입장/퇴장 메시지 정보
-     **/
-    @Override
-    public Optional<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findEnterOrExitMessageById(Long chatMessageId) {
-        return Optional.ofNullable(jpaQueryFactory.select(Projections.fields(ChatMessageResponse.ChatMessageItemInfoProjectionDTO.class,
-                        chatMessage.id,
-                        chatMessage.content,
-                        chatMessage.messageType,
-                        chatMessage.createdAt.as("sentAt")))
-                .from(chatMessage)
-                .where(chatMessage.id.eq(chatMessageId))
-                .fetchOne());
-    }
 }
 

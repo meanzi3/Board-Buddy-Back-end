@@ -7,8 +7,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.ChatMessageRequest;
-import sumcoda.boardbuddy.dto.ChatMessageResponse;
-import sumcoda.boardbuddy.dto.common.PageResponse;
+import sumcoda.boardbuddy.dto.client.ChatMessageItemInfoDTO;
+import sumcoda.boardbuddy.dto.client.PageResponseDTO;
+import sumcoda.boardbuddy.dto.fetch.ChatMessageItemInfoProjection;
 import sumcoda.boardbuddy.entity.ChatMessage;
 import sumcoda.boardbuddy.entity.ChatRoom;
 import sumcoda.boardbuddy.entity.Member;
@@ -16,6 +17,7 @@ import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.exception.*;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
+import sumcoda.boardbuddy.mapper.ChatMessageMapper;
 import sumcoda.boardbuddy.repository.chatMessage.ChatMessageRepository;
 import sumcoda.boardbuddy.repository.chatRoom.ChatRoomRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
@@ -27,7 +29,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
-import static java.time.ZoneOffset.UTC;
 import static sumcoda.boardbuddy.util.ChatMessageUtil.*;
 
 
@@ -46,6 +47,8 @@ public class ChatMessageService {
     private final MemberChatRoomRepository memberChatRoomRepository;
 
     private final SimpMessagingTemplate messagingTemplate;
+
+    private final ChatMessageMapper chatMessageMapper;
 
 
     /**
@@ -87,10 +90,10 @@ public class ChatMessageService {
             throw new ChatMessageSaveException("서버 문제로 메세지를 저장할 수 없습니다. 관리자에게 문의하세요.");
         }
 
-        ChatMessageResponse.ChatMessageItemInfoProjectionDTO responseChatMessage = chatMessageRepository.findTalkMessageById(chatMessageId)
+        ChatMessageItemInfoProjection responseChatMessage = chatMessageRepository.findChatMessageById(chatMessageId)
                 .orElseThrow(() -> new ChatMessageRetrievalException("서버 문제로 해당 메세지를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        ChatMessageResponse.ChatMessageItemInfoDTO payload = convertPayload(responseChatMessage);
+        ChatMessageItemInfoDTO payload = chatMessageMapper.toChatMessageItemInfoDTO(responseChatMessage);
 
         try {
             // 채팅방 구독자들에게 메시지 전송 (STOMP SEND)
@@ -102,10 +105,6 @@ public class ChatMessageService {
             throw e; // 메시지 전송시 예외 발생시 DB에 메시지를 저장한 작업 같은 것들을 롤백
         }
     }
-
-
-
-
 
     /**
      * 채팅방 입장/퇴장 메세지 발행 및 채팅방에 사용자 입장/퇴장 메세지 전송
@@ -144,10 +143,10 @@ public class ChatMessageService {
             throw new ChatMessageSaveException("서버 문제로 메세지를 저장할 수 없습니다. 관리자에게 문의하세요.");
         }
 
-        ChatMessageResponse.ChatMessageItemInfoProjectionDTO responseChatMessage = chatMessageRepository.findEnterOrExitMessageById(chatMessageId)
+        ChatMessageItemInfoProjection responseChatMessage = chatMessageRepository.findChatMessageById(chatMessageId)
                 .orElseThrow(() -> new ChatMessageRetrievalException("서버 문제로 해당 메세지를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        ChatMessageResponse.ChatMessageItemInfoDTO payload = convertPayload(responseChatMessage);
+        ChatMessageItemInfoDTO payload = chatMessageMapper.toChatMessageItemInfoDTO(responseChatMessage);
 
         // 채팅방 구독자들에게 메시지 전송
         messagingTemplate.convertAndSend("/ws/chat/messages/subscription/" + chatRoomId, payload);
@@ -165,7 +164,7 @@ public class ChatMessageService {
      * @since 1.0
      * @version 2.0
      */
-    public PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO> findInitialChatMessages(Long chatRoomId, String username) {
+    public PageResponseDTO<ChatMessageItemInfoDTO> findInitialChatMessages(Long chatRoomId, String username) {
 
         // 채팅방 입장 검증
         validateChatRoomAccess(chatRoomId, username);
@@ -173,7 +172,7 @@ public class ChatMessageService {
         Instant joinedAt = findJoinedAt(chatRoomId, username);
 
         // 페이지 조회
-        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> chatMessageItemList =
+        List<ChatMessageItemInfoProjection> chatMessageItemList =
                 chatMessageRepository.findInitialMessagesByChatRoomIdAndUsernameAndJoinedAt(chatRoomId, username, joinedAt);
 
         log.debug("1. chatMessageItemList.size(): {}", chatMessageItemList.size());
@@ -189,8 +188,8 @@ public class ChatMessageService {
         log.debug("2. chatMessageItemList.size(): {}", chatMessageItemList.size());
 
 
-        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> subChatMessageItemList =
-                getSubChatMessageItemInfoProjectionDTOList(chatMessageItemList, hasMore);
+        List<ChatMessageItemInfoProjection> subChatMessageItemList =
+                getSubChatMessageItemInfoProjections(chatMessageItemList, hasMore);
 
         log.debug("3. subChatMessageItemList.size(): {}", subChatMessageItemList.size());
 
@@ -198,7 +197,7 @@ public class ChatMessageService {
         Collections.reverse(subChatMessageItemList);
 
         // 클라이언트 제공 형태로 변환
-        return convertToChatMessagePageResponse(subChatMessageItemList, hasMore, nextCursor);
+        return chatMessageMapper.toChatMessagePageResponseDTO(subChatMessageItemList, hasMore, nextCursor);
     }
 
     /**
@@ -214,7 +213,7 @@ public class ChatMessageService {
      * @since 1.0
      * @version 2.0
      */
-    public PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO> findNewerChatMessages(Long chatRoomId, String username, String cursor) {
+    public PageResponseDTO<ChatMessageItemInfoDTO> findNewerChatMessages(Long chatRoomId, String username, String cursor) {
 
         // 채팅방 입장 검증
         validateChatRoomAccess(chatRoomId, username);
@@ -227,7 +226,7 @@ public class ChatMessageService {
         Long cursorId = parsed.getSecond();
 
         // 페이지 조회
-        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> chatMessageItemList =
+        List<ChatMessageItemInfoProjection> chatMessageItemList =
                 chatMessageRepository.findNewerMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(
                         chatRoomId, username, joinedAt, cursorSentAt, cursorId);
 
@@ -237,11 +236,11 @@ public class ChatMessageService {
         // nextCursor 생성 (마지막 요소 기준)
         String nextCursor = getNextCursor(chatMessageItemList, hasMore);
 
-        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> subChatMessageItemList =
-                getSubChatMessageItemInfoProjectionDTOList(chatMessageItemList, hasMore);
+        List<ChatMessageItemInfoProjection> subChatMessageItemList =
+                getSubChatMessageItemInfoProjections(chatMessageItemList, hasMore);
 
         // 클라이언트 제공 형태로 변환
-        return convertToChatMessagePageResponse(subChatMessageItemList, hasMore, nextCursor);
+        return chatMessageMapper.toChatMessagePageResponseDTO(subChatMessageItemList, hasMore, nextCursor);
     }
 
     /**
@@ -257,7 +256,7 @@ public class ChatMessageService {
      * @since 1.0
      * @version 2.0
      */
-    public PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO> findOlderChatMessages(Long chatRoomId, String username, String cursor) {
+    public PageResponseDTO<ChatMessageItemInfoDTO> findOlderChatMessages(Long chatRoomId, String username, String cursor) {
 
         // 채팅방 입장 검증
         validateChatRoomAccess(chatRoomId, username);
@@ -270,7 +269,7 @@ public class ChatMessageService {
         Long cursorId = parsed.getSecond();
 
         // 페이지 조회
-        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> chatMessageItemList =
+        List<ChatMessageItemInfoProjection> chatMessageItemList =
                 chatMessageRepository.findOlderMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(
                         chatRoomId, username, joinedAt, cursorSentAt, cursorId);
 
@@ -279,14 +278,14 @@ public class ChatMessageService {
 
         String nextCursor = getNextCursor(chatMessageItemList, hasMore);
 
-        List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> subChatMessageItemList =
-                getSubChatMessageItemInfoProjectionDTOList(chatMessageItemList, hasMore);
+        List<ChatMessageItemInfoProjection> subChatMessageItemList =
+                getSubChatMessageItemInfoProjections(chatMessageItemList, hasMore);
 
         // ASC 순서로 통일
         Collections.reverse(subChatMessageItemList);
 
         // 클라이언트 제공 형태로 변환
-        return convertToChatMessagePageResponse(subChatMessageItemList, hasMore, nextCursor);
+        return chatMessageMapper.toChatMessagePageResponseDTO(subChatMessageItemList, hasMore, nextCursor);
     }
 
     /**

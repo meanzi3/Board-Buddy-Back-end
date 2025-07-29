@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.boardbuddy.dto.ChatMessageResponse;
 import sumcoda.boardbuddy.dto.ChatRoomResponse;
-import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.MemberChatRoomResponse;
+import sumcoda.boardbuddy.dto.client.ChatRoomInfoDTO;
+import sumcoda.boardbuddy.dto.fetch.ChatRoomInfoProjection;
 import sumcoda.boardbuddy.entity.ChatRoom;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
@@ -17,6 +17,7 @@ import sumcoda.boardbuddy.exception.*;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleRetrievalException;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
+import sumcoda.boardbuddy.mapper.ChatRoomMapper;
 import sumcoda.boardbuddy.repository.chatRoom.ChatRoomRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.memberChatRoom.MemberChatRoomRepository;
@@ -25,7 +26,6 @@ import sumcoda.boardbuddy.repository.member.MemberRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static sumcoda.boardbuddy.util.ChatRoomUtil.convertToChatRoomDetailsDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +39,8 @@ public class ChatRoomService {
     private final MemberRepository memberRepository;
 
     private final GatherArticleRepository gatherArticleRepository;
+
+    private final ChatRoomMapper chatRoomMapper;
 
     /**
      * 채팅방 생성
@@ -130,13 +132,13 @@ public class ChatRoomService {
      * @param username 사용자 아이디
      * @return 사용자가 참여하고 있는 채팅방 상세 정보 목록
      **/
-    public List<ChatRoomResponse.ChatRoomDetailsDTO> getChatRoomDetailsListByUsername(String username) {
+    public List<ChatRoomInfoDTO> getChatRoomDetailsListByUsername(String username) {
         Boolean isMemberExists = memberRepository.existsByUsername(username);
         if (!isMemberExists) {
             throw new MemberRetrievalException("서버 문제로 사용자의 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
         }
-        List<ChatRoomResponse.ChatRoomDetailsProjectionDTO> chatRoomDetailsListByUsername = chatRoomRepository.findChatRoomDetailsListByUsername(username);
+        List<ChatRoomInfoProjection> chatRoomDetailsListByUsername = chatRoomRepository.findChatRoomInfoProjectionsByUsername(username);
 
-        return convertToChatRoomDetailsDTO(chatRoomDetailsListByUsername);
+        return chatRoomMapper.toChatRoomInfoDTOList(chatRoomDetailsListByUsername);
     }
 }

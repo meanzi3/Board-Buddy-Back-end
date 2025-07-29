@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
-import sumcoda.boardbuddy.dto.ChatRoomResponse;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.dto.client.ChatRoomInfoDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.ChatRoomService;
 import sumcoda.boardbuddy.service.GatherArticleService;
@@ -50,8 +50,8 @@ public class ChatRoomController {
      * @return 사용자가 참여한 채팅방 목록
      */
     @GetMapping("/api/chat/rooms")
-    public ResponseEntity<ApiResponse<Map<String, List<ChatRoomResponse.ChatRoomDetailsDTO>>>> getChatRoomDetailsByUsername(@RequestAttribute String username) {
-        List<ChatRoomResponse.ChatRoomDetailsDTO> chatRoomDetailsList = chatRoomService.getChatRoomDetailsListByUsername(username);
+    public ResponseEntity<ApiResponse<Map<String, List<ChatRoomInfoDTO>>>> getChatRoomDetailsByUsername(@RequestAttribute String username) {
+        List<ChatRoomInfoDTO> chatRoomDetailsList = chatRoomService.getChatRoomDetailsListByUsername(username);
 
         return buildSuccessResponseWithPairKeyData("chatRoomDetailsList", chatRoomDetailsList, "참여중인 채팅방 목록을 성공적으로 조회했습니다.", HttpStatus.OK);
     }

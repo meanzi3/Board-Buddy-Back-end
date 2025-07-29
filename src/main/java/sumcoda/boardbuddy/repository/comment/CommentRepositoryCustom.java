@@ -1,6 +1,7 @@
 package sumcoda.boardbuddy.repository.comment;
 
 import sumcoda.boardbuddy.dto.CommentResponse;
+import sumcoda.boardbuddy.dto.fetch.CommentInfoProjection;
 import sumcoda.boardbuddy.entity.Comment;
 import sumcoda.boardbuddy.entity.Member;
 
@@ -12,7 +13,7 @@ public interface CommentRepositoryCustom {
 
   long countCommentsByMember(Member member, LocalDateTime startOfLastMonth, LocalDateTime endOfLastMonth);
 
-  List<CommentResponse.InfoDTO> findCommentDTOsByGatherArticleId(Long gatherArticleId);
+  List<CommentInfoProjection> findCommentInfoProjectionsByGatherArticleId(Long gatherArticleId);
 
   Optional<Comment> findCommentByCommentId(Long commentId);
 

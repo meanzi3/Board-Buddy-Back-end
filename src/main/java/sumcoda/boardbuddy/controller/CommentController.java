@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.CommentRequest;
-import sumcoda.boardbuddy.dto.CommentResponse;
+import sumcoda.boardbuddy.dto.client.CommentInfoDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.CommentService;
 import sumcoda.boardbuddy.service.NotificationService;
@@ -57,11 +57,11 @@ public class CommentController {
      * @return 댓글 리스트 응답
      */
     @GetMapping("/api/gather-articles/{gatherArticleId}/comments")
-    public ResponseEntity<ApiResponse<Map<String, List<CommentResponse.InfoDTO>>>> getComments(
+    public ResponseEntity<ApiResponse<Map<String, List<CommentInfoDTO>>>> getComments(
             @PathVariable Long gatherArticleId) {
         log.info("getComments is working");
 
-        List<CommentResponse.InfoDTO> comments = commentService.getComments(gatherArticleId);
+        List<CommentInfoDTO> comments = commentService.getComments(gatherArticleId);
 
         return buildSuccessResponseWithPairKeyData("comments", comments, "댓글 조회를 성공하였습니다.", HttpStatus.OK);
     }

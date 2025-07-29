@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.AuthRequest;
 import sumcoda.boardbuddy.dto.AuthResponse;
-import sumcoda.boardbuddy.dto.MemberAuthProfileDTO;
+import sumcoda.boardbuddy.dto.client.MemberAuthProfileDTO;
 import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
 import sumcoda.boardbuddy.exception.auth.InvalidPasswordException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationAttemptExceededException;
@@ -15,14 +15,12 @@ import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.member.PhoneNumberAlreadyExistsException;
+import sumcoda.boardbuddy.mapper.MemberProfileMapper;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.SmsCertificationRepository;
 import sumcoda.boardbuddy.util.SmsCertificationUtil;
 
 import java.security.SecureRandom;
-
-import static sumcoda.boardbuddy.util.MemberProfileUtil.convertMemberAuthProfileDTO;
-import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +36,8 @@ public class AuthService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
+
+    private final MemberProfileMapper memberProfileMapper;
 
 
     /**
@@ -143,11 +143,7 @@ public class AuthService {
         MemberAuthProfileProjection projection = memberRepository.findMemberAuthProfileByUsername(username).orElseThrow(() ->
                 new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        String profileImageS3SavedPath = buildProfileImageS3RequestKey(projection.s3SavedObjectName());
-
-        String profileImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3SavedPath);
-
-        return convertMemberAuthProfileDTO(projection, profileImageSignedURL);
+        return memberProfileMapper.toMemberAuthProfileDTO(projection);
     }
 
     /**

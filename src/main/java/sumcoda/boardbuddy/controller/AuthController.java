@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import sumcoda.boardbuddy.dto.AuthRequest;
-import sumcoda.boardbuddy.dto.MemberAuthProfileDTO;
+import sumcoda.boardbuddy.dto.client.MemberAuthProfileDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.AuthService;
 

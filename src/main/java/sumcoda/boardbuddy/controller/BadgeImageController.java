@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import sumcoda.boardbuddy.dto.BadgeImageInfoDTO;
+import sumcoda.boardbuddy.dto.client.BadgeImageInfoDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.BadgeImageService;
 

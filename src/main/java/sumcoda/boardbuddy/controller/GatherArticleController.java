@@ -6,7 +6,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sumcoda.boardbuddy.dto.GatherArticleDetailedInfoDTO;
+import sumcoda.boardbuddy.dto.client.GatherArticleDetailedInfoDTO;
 import sumcoda.boardbuddy.dto.GatherArticleRequest;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.common.ApiResponse;

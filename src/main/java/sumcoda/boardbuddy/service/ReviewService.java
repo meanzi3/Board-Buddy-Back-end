@@ -5,7 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.GatherArticleResponse;
 import sumcoda.boardbuddy.dto.ReviewRequest;
-import sumcoda.boardbuddy.dto.ReviewResponse;
+import sumcoda.boardbuddy.dto.client.ReviewAuthorDTO;
+import sumcoda.boardbuddy.dto.fetch.ReviewAuthorProjection;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
@@ -17,6 +18,7 @@ import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException
 import sumcoda.boardbuddy.exception.memberGatherArticle.MemberNotJoinedGatherArticleException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.review.ReviewAlreadyExistsException;
+import sumcoda.boardbuddy.mapper.ReviewMapper;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
@@ -37,13 +39,18 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
 
+    private final ReviewMapper reviewMapper;
+
     /**
-     * 모집글에 참가한 유저 리스트 조회 요청 캐치
+     * 완료된 모집글의 참가자 중 본인을 제외한 리뷰 작성자 리스트를 조회
      *
-     * @param gatherArticleId 모집글 Id
-     * @param username 로그인 사용자 아이디
-     **/
-    public List<ReviewResponse.UserDTO> getParticipatedList(Long gatherArticleId, String username) {
+     * @param gatherArticleId 조회 대상 모집글의 ID
+     * @param currentUsername 현재 로그인한 사용자의 username
+     * @return 본인을 제외한 모집글 참가자들의 ReviewAuthorDTO 리스트
+     * @throws GatherArticleNotFoundException 해당 ID의 모집글이 존재하지 않을때
+     * @throws GatherArticleNotCompletedException 모집글 상태가 COMPLETED가 아닐때
+     */
+    public List<ReviewAuthorDTO> getReviewAuthorsExcludingCurrentMember(Long gatherArticleId, String currentUsername) {
         GatherArticleResponse.StatusDTO statusDTO = gatherArticleRepository.findStatusDTOById(gatherArticleId)
                 .orElseThrow(() -> new GatherArticleNotFoundException("해당 모집글을 찾을 수 없습니다."));
 
@@ -51,7 +58,10 @@ public class ReviewService {
             throw new GatherArticleNotCompletedException("모임이 종료된 모집글만 조회할 수 있습니다.");
         }
 
-        return memberGatherArticleRepository.findParticipantsExcludingUsername(gatherArticleId, username);
+        List<ReviewAuthorProjection> projections =
+                memberGatherArticleRepository.findReviewerByGatherArticleIdAndUsernameNot(gatherArticleId, currentUsername);
+
+        return reviewMapper.toReviewAuthorDTOList(projections);
     }
 
     /**
@@ -63,8 +73,12 @@ public class ReviewService {
      **/
     @Transactional
     public void sendReview(Long gatherArticleId, ReviewRequest.SendDTO sendDTO, String username) {
-        memberGatherArticleRepository.findByGatherArticleIdAndMemberUsername(gatherArticleId, username)
-                .orElseThrow(() -> new MemberNotJoinedGatherArticleException("해당 유저는 해당 모집글에 참여하지 않았습니다."));
+
+        Boolean isExistsByGatherArticleIdAndUsername = memberGatherArticleRepository.existsByGatherArticleIdAndMemberUsername(gatherArticleId, username);
+
+        if (!isExistsByGatherArticleIdAndUsername) {
+            throw new MemberNotJoinedGatherArticleException("해당 유저는 해당 모집글에 참여하지 않았습니다.");
+        }
 
         GatherArticle gatherArticle = gatherArticleRepository.findById(gatherArticleId)
                 .orElseThrow(() -> new GatherArticleNotFoundException("해당 모집글을 찾을 수 없습니다."));

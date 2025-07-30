@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.ReviewRequest;
-import sumcoda.boardbuddy.dto.ReviewResponse;
+import sumcoda.boardbuddy.dto.client.ReviewAuthorDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.ReviewService;
 
@@ -27,18 +27,18 @@ public class ReviewController {
      * 리뷰 전송 가능한 유저 리스트 조회 요청 캐치
      *
      * @param gatherArticleId 모집글 Id
-     * @param username        로그인 사용자 아이디
+     * @param username 로그인 사용자 아이디
      * @return 유저 리스트 조회가 성공했다면 약속된 SuccessResponse 반환
      **/
     @GetMapping("/api/reviews/{gatherArticleId}")
-    public ResponseEntity<ApiResponse<Map<String, List<ReviewResponse.UserDTO>>>> getParticipatedList (
+    public ResponseEntity<ApiResponse<Map<String, List<ReviewAuthorDTO>>>> getReviewAuthorsExcludingCurrentMember (
             @PathVariable Long gatherArticleId,
             @RequestAttribute String username) {
         log.info("get participated list is working");
 
-        List<ReviewResponse.UserDTO> participatedList = reviewService.getParticipatedList(gatherArticleId, username);
+        List<ReviewAuthorDTO> reviewAuthorDTOList = reviewService.getReviewAuthorsExcludingCurrentMember(gatherArticleId, username);
 
-        return buildSuccessResponseWithPairKeyData("users", participatedList, "참가한 유저 리스트 조회에 성공하였습니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("users", reviewAuthorDTOList, "참가한 유저 리스트 조회에 성공하였습니다.", HttpStatus.OK);
     }
 
     /**

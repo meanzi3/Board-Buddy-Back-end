@@ -5,7 +5,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sumcoda.boardbuddy.dto.ParticipationApplicationInfoDTO;
+import sumcoda.boardbuddy.dto.client.ParticipationApplicationInfoDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.enumerate.MessageType;
 import sumcoda.boardbuddy.service.ChatMessageService;

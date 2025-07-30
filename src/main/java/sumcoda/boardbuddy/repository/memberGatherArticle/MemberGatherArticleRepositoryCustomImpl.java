@@ -4,7 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.MemberResponse;
-import sumcoda.boardbuddy.dto.ReviewResponse;
+import sumcoda.boardbuddy.dto.fetch.ReviewAuthorProjection;
 import sumcoda.boardbuddy.enumerate.MemberGatherArticleRole;
 
 import java.util.List;
@@ -80,24 +80,24 @@ public class MemberGatherArticleRepositoryCustomImpl implements MemberGatherArti
 
   // 자신을 제외한 모임 참가 유저 리스트를 반환하는 메서드
   @Override
-  public List<ReviewResponse.UserDTO> findParticipantsExcludingUsername(Long gatherArticleId, String username) {
+  public List<ReviewAuthorProjection> findReviewerByGatherArticleIdAndUsernameNot(Long gatherArticleId, String excludedUsername) {
       return jpaQueryFactory
-              .select(Projections.fields(ReviewResponse.UserDTO.class,
-                      profileImage.profileImageS3SavedURL,
+              .select(Projections.constructor(ReviewAuthorProjection.class,
+                      profileImage.s3SavedObjectName,
                       member.rank,
                       member.nickname,
-                      review.id.isNotNull().as("hasReviewed")
+                      review.hasReviewed
               ))
               .from(memberGatherArticle)
               .join(memberGatherArticle.member, member)
               .leftJoin(member.profileImage, profileImage)
               .leftJoin(review).on(
-                      review.reviewer.username.eq(username)
+                      review.reviewer.username.eq(excludedUsername)
                               .and(review.reviewee.eq(member))
                               .and(review.gatherArticle.id.eq(gatherArticleId))
               )
               .where(memberGatherArticle.gatherArticle.id.eq(gatherArticleId)
-                      .and(member.username.ne(username)))
+                      .and(member.username.ne(excludedUsername)))
               .fetch();
   }
 }

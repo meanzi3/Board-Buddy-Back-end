@@ -1,9 +1,6 @@
 package sumcoda.boardbuddy.util;
 
 
-import sumcoda.boardbuddy.dto.BadgeImageInfoDTO;
-import sumcoda.boardbuddy.dto.fetch.BadgeImageInfoProjection;
-
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
@@ -20,20 +17,6 @@ public final class BadgeImageUtil {
 
     private BadgeImageUtil() {
         /* 유틸 클래스라 인스턴스화 금지 */
-    }
-
-    /**
-     * Projection 객체를 BadgeImageInfoDTO 객체로 변환
-     *
-     * @param projection DB에서 조회된 BadgeImageInfoProjectionDTO 리스트
-     * @param badgeImageSignedURL 생성된 CloudFront Signed URL
-     * @return BadgeImageInfoDTO 객체
-     */
-    public static BadgeImageInfoDTO convertBadgeImageInfoDTO(BadgeImageInfoProjection projection, String badgeImageSignedURL) {
-        return BadgeImageInfoDTO.builder()
-                .badgeImageSignedURL(badgeImageSignedURL)
-                .badgeYearMonth(projection.badgeYearMonth())
-                .build();
     }
 
     /**

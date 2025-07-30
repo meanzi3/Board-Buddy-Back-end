@@ -4,9 +4,10 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import sumcoda.boardbuddy.dto.ChatMessageResponse;
 import sumcoda.boardbuddy.dto.ChatRoomResponse;
-import sumcoda.boardbuddy.dto.GatherArticleResponse;
+import sumcoda.boardbuddy.dto.fetch.ChatMessageLastSentInfoProjection;
+import sumcoda.boardbuddy.dto.fetch.ChatRoomInfoProjection;
+import sumcoda.boardbuddy.dto.fetch.GatherArticleSimpleInfoProjection;
 import sumcoda.boardbuddy.entity.QChatMessage;
 import sumcoda.boardbuddy.entity.QChatRoom;
 
@@ -48,22 +49,25 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
      * @return 사용자가 속한 채팅방의 상세 정보 목록
      **/
     @Override
-    public List<ChatRoomResponse.ChatRoomDetailsProjectionDTO> findChatRoomDetailsListByUsername(String username) {
+    public List<ChatRoomInfoProjection> findChatRoomInfoProjectionsByUsername(String username) {
+
         QChatMessage subQueryChatMessage = new QChatMessage("subQueryChatMessage");
+
         QChatRoom subQueryChatRoom = new QChatRoom("subQueryChatRoom");
+
         return jpaQueryFactory
-                .select(Projections.fields(ChatRoomResponse.ChatRoomDetailsProjectionDTO.class,
+                .select(Projections.constructor(ChatRoomInfoProjection.class,
                         chatRoom.id.as("chatRoomId"),
-                        Projections.fields(GatherArticleResponse.SimpleInfoProjectionDTO.class,
+                        Projections.constructor(GatherArticleSimpleInfoProjection.class,
                                 gatherArticle.id.as("gatherArticleId"),
                                 gatherArticle.title,
                                 gatherArticle.meetingLocation,
                                 gatherArticle.currentParticipants
-                        ).as("gatherArticleSimpleProjectionInfo"),
-                        Projections.fields(ChatMessageResponse.LatestChatMessageInfoProjectionDTO.class,
+                        ),
+                        Projections.constructor(ChatMessageLastSentInfoProjection.class,
                                 chatMessage.content,
                                 chatMessage.createdAt.as("sentAt")
-                        ).as("latestChatMessageInfoProjectionDTO")
+                        )
                 ))
                 .from(memberChatRoom)
                 .join(memberChatRoom.member, member)

@@ -12,18 +12,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import sumcoda.boardbuddy.dto.MemberAuthProfileDTO;
+import sumcoda.boardbuddy.dto.client.MemberAuthProfileDTO;
 import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
 import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
+import sumcoda.boardbuddy.mapper.MemberProfileMapper;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
-import sumcoda.boardbuddy.service.CloudFrontSignedUrlService;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static sumcoda.boardbuddy.util.MemberProfileUtil.convertMemberAuthProfileDTO;
-import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
 
 @Slf4j
 @Component
@@ -32,7 +29,12 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final MemberRepository memberRepository;
 
-    private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
+    private final MemberProfileMapper memberProfileMapper;
+
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    Map<String, Object> responseData = new HashMap<>();
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -42,10 +44,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             throw new AuthenticationMissingException("인증 객체가 누락되었습니다. 관리자에게 문의하세요.");
         }
 
-        final ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> responseData = new HashMap<>();
-
-        UserDetails user =  (UserDetails) authentication.getPrincipal();
+        UserDetails user = (UserDetails) authentication.getPrincipal();
 
         String username = user.getUsername();
 
@@ -54,11 +53,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         MemberAuthProfileProjection projection = memberRepository.findMemberAuthProfileByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
 
-        String profileImageS3SavedPath = buildProfileImageS3RequestKey(projection.s3SavedObjectName());
-
-        String profileImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3SavedPath);
-
-        MemberAuthProfileDTO memberAuthProfileDTO = convertMemberAuthProfileDTO(projection, profileImageSignedURL);
+        MemberAuthProfileDTO memberAuthProfileDTO = memberProfileMapper.toMemberAuthProfileDTO(projection);
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

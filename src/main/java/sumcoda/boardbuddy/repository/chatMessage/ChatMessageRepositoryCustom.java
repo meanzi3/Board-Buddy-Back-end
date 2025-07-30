@@ -1,6 +1,6 @@
 package sumcoda.boardbuddy.repository.chatMessage;
 
-import sumcoda.boardbuddy.dto.ChatMessageResponse;
+import sumcoda.boardbuddy.dto.fetch.ChatMessageItemInfoProjection;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -9,16 +9,14 @@ import java.util.Optional;
 
 public interface ChatMessageRepositoryCustom {
 
-    List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findInitialMessagesByChatRoomIdAndUsernameAndJoinedAt(Long chatRoomId, String username, Instant joinedAt);
+    List<ChatMessageItemInfoProjection> findInitialMessagesByChatRoomIdAndUsernameAndJoinedAt(Long chatRoomId, String username, Instant joinedAt);
 
-    List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findNewerMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId);
+    List<ChatMessageItemInfoProjection> findNewerMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId);
 
-    List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findOlderMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId);
+    List<ChatMessageItemInfoProjection> findOlderMessagesByChatRoomIdAndUsernameAndJoinedAtAndCursor(Long chatRoomId, String username, Instant joinedAt, Instant cursorSentAt, Long cursorId);
 
     LocalDateTime findJoinedAtByChatRoomIdAndUsername(Long chatRoomId, String username);
 
-    Optional<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findTalkMessageById(Long chatMessageId);
-
-    Optional<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> findEnterOrExitMessageById(Long chatMessageId);
+    Optional<ChatMessageItemInfoProjection> findChatMessageById(Long chatMessageId);
 
 }

@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import sumcoda.boardbuddy.dto.ChatMessageRequest;
-import sumcoda.boardbuddy.dto.ChatMessageResponse;
+import sumcoda.boardbuddy.dto.client.ChatMessageItemInfoDTO;
+import sumcoda.boardbuddy.dto.client.PageResponseDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
-import sumcoda.boardbuddy.dto.common.PageResponse;
 import sumcoda.boardbuddy.service.ChatMessageService;
 
 
@@ -71,13 +71,13 @@ public class ChatMessageController {
      * @since 1.0
      */
     @GetMapping("/api/chat/messages/{chatRoomId}")
-    public ResponseEntity<ApiResponse<PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO>>> getChatMessages(
+    public ResponseEntity<ApiResponse<PageResponseDTO<ChatMessageItemInfoDTO>>> getChatMessages(
             @PathVariable Long chatRoomId,
             @RequestAttribute String username,
             @RequestParam(name = "direction", defaultValue = "initial") String direction,
             @RequestParam(required = false) String cursor) {
 
-        PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO> chatMessages = switch (direction) {
+        PageResponseDTO<ChatMessageItemInfoDTO> chatMessages = switch (direction) {
             case "newer" -> chatMessageService.findNewerChatMessages(chatRoomId, username, cursor);
 
             case "older" -> chatMessageService.findOlderChatMessages(chatRoomId, username, cursor);
@@ -98,13 +98,13 @@ public class ChatMessageController {
 //     * @since 1.0
 //     */
 //    @GetMapping("/api/chat/rooms/{chatRoomId}/messages/test")
-//    public ResponseEntity<ApiResponse<PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO>>> getChatMessagesTest(
+//    public ResponseEntity<ApiResponse<PageResponseDTO<ChatMessageResponse.ChatMessageItemInfoDTO>>> getChatMessagesTest(
 //            @PathVariable Long chatRoomId,
 //            @RequestParam String username,
 //            @RequestParam(name = "direction", defaultValue = "initial") String direction,
 //            @RequestParam(required = false) String cursor) throws JsonProcessingException {
 //
-//        PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO> chatMessages = switch (direction) {
+//        PageResponseDTO<ChatMessageResponse.ChatMessageItemInfoDTO> chatMessages = switch (direction) {
 //            case "newer" -> chatMessageService.findNewerChatMessages(chatRoomId, username, cursor);
 //
 //            case "older" -> chatMessageService.findOlderChatMessages(chatRoomId, username, cursor);

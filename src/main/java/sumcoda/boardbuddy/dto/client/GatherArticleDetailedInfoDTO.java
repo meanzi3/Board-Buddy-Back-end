@@ -1,4 +1,4 @@
-package sumcoda.boardbuddy.dto;
+package sumcoda.boardbuddy.dto.client;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;

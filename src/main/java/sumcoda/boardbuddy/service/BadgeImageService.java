@@ -4,10 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.boardbuddy.dto.BadgeImageInfoDTO;
+import sumcoda.boardbuddy.dto.client.BadgeImageInfoDTO;
+import sumcoda.boardbuddy.dto.fetch.BadgeImageInfoProjection;
 import sumcoda.boardbuddy.entity.BadgeImage;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
-import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
+import sumcoda.boardbuddy.mapper.BadgeImageMapper;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.badgeImage.BadgeImageRepository;
 import sumcoda.boardbuddy.util.FileStorageUtil;
@@ -28,40 +29,24 @@ public class BadgeImageService {
 
     private final MemberRepository memberRepository;
 
-    private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
+    private final BadgeImageMapper badgeImageMapper;
 
     /**
      * 뱃지 조회 요청 캐치
      *
-     * @param nickname 사용자가 입력한 닉네임
+     * @param nickname 사용자 닉네임
      * @return 뱃지 이미지 URL 리스트
      **/
     public List<BadgeImageInfoDTO> getBadges(String nickname) {
-        if (nickname == null) {
-            throw new MemberRetrievalException("뱃지 조회 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
-        }
 
-        if (Boolean.FALSE.equals(memberRepository.existsByNickname(nickname))) {
+        Boolean isExistsByNickname = memberRepository.existsByNickname(nickname);
+
+        if (!isExistsByNickname) {
             throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
         }
+        List<BadgeImageInfoProjection> projections = badgeImageRepository.findBadgeImagesByNickname(nickname);
 
-        // 로컬 환경용 코드
-//        return badgeImageRepository.findBadgeImagesByNickname(nickname)
-//                .stream()
-//                .map(dto -> new BadgeImageInfoDTO.BadgeImageInfoDTO(buildBadgeUrl(dto.getBadgeImageS3SavedURL()), dto.getBadgeYearMonth()))
-//                .collect(Collectors.toList());
-
-        // S3 환경에서 이용할 코드 주석
-        return badgeImageRepository.findBadgeImagesByNickname(nickname).stream()
-                .map(projectionDTO -> {
-
-                    String badgeImageS3SavedPath = buildBadgeImageS3RequestKey(projectionDTO.s3SavedObjectName());
-
-                    String badgeImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(badgeImageS3SavedPath);
-
-                    return convertBadgeImageInfoDTO(projectionDTO, badgeImageSignedURL);
-                })
-                .toList();
+        return badgeImageMapper.toBadgeImageInfoDTOList(projections);
     }
 
     /**

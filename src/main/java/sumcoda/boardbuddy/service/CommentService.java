@@ -3,16 +3,16 @@ package sumcoda.boardbuddy.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.boardbuddy.dto.CommentRequest;
-import sumcoda.boardbuddy.dto.CommentResponse;
-import sumcoda.boardbuddy.dto.GatherArticleResponse;
-import sumcoda.boardbuddy.dto.MemberResponse;
+import sumcoda.boardbuddy.dto.*;
+import sumcoda.boardbuddy.dto.client.CommentInfoDTO;
+import sumcoda.boardbuddy.dto.fetch.CommentInfoProjection;
 import sumcoda.boardbuddy.entity.Comment;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.exception.comment.*;
 import sumcoda.boardbuddy.exception.gatherArticle.GatherArticleNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
+import sumcoda.boardbuddy.mapper.CommentMapper;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.comment.CommentRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
@@ -29,6 +29,8 @@ public class CommentService {
     private final GatherArticleRepository gatherArticleRepository;
 
     private final MemberRepository memberRepository;
+
+    private final CommentMapper commentMapper;
 
     /**
      * 댓글 작성
@@ -86,15 +88,21 @@ public class CommentService {
      * @param gatherArticleId 모집글 ID
      * @return 댓글 리스트
      */
-    public List<CommentResponse.InfoDTO> getComments(Long gatherArticleId) {
+    public List<CommentInfoDTO> getComments(Long gatherArticleId) {
+
+        boolean isGatherArticleExists = gatherArticleRepository.existsById(gatherArticleId);
 
         // 모집글 검증
-        GatherArticleResponse.IdDTO idDTO = gatherArticleRepository.findIdDTOById(gatherArticleId)
-                .orElseThrow(() -> new GatherArticleNotFoundException("존재하지 않는 모집글입니다."));
+        if (!isGatherArticleExists) {
+            throw new GatherArticleNotFoundException("존재하지 않는 모집글입니다.");
+        }
 
         // 댓글 조회
-        return commentRepository.findCommentDTOsByGatherArticleId(idDTO.getId());
+        List<CommentInfoProjection> projections = commentRepository.findCommentInfoProjectionsByGatherArticleId(gatherArticleId);
+
+        return commentMapper.toCommentInfoDTOList(projections);
     }
+
 
     /**
      * 댓글 수정

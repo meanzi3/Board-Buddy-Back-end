@@ -1,7 +1,7 @@
 package sumcoda.boardbuddy.repository.memberGatherArticle;
 
 import sumcoda.boardbuddy.dto.MemberResponse;
-import sumcoda.boardbuddy.dto.ReviewResponse;
+import sumcoda.boardbuddy.dto.fetch.ReviewAuthorProjection;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,5 +16,5 @@ public interface MemberGatherArticleRepositoryCustom {
 
   List<MemberResponse.UsernameDTO> findParticipantsByGatherArticleId(Long gatherArticleId);
 
-  List<ReviewResponse.UserDTO> findParticipantsExcludingUsername(Long gatherArticleId, String username);
+  List<ReviewAuthorProjection> findReviewerByGatherArticleIdAndUsernameNot(Long gatherArticleId, String excludedUsername);
 }

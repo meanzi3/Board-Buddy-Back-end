@@ -1,4 +1,4 @@
-package sumcoda.boardbuddy.dto;
+package sumcoda.boardbuddy.dto.client;
 
 import lombok.Builder;
 import sumcoda.boardbuddy.enumerate.MemberType;

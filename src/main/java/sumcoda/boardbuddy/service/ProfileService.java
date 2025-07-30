@@ -12,9 +12,10 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import sumcoda.boardbuddy.config.AwsS3Config;
-import sumcoda.boardbuddy.dto.BadgeImageInfoDTO;
-import sumcoda.boardbuddy.dto.MemberProfileInfoDTO;
+import sumcoda.boardbuddy.dto.client.BadgeImageInfoDTO;
+import sumcoda.boardbuddy.dto.client.MemberProfileInfoDTO;
 import sumcoda.boardbuddy.dto.MemberRequest;
+import sumcoda.boardbuddy.dto.fetch.BadgeImageInfoProjection;
 import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
 import sumcoda.boardbuddy.dto.fetch.ProfileImageObjectNameProjection;
 import sumcoda.boardbuddy.entity.Member;
@@ -24,6 +25,8 @@ import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.profileImage.ProfileImageRetrievalException;
 import sumcoda.boardbuddy.exception.profileImage.ProfileImageSaveException;
+import sumcoda.boardbuddy.mapper.BadgeImageMapper;
+import sumcoda.boardbuddy.mapper.MemberProfileMapper;
 import sumcoda.boardbuddy.repository.profileImage.ProfileImageRepository;
 import sumcoda.boardbuddy.repository.badgeImage.BadgeImageRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
@@ -31,8 +34,6 @@ import sumcoda.boardbuddy.repository.member.MemberRepository;
 import java.io.IOException;
 import java.util.List;
 
-import static sumcoda.boardbuddy.util.BadgeImageUtil.*;
-import static sumcoda.boardbuddy.util.MemberProfileUtil.convertMemberProfileInfoDTO;
 import static sumcoda.boardbuddy.util.ProfileImageUtil.*;
 
 @Slf4j
@@ -54,7 +55,9 @@ public class ProfileService {
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
+    private final MemberProfileMapper memberProfileMapper;
+
+    private final BadgeImageMapper badgeImageMapper;
 
 
     /**
@@ -69,25 +72,14 @@ public class ProfileService {
             throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
         }
 
-        List<BadgeImageInfoDTO> badgeImageInfoDTOList = badgeImageRepository.findTop3BadgeImagesByNickname(nickname).stream()
-                .map(projection -> {
+        List<BadgeImageInfoProjection> badgeImageInfoProjections = badgeImageRepository.findTop3BadgeImagesByNickname(nickname);
 
-                    String badgeImageS3RequestKey = buildBadgeImageS3RequestKey(projection.s3SavedObjectName());
-
-                    String badgeImageSignedUrl = cloudFrontSignedUrlService.generateSignedUrl(badgeImageS3RequestKey);
-
-                    return convertBadgeImageInfoDTO(projection, badgeImageSignedUrl);
-                })
-                .toList();
+        List<BadgeImageInfoDTO> badgeImageInfoDTOList = badgeImageMapper.toBadgeImageInfoDTOList(badgeImageInfoProjections);
 
         MemberProfileProjection memberProfileProjection = memberRepository.findMemberProfileByNickname(nickname)
                 .orElseThrow(() -> new MemberRetrievalException("프로필을 조회할 수 없습니다. 관리자에게 문의하세요."));
 
-        String profileImageS3RequestKey = buildProfileImageS3RequestKey(memberProfileProjection.s3SavedObjectName());
-
-        String profileImageSignedUrl = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3RequestKey);
-
-        return convertMemberProfileInfoDTO(memberProfileProjection, badgeImageInfoDTOList, profileImageSignedUrl);
+        return memberProfileMapper.toMemberProfileInfoDTO(memberProfileProjection, badgeImageInfoDTOList);
     }
 
     /**

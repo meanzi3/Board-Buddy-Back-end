@@ -3,18 +3,13 @@ package sumcoda.boardbuddy.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.util.Pair;
-import sumcoda.boardbuddy.dto.ChatMessageResponse;
-import sumcoda.boardbuddy.dto.common.PageResponse;
+import sumcoda.boardbuddy.dto.fetch.ChatMessageItemInfoProjection;
 import sumcoda.boardbuddy.enumerate.MessageType;
-import sumcoda.boardbuddy.exception.ChatMessageRetrievalException;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class ChatMessageUtil {
 
@@ -24,102 +19,6 @@ public class ChatMessageUtil {
 
     public static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
 
-    /**
-     * 주어진 메시지 프로젝션 DTO를 채팅 메시지 항목 DTO로 변환
-     *
-     * @param responseChatMessage 변환할 메시지 프로젝션 DTO
-     * @return 변환된 ChatMessageItemInfoDTO 객체
-     * @since 1.0
-     * @version 2.0
-     */
-    public static ChatMessageResponse.ChatMessageItemInfoDTO convertPayload(
-            ChatMessageResponse.ChatMessageItemInfoProjectionDTO responseChatMessage) {
-        // 1) 공통 필드 세팅
-        var builder = ChatMessageResponse.ChatMessageItemInfoDTO.builder()
-                .id(responseChatMessage.getId())
-                .content(responseChatMessage.getContent())
-                .messageType(responseChatMessage.getMessageType())
-                .sentAt(LocalDateTime.ofInstant(responseChatMessage.getSentAt(), ZONE));
-
-
-//        // 2) Talk 타입일 때만 추가 필드 세팅
-//        // 성능 개선용
-//        if (responseChatMessage.getMessageType().equals("TALK")) {
-//            builder.nickname(responseChatMessage.getNickname())
-//                    .profileImageURL(responseChatMessage.getProfileImageURL())
-//                    .rank(responseChatMessage.getRank());
-//        }
-
-        // 2) Talk 타입일 때만 추가 필드 세팅
-        if (Objects.equals(responseChatMessage.getMessageType(), MessageType.TALK)) {
-            builder
-                    .nickname(responseChatMessage.getNickname())
-                    .profileImageS3SavedURL(responseChatMessage.getProfileImageS3SavedURL())
-                    .rank(responseChatMessage.getRank());
-        }
-
-        // 3) 빌드해서 반환
-        return builder.build();
-    }
-
-    /**
-     * 페이징 조회 결과를 클라이언트 제공용 DTO로 변환
-     *
-     * @param chatMessages 레포지토리에서 내려온 PageResponse
-     * @param hasMore 조회 방향으로 메시지가 더 있는지 여부
-     * @param nextCursor 조회 방향에 따른 첫번째 또는 마지막 메시지를 가리키는 커서
-     * @return 클라이언트 제공용 ChatMessageItemInfoDTO 페이징 결과
-     * @throws ChatMessageRetrievalException 데이터가 없거나 매핑에 실패할 때
-     * @since 1.0
-     * @version 2.0
-     */
-    public static PageResponse<ChatMessageResponse.ChatMessageItemInfoDTO> convertToChatMessagePageResponse(
-            List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> chatMessages,
-            Boolean hasMore,
-            String nextCursor) {
-
-        // 빈 페이지 예외 처리
-        if (chatMessages.isEmpty()) {
-            throw new ChatMessageRetrievalException(
-                    "서버 문제로 메시지를 조회하지 못하였습니다. 관리자에게 문의하세요"
-            );
-        }
-
-        // 내부 DTO → 최종 API DTO 매핑
-        List<ChatMessageResponse.ChatMessageItemInfoDTO> chatMessageItemInfoDTOList = chatMessages.stream()
-                .map(chatMessage -> {
-                    var builder = ChatMessageResponse.ChatMessageItemInfoDTO.builder()
-                            .id(chatMessage.getId())
-                            .content(chatMessage.getContent())
-                            .messageType(chatMessage.getMessageType())
-                            .sentAt(LocalDateTime.ofInstant(chatMessage.getSentAt(), ZONE));
-
-
-                    // TALK 타입에만 추가 필드 설정
-                    if (Objects.equals(chatMessage.getMessageType(), MessageType.TALK)) {
-                        builder.nickname(chatMessage.getNickname())
-                                .profileImageS3SavedURL(chatMessage.getProfileImageS3SavedURL())
-                                .rank(chatMessage.getRank());
-                    }
-
-                    // 성능 개선용
-//                    // TALK 타입에만 추가 필드 설정
-//                    if (Objects.equals(chatMessage.getMessageType(), "TALK")) {
-//                        builder.nickname(chatMessage.getNickname())
-//                                .profileImageURL(chatMessage.getProfileImageURL())
-//                                .rank(chatMessage.getRank());
-//                    }
-                    return builder.build();
-                })
-                .collect(Collectors.toList());
-
-        // 기존 page 의 hasMore, nextCursor 를 그대로 담아 새 PageResponse 생성
-        return PageResponse.<ChatMessageResponse.ChatMessageItemInfoDTO>builder()
-                .dataList(chatMessageItemInfoDTOList)
-                .hasMore(hasMore)
-                .nextCursor(nextCursor)
-                .build();
-    }
 
     /**
      * 페이지 크기에 따라 메시지 프로젝션 리스트에서 일부 항목을 반환
@@ -130,8 +29,8 @@ public class ChatMessageUtil {
      * @since 1.0
      * @version 2.0
      */
-    public static List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> getSubChatMessageItemInfoProjectionDTOList(
-            List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> chatMessagesItemList,
+    public static List<ChatMessageItemInfoProjection> getSubChatMessageItemInfoProjections(
+            List<ChatMessageItemInfoProjection> chatMessagesItemList,
             Boolean hasMore) {
 
         return hasMore ? chatMessagesItemList.subList(0, CHAT_MESSAGE_PAGE_SIZE) : chatMessagesItemList;
@@ -169,34 +68,6 @@ public class ChatMessageUtil {
         return Pair.of(cursorSentAt, cursorId);
     }
 
-//    /**
-//     * 주어진 방향에 따라 다음 페이지 조회용 커서를 계산
-//     *
-//     * @param dataList  ASC(오래된→최신) 순으로 정렬된 메시지 프로젝션 리스트
-//     * @param hasMore   추가로 가져올 메시지가 있는지 여부
-//     * @param isNewer   true면 최신 방향 페이지네이션, false면 과거 방향 페이지네이션
-//     * @return 다음 조회 커서 문자열 또는 더 이상 없으면 null
-//     * @since 1.0
-//     * @version 2.0
-//     */
-//    @Nullable
-//    public static String getNextCursor(
-//            List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> dataList,
-//            Boolean hasMore,
-//            boolean isNewer
-//    ) {
-//        // 더 가져올 메시지가 없거나, 데이터 자체가 비어 있으면 null 반환
-//        if (!hasMore || dataList.isEmpty()) {
-//            return null;
-//        }
-//
-//        int idx = isNewer
-//                ? dataList.size() - 1 // 최신 방향: 마지막 인덱스
-//                : 0; // 과거 방향: 첫 인덱스
-//
-//        return formatCursor(dataList.get(idx));
-//    }
-
     /**
      * 주어진 방향에 따라 다음 페이지 조회용 커서를 계산
      *
@@ -208,24 +79,22 @@ public class ChatMessageUtil {
      */
     @Nullable
     public static String getNextCursor(
-            List<ChatMessageResponse.ChatMessageItemInfoProjectionDTO> dataList,
+            List<ChatMessageItemInfoProjection> dataList,
             Boolean hasMore
     ) {
         if (hasMore) {
             // hasMore == true 이므로 list.size() >= pageSize+1
             // 여기서만 커서를 계산
-            ChatMessageResponse.ChatMessageItemInfoProjectionDTO message
+            ChatMessageItemInfoProjection message
                     = dataList.get(CHAT_MESSAGE_PAGE_SIZE - 1);
-            Long epochMilli = message.getSentAt().toEpochMilli();
-            Long id = message.getId();
+            Long epochMilli = message.sentAt().toEpochMilli();
+            Long id = message.id();
 
             return epochMilli + "_" + id;
         }
 
         return null;
     }
-
-
 
     /**
      * 채팅방 입장/퇴장 메시지 내용을 생성

@@ -4,16 +4,17 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.CommentResponse;
+import sumcoda.boardbuddy.dto.fetch.CommentInfoProjection;
 import sumcoda.boardbuddy.entity.Comment;
 import sumcoda.boardbuddy.entity.Member;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static sumcoda.boardbuddy.entity.QComment.*;
 import static sumcoda.boardbuddy.entity.QMember.member;
+import static sumcoda.boardbuddy.entity.QProfileImage.profileImage;
 
 @RequiredArgsConstructor
 public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
@@ -31,20 +32,25 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
     }
 
     @Override
-    public List<CommentResponse.InfoDTO> findCommentDTOsByGatherArticleId(Long gatherArticleId) {
+    public List<CommentInfoProjection> findCommentInfoProjectionsByGatherArticleId(Long gatherArticleId) {
 
-        List<Comment> comments = jpaQueryFactory.selectFrom(comment)
+        return jpaQueryFactory
+                .select(Projections.constructor(CommentInfoProjection.class,
+                        comment.id,
+                        comment.parent.id,
+                        comment.content,
+                        comment.createdAt,
+                        member.nickname,
+                        member.rank,
+                        profileImage.s3SavedObjectName
+                ))
+                .from(comment)
+                // 1) Comment → Member 조인 (inner)
                 .join(comment.member, member)
-                .fetchJoin()
-                .leftJoin(comment.children)
-                .fetchJoin()
+                // 2) Member → ProfileImage 조인 (left)
+                .leftJoin(member.profileImage, profileImage)
                 .where(comment.gatherArticle.id.eq(gatherArticleId))
                 .fetch();
-
-        return comments.stream()
-                .filter(c -> c.getParent() == null)
-                .map(CommentResponse.InfoDTO::from)
-                .collect(Collectors.toList());
     }
 
     @Override

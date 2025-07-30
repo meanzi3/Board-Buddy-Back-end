@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.boardbuddy.dto.MemberRankingDTO;
+import sumcoda.boardbuddy.dto.client.MemberRankingDTO;
+import sumcoda.boardbuddy.dto.fetch.MemberRankingProjection;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.RankScorePoints;
+import sumcoda.boardbuddy.mapper.RankingMapper;
 import sumcoda.boardbuddy.repository.MemberJdbcRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.comment.CommentRepository;
@@ -22,7 +24,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
 import static sumcoda.boardbuddy.util.RankingUtil.*;
 
 @Service
@@ -41,7 +42,7 @@ public class RankingService {
 
     private final BadgeImageService badgeImageService;
 
-    private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
+    private final RankingMapper rankingMapper;
 
 
     /**
@@ -49,18 +50,9 @@ public class RankingService {
      * @return TOP3 MemberRankingDTO 리스트
      */
     public List<MemberRankingDTO> getTop3Rankings(){
+        List<MemberRankingProjection> projections = memberRepository.findTop3RankingMembers();
 
-        return memberRepository.findTop3RankingMembers().stream()
-                .map(projection -> {
-
-                    String profileImageS3SavedPath = buildProfileImageS3RequestKey(projection.s3SavedObjectName());
-
-                    String profileImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3SavedPath);
-
-                    return convertMemberRankingDTO(projection, profileImageSignedURL);
-
-                })
-                .toList();
+        return rankingMapper.toMemberRankingDTOList(projections);
     }
 
 

@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.MemberResponse;
-import sumcoda.boardbuddy.dto.ParticipationApplicationInfoDTO;
+import sumcoda.boardbuddy.dto.client.ParticipationApplicationInfoDTO;
+import sumcoda.boardbuddy.dto.fetch.ParticipationApplicationInfoProjection;
 import sumcoda.boardbuddy.entity.GatherArticle;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.MemberGatherArticle;
@@ -18,6 +19,7 @@ import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.memberGatherArticle.*;
 import sumcoda.boardbuddy.exception.participationApplication.*;
+import sumcoda.boardbuddy.mapper.ParticipationApplicationMapper;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
@@ -25,9 +27,6 @@ import sumcoda.boardbuddy.repository.participationApplication.ParticipationAppli
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static sumcoda.boardbuddy.util.ParticipationApplicationUtil.convertParticipationApplicationInfoDTO;
-import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
 
 @Service
 @RequiredArgsConstructor
@@ -42,8 +41,7 @@ public class ParticipationApplicationService {
 
     private final ParticipationApplicationRepository participationApplicationRepository;
 
-    private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
-
+    private final ParticipationApplicationMapper participationApplicationMapper;
 
     /**
      * 모집글 참가 신청 처리
@@ -315,14 +313,9 @@ public class ParticipationApplicationService {
         }
 
         // 참가 신청 현황 조회
-        return participationApplicationRepository.findParticipationAppliedMemberByGatherArticleId(gatherArticleId).stream()
-                .map(projection -> {
-                    String profileImageS3SavedPath = buildProfileImageS3RequestKey(projection.s3SavedObjectName());
+        List<ParticipationApplicationInfoProjection> projections =
+                participationApplicationRepository.findParticipationAppliedMemberByGatherArticleId(gatherArticleId);
 
-                    String profileImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3SavedPath);
-
-                    return convertParticipationApplicationInfoDTO(projection, profileImageSignedURL);
-                })
-                .toList();
+        return participationApplicationMapper.toParticipationApplicationInfoDTOList(projections);
     }
 }

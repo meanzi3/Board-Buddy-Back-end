@@ -1,6 +1,5 @@
 package sumcoda.boardbuddy.repository.participationApplication;
 
-import sumcoda.boardbuddy.dto.ParticipationApplicationResponse;
 import sumcoda.boardbuddy.dto.fetch.ParticipationApplicationInfoProjection;
 import sumcoda.boardbuddy.entity.ParticipationApplication;
 

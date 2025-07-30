@@ -8,6 +8,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.*;
+import sumcoda.boardbuddy.dto.client.GatherArticleAuthorDTO;
+import sumcoda.boardbuddy.dto.client.GatherArticleDetailedInfoDTO;
 import sumcoda.boardbuddy.dto.fetch.GatherArticleAuthorProjection;
 import sumcoda.boardbuddy.dto.fetch.GatherArticleDetailedInfoProjection;
 import sumcoda.boardbuddy.entity.GatherArticle;
@@ -23,6 +25,7 @@ import sumcoda.boardbuddy.enumerate.GatherArticleStatus;
 import sumcoda.boardbuddy.exception.gatherArticle.*;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.memberGatherArticle.MemberGatherArticleRetrievalException;
+import sumcoda.boardbuddy.mapper.GatherArticleMapper;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.memberGatherArticle.MemberGatherArticleRepository;
@@ -31,9 +34,6 @@ import sumcoda.boardbuddy.util.GatherArticleValidationUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static sumcoda.boardbuddy.util.GatherArticleUtil.*;
-import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
 
 @Slf4j
 @Service
@@ -65,6 +65,7 @@ public class GatherArticleService {
 
     private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
 
+    private final GatherArticleMapper gatherArticleMapper;
 
     /**
      * @apiNote 현재는 사용률 저조로 비활성화된 상태
@@ -139,13 +140,9 @@ public class GatherArticleService {
         GatherArticleAuthorProjection authorProjection = gatherArticleRepository.findGatherArticleAuthorByGatherArticleId(gatherArticleId)
                 .orElseThrow(() -> new GatherArticleAuthorRetrievalException("해당 모집글의 작성자 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        String profileImageS3SavedPath = buildProfileImageS3RequestKey(authorProjection.s3SavedObjectName());
+        GatherArticleAuthorDTO gatherArticleAuthorDTO = gatherArticleMapper.toGatherArticleAuthorDTO(authorProjection);
 
-        String profileImageSignedURL = cloudFrontSignedUrlService.generateSignedUrl(profileImageS3SavedPath);
-
-        GatherArticleAuthorDTO gatherArticleAuthorDTO = convertGatherArticleAuthorDTO(authorProjection, profileImageSignedURL);
-
-        return convertGatherArticleDetailedInfoDTO(infoProjection, gatherArticleAuthorDTO);
+        return gatherArticleMapper.toGatherArticleDetailedInfoDTO(infoProjection, gatherArticleAuthorDTO);
     }
 
 

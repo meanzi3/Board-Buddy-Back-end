@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.service.CloudFrontSignedUrlService;
 
-import static sumcoda.boardbuddy.util.BadgeImageUtil.buildBadgeImageS3RequestKey;
+import static sumcoda.boardbuddy.util.BadgeImageUtil.*;
 import static sumcoda.boardbuddy.util.ProfileImageUtil.buildProfileImageS3RequestKey;
 
 @Component

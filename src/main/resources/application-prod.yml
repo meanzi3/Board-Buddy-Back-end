@@ -33,15 +33,13 @@ spring:
           region: ${PROD_S3_BUCKET_REGION}
         stack:
           auto: false
-
       cloud-front:
         domain: ${PROD_CLOUD_FRONT_DOMAIN}
         key-pair-id: ${PROD_CLOUD_FRONT_KEY_PAIR_ID}
-        private-key: ${PROD_CLOUD_FRONT_PRIVATE_KEY}
+        secret:
+          region: ${PROD_CLOUD_FRONT_SECRET_REGION}
+          name: ${PROD_CLOUD_FRONT_SECRET_NAME}
         url-expiration-minutes: ${PROD_CLOUD_FRONT_URL_EXPIRATION_MINUTES}
-
-
-
 
   cool-sms:
     api-key: ${PROD_SMS_API_KEY}

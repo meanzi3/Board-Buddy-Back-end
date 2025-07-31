@@ -1,6 +1,5 @@
 package sumcoda.boardbuddy.util;
 
-import java.sql.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -31,8 +30,6 @@ public final class CloudFrontSignedUrlUtil {
      * @return 만료 시각을 나타내는 Instant 객체
      */
     public static Instant calculateExpiration(int minutes) {
-        Instant expiration = Instant.now().plus(minutes, ChronoUnit.MINUTES);
-
-        return Date.from(expiration).toInstant();
+        return Instant.now().plus(minutes, ChronoUnit.MINUTES);
     }
 }

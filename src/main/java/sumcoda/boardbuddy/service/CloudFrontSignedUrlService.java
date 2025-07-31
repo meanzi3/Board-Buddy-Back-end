@@ -36,13 +36,13 @@ public class CloudFrontSignedUrlService {
         Instant expiration = CloudFrontSignedUrlUtil.calculateExpiration(cloudFrontConfig.getUrlExpirationMinutes());
 
         // 3. Canned policy 방식으로 Signed URL 생성
-        CannedSignerRequest signerReq = CannedSignerRequest.builder()
+        CannedSignerRequest cannedSignerRequest = CannedSignerRequest.builder()
                 .resourceUrl(resourceUrl)
                 .privateKey(cloudFrontRSAPrivateKey)
                 .keyPairId(cloudFrontConfig.getKeyPairId())
                 .expirationDate(expiration)
                 .build();
 
-        return cloudFrontUtilities.getSignedUrlWithCannedPolicy(signerReq).url();
+        return cloudFrontUtilities.getSignedUrlWithCannedPolicy(cannedSignerRequest).url();
     }
 }

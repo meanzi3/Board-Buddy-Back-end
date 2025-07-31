@@ -60,8 +60,9 @@ jobs:
           SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
           SPRING_CLOUD_AWS_CLOUD_FRONT_DOMAIN=${{ secrets.PROD_CLOUD_FRONT_DOMAIN}}
           SPRING_CLOUD_AWS_CLOUD_FRONT_KEY_PAIR_ID=${{ secrets.PROD_CLOUD_FRONT_KEY_PAIR_ID}}
-          SPRING_CLOUD_AWS_CLOUD_FRONT_PRIVATE_KEY=${{ secrets.PROD_CLOUD_FRONT_PRIVATE_KEY}}
           SPRING_CLOUD_AWS_CLOUD_FRONT_URL_EXPIRATION_MINUTES=${{ secrets.PROD_CLOUD_FRONT_URL_EXPIRATION_MINUTES}}
+          SPRING_CLOUD_AWS_CLOUD_FRONT_SECRET_REGION=${{ secrets.PROD_CLOUD_FRONT_SECRET_REGION}}
+          SPRING_CLOUD_AWS_CLOUD_FRONT_SECRET_NAME=${{ secrets.PROD_CLOUD_FRONT_SECRET_NAME}}
           SPRING_PROFILES_ACTIVE=common,prod
           EOF
 
@@ -114,8 +115,8 @@ jobs:
           sudo docker run -d --name redis \
             -v /home/ec2-user/redis.conf:/usr/local/etc/redis/redis.conf \
             --network spring-boot-app-network \
-            -e REDIS_PASSWORD=${PROD_REDIS_PASSWORD} \
-            -p 6379:6379 redis:latest redis-server /usr/local/etc/redis/redis.conf
+            -e REDIS_PASSWORD=${{ secrets.PROD_REDIS_PASSWORD }} \
+            -p 6379:${{ secrets.PROD_REDIS_PORT }} redis:latest redis-server /usr/local/etc/redis/redis.conf
 
           # Spring Boot 애플리케이션 컨테이너 재시작
           if sudo docker ps -a -q -f name=spring-boot-app; then

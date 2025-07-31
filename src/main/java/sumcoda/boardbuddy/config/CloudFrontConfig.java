@@ -1,7 +1,7 @@
 package sumcoda.boardbuddy.config;
 
 import lombok.Getter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.regions.Region;
@@ -16,18 +16,21 @@ import java.util.Base64;
 
 @Getter
 @Configuration
-@ConfigurationProperties(prefix = "spring.cloud.aws.cloud-front")
 public class CloudFrontConfig {
 
+    @Value("${spring.cloud.aws.cloud-front.domain}")
     private String domain;
 
+    @Value("${spring.cloud.aws.cloud-front.key-pair-id}")
     private String keyPairId;
 
+    @Value("${spring.cloud.aws.cloud-front.url-expiration-minutes}")
     private int urlExpirationMinutes;
 
+    @Value("${spring.cloud.aws.cloud-front.secret.region}")
     private String secretRegion;
 
-    //Secrets Manager 시크릿 이름 프로퍼티
+    @Value("${spring.cloud.aws.cloud-front.secret.name}")
     private String secretName;
 
 

@@ -5,10 +5,11 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.cloudfront.CloudFrontUtilities;
 import software.amazon.awssdk.services.cloudfront.model.CannedSignerRequest;
 import sumcoda.boardbuddy.config.CloudFrontConfig;
-import sumcoda.boardbuddy.util.CloudFrontSignedUrlUtil;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.time.Instant;
+
+import static sumcoda.boardbuddy.util.CloudFrontUtil.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +31,10 @@ public class CloudFrontSignedUrlService {
     public String generateSignedUrl(String requestKey) {
 
         // 1. 서명 대상 URL (도메인 + 객체 경로)
-        String resourceUrl = CloudFrontSignedUrlUtil.buildResourceUrl(cloudFrontConfig.getDomain(), requestKey);
+        String resourceUrl = buildResourceUrl(cloudFrontConfig.getDomain(), requestKey);
 
         // 2. 만료 시간 계산
-        Instant expiration = CloudFrontSignedUrlUtil.calculateExpiration(cloudFrontConfig.getUrlExpirationMinutes());
+        Instant expiration = calculateExpiration(cloudFrontConfig.getUrlExpirationMinutes());
 
         // 3. Canned policy 방식으로 Signed URL 생성
         CannedSignerRequest cannedSignerRequest = CannedSignerRequest.builder()

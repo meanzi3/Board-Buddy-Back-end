@@ -39,6 +39,7 @@ spring:
         secret:
           region: ${PROD_CLOUD_FRONT_SECRET_REGION}
           name: ${PROD_CLOUD_FRONT_SECRET_NAME}
+          key-value-name: ${PROD_CLOUD_FRONT_SECRET_KEY_VALUE_NAME}
         url-expiration-minutes: ${PROD_CLOUD_FRONT_URL_EXPIRATION_MINUTES}
 
   cool-sms:

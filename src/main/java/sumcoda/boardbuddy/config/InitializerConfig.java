@@ -22,19 +22,22 @@ public class InitializerConfig {
 
     /**
      * admin, test 계정 생성
-     * @return
      */
-//    @Bean
-//    public ApplicationRunner initializer() {
-//        return args -> {
-//            memberService.createAdminAccount();
-//            memberService.createInitTestAccounts();
-//            badgeImageService.assignBadgesToInitTestMembers(YearMonth.now().minusMonths(1));
-//        };
-//    }
+    @Bean
+    public ApplicationRunner initializer() {
+        return args -> {
+
+            // 프로덕션 코드
+            // ddl-auto none 으로 수정후 아래 로직 비활성화
+            memberService.createAdminAccount();
+            memberService.createInitTestAccounts();
+            badgeImageService.assignBadgesToInitTestMembers(YearMonth.now().minusMonths(1));
+        };
+    }
 
     @PostConstruct
     public void setTimeZone(){
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
     }
 }
+

@@ -98,8 +98,8 @@ public final class CloudFrontUtil {
      */
     public static RSAPrivateKey getRsaPrivateKey(String privateKeyPem) throws InvalidKeySpecException, NoSuchAlgorithmException {
         String base64 = privateKeyPem
-                .replace("-----BEGIN (.*)-----", "")
-                .replace("-----END (.*)-----", "")
+                .replace("-----BEGIN RSA PRIVATE KEY-----", "")
+                .replace("-----END RSA PRIVATE KEY-----", "")
                 .replaceAll("\\s+", "");
 
         byte[] decode = Base64.getDecoder().decode(base64);

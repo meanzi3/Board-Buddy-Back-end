@@ -43,10 +43,9 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     private static String getErrorMessage(HttpServletResponse response, AuthenticationException exception) {
         String errorMessage;
 
-        if (exception instanceof BadCredentialsException ||
-                exception instanceof InvalidUsernameException ||
-                exception instanceof InvalidPasswordException) {
+        if (exception instanceof BadCredentialsException || exception instanceof InvalidUsernameException || exception instanceof InvalidPasswordException) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
             if (exception instanceof BadCredentialsException) {
                 errorMessage = "입력한 회원 정보가 올바르지 않습니다. 올바른 회원정보를 입력하세요.";
             } else {

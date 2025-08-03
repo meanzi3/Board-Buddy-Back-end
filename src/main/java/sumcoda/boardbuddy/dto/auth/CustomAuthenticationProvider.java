@@ -30,9 +30,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String password = (String) authentication.getCredentials();
 
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
-        if (userDetails == null) {
-            throw new InvalidUsernameException("유효하지 않은 아이디 입니다. 올바른 아이디를 입력하였는지 확인해주세요.");
-        }
 
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new InvalidPasswordException("유효하지 않은 비밀번호 입니다. 올바른 비밀번호를 입력하였는지 확인해주세요.");

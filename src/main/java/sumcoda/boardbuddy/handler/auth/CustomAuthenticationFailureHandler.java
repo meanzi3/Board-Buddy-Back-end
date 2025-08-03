@@ -10,10 +10,10 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.exception.auth.InvalidPasswordException;
+import sumcoda.boardbuddy.exception.auth.InvalidUsernameException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         String errorMessage;
 
         if (exception instanceof BadCredentialsException ||
-                exception instanceof UsernameNotFoundException ||
+                exception instanceof InvalidUsernameException ||
                 exception instanceof InvalidPasswordException) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             if (exception instanceof BadCredentialsException) {

@@ -5,11 +5,11 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
 import sumcoda.boardbuddy.exception.auth.InvalidPasswordException;
-import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
         if (userDetails == null) {
-            throw new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요.");
+            throw new UsernameNotFoundException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요.");
         }
 
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {

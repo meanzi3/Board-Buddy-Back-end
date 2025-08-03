@@ -31,14 +31,13 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final MemberProfileMapper memberProfileMapper;
 
-    final ObjectMapper objectMapper = new ObjectMapper();
-
-    Map<String, Object> responseData = new HashMap<>();
-
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         log.info("success handler is working");
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        Map<String, Object> responseData = new HashMap<>();
 
         if (authentication == null) {
             throw new AuthenticationMissingException("인증 객체가 누락되었습니다. 관리자에게 문의하세요.");

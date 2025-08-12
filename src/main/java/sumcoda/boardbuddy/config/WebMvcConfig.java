@@ -29,7 +29,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private static final List<String> GLOBAL_EXCLUDES =
             Stream.concat(
                     GATHER_ARTICLE_PATHS.stream(),
-                    List.of( "/api/auth/register",
+                    Stream.of( "/api/auth/register",
                                     "/api/auth/username/check",
                                     "/api/auth/nickname/check",
                                     "/api/auth/sms-certifications/send",
@@ -39,8 +39,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                                     "/api/login/oauth2/code/**",
                                     "/api/board-cafes",
                                     "/api/regions/**",
-                                    "/api/rankings")
-                            .stream()
+                                    "/api/rankings"
+                            )
             ).toList();
 
     @Override

@@ -114,7 +114,8 @@ public class SecurityConfig {
                                 "/api/login/oauth2/code/**",
                                 "/api/board-cafes",
                                 "/api/regions/**",
-                                "/api/rankings"
+                                "/api/rankings",
+                                "/api/auth/status"
                         ).permitAll()
                         .requestMatchers(
                                 // 동일한 URL 요청에 대해서 GET 요청만 permitAll()

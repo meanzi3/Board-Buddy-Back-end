@@ -43,14 +43,22 @@ public class ProfileImage {
     }
 
     // ProfileImage 1 <-> 1 Member
-    // 양방향 연관관계 편의 메서드
-    public void assignMember(Member member) {
-        if (this.member != null) {
-            this.member.assignProfileImage(null);
+    // 양방향 연관 관계 비공개 편의 메서드
+    void assignMember(Member newMember, boolean updateInverseSide) {
+        if (this.member == newMember) return;
+
+        Member old = this.member;
+        this.member = newMember;
+
+        if (!updateInverseSide) return;
+
+        // 끊기
+        if (old != null && old.getProfileImage() == this) {
+            old.assignProfileImage(null, false);
         }
-        this.member = member;
-        if (member != null && member.getProfileImage() != this) {
-            member.assignProfileImage(this);
+        // 연결
+        if (newMember != null && newMember.getProfileImage() != this) {
+            newMember.assignProfileImage(this, false);
         }
     }
 }

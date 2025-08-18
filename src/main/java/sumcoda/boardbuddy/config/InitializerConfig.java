@@ -28,10 +28,10 @@ public class InitializerConfig {
         return args -> {
 
             // 프로덕션 코드
-            // ddl-auto none 으로 수정후 아래 로직 비활성화
-            memberService.createAdminAccount();
-            memberService.createInitTestAccounts();
-            badgeImageService.assignBadgesToInitTestMembers(YearMonth.now().minusMonths(1));
+            // TODO: ddl-auto none 으로 수정후 아래 로직 비활성화
+//            memberService.createAdminAccount();
+//            memberService.createInitTestAccounts();
+//            badgeImageService.assignBadgesToInitTestMembers(YearMonth.now().minusMonths(1));
         };
     }
 

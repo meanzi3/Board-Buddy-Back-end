@@ -115,66 +115,71 @@ public class ProfileService {
             member.assignDescription(updateProfileDTO.getDescription());
         }
 
-        if (profileImageFile == null || profileImageFile.isEmpty()) {
-            member.assignProfileImage(null);
-        } else {
-            // 이미지 파일 형식 검증
-            String contentType = profileImageFile.getContentType();
-            if (contentType != null && !contentType.startsWith("image")) {
-                throw new InvalidFileFormatException("지원되지 않는 파일 형식입니다.");
+        // 프로필 이미지 업로드/교체 여부 확인
+        final boolean isProfileImageNewUpload = (profileImageFile != null && !profileImageFile.isEmpty());
+
+        // 업로드/교체 의도가 없으면 그대로 유지
+        if (!isProfileImageNewUpload) {
+            return; // 텍스트 필드만 갱신하고 종료
+        }
+
+        // 프로필 이미지 교체
+        // 이미지 파일 형식 검증
+        String contentType = profileImageFile.getContentType();
+        if (contentType != null && !contentType.startsWith("image")) {
+            throw new InvalidFileFormatException("지원되지 않는 파일 형식입니다.");
+        }
+        try {
+
+            String bucketName = awsS3Config.getBucketName();
+
+            boolean isExistsProfileImage = profileImageRepository.existsByUsername(username);
+
+            // 기존 프로필 이미지가 있다면 S3에서 삭제
+            if (isExistsProfileImage) {
+                ProfileImageObjectNameProjection profileImageObjectNameProjection = profileImageRepository.findProfileImageObjectNameByUsername(username)
+                        .orElseThrow(() -> new ProfileImageRetrievalException("서버 문제로 기존 프로필 이미지 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+                String profileImageSavedObjectName = profileImageObjectNameProjection.s3SavedObjectName();
+
+                String s3DeleteRequestKey = buildProfileImageS3RequestKey(profileImageSavedObjectName);
+
+                // DeleteObjectRequest 생성
+                DeleteObjectRequest deleteObjectRequest = buildDeleteObjectRequest(bucketName, s3DeleteRequestKey);
+
+                s3Client.deleteObject(deleteObjectRequest);
+
+                member.assignProfileImage(null);
+
+                profileImageRepository.deleteByS3SavedObjectName(profileImageSavedObjectName);
             }
-            try {
 
-                String bucketName = awsS3Config.getBucketName();
+            // 원본 파일명에서 확장자만 추출
+            String originalFilename = profileImageFile.getOriginalFilename();
 
-                boolean isExistsProfileImage = profileImageRepository.existsByUsername(username);
+            String s3SavedObjectName = buildS3SavedObjectName(originalFilename);
 
-                // 기존 프로필 이미지가 있다면 S3에서 삭제
-                if (isExistsProfileImage) {
-                    ProfileImageObjectNameProjection profileImageObjectNameProjection = profileImageRepository.findProfileImageObjectNameByUsername(username)
-                            .orElseThrow(() -> new ProfileImageRetrievalException("서버 문제로 기존 프로필 이미지 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
+            String s3PutRequestKey = buildProfileImageS3RequestKey(s3SavedObjectName);
 
-                    String profileImageSavedObjectName = profileImageObjectNameProjection.s3SavedObjectName();
+            // PutObjectRequest 생성
+            PutObjectRequest putObjectRequest = buildPutObjectRequest(profileImageFile, bucketName, s3PutRequestKey);
 
-                    String s3DeleteRequestKey = buildProfileImageS3RequestKey(profileImageSavedObjectName);
+            RequestBody requestBody = convertRequestBody(profileImageFile);
+            // S3에 업로드
+            s3Client.putObject(putObjectRequest, requestBody);
 
-                    // DeleteObjectRequest 생성
-                    DeleteObjectRequest deleteObjectRequest = buildDeleteObjectRequest(bucketName, s3DeleteRequestKey);
+            // 새로운 프로필 이미지 생성
+            ProfileImage newProfileImage = ProfileImage.buildProfileImage(
+                    originalFilename,
+                    s3SavedObjectName
+            );
 
-                    s3Client.deleteObject(deleteObjectRequest);
+            member.assignProfileImage(newProfileImage);
 
-                    member.assignProfileImage(null);
+            profileImageRepository.save(newProfileImage);
 
-                    profileImageRepository.deleteByS3SavedObjectName(profileImageSavedObjectName);
-                }
-
-                // 원본 파일명에서 확장자만 추출
-                String originalFilename = profileImageFile.getOriginalFilename();
-
-                String s3SavedObjectName = buildS3SavedObjectName(originalFilename);
-
-                String s3PutRequestKey = buildProfileImageS3RequestKey(s3SavedObjectName);
-
-                // PutObjectRequest 생성
-                PutObjectRequest putObjectRequest = buildPutObjectRequest(profileImageFile, bucketName, s3PutRequestKey);
-
-                RequestBody requestBody = convertRequestBody(profileImageFile);
-                // S3에 업로드
-                s3Client.putObject(putObjectRequest, requestBody);
-
-                // 새로운 프로필 이미지 생성
-                ProfileImage newProfileImage = ProfileImage.buildProfileImage(
-                        originalFilename,
-                        s3SavedObjectName
-                );
-
-                member.assignProfileImage(newProfileImage);
-
-                profileImageRepository.save(newProfileImage);
-
-            } catch (IOException e) {
-                throw new ProfileImageSaveException("프로필 이미지를 저장하는 동안 오류가 발생했습니다.");
-            }
+        } catch (IOException e) {
+            throw new ProfileImageSaveException("프로필 이미지를 저장하는 동안 오류가 발생했습니다.");
         }
     }
 }

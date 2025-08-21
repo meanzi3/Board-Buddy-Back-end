@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -33,6 +34,7 @@ import sumcoda.boardbuddy.repository.member.MemberRepository;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static sumcoda.boardbuddy.util.ProfileImageUtil.*;
 
@@ -101,7 +103,7 @@ public class ProfileService {
         }
 
         // 비밀번호가 null이 아니면 암호화 후 업데이트
-        if (updateProfileDTO.getPassword() != null && !updateProfileDTO.getPassword().isEmpty()) {
+        if (updateProfileDTO.getPassword() != null && !updateProfileDTO.getPassword().isBlank()) {
             member.assignPassword(bCryptPasswordEncoder.encode(updateProfileDTO.getPassword()));
         }
 
@@ -123,52 +125,32 @@ public class ProfileService {
             return; // 텍스트 필드만 갱신하고 종료
         }
 
-        // 프로필 이미지 교체
-        // 이미지 파일 형식 검증
-        String contentType = profileImageFile.getContentType();
-        if (contentType != null && !contentType.startsWith("image")) {
+        // 파일 검증
+        final String contentType = profileImageFile.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
             throw new InvalidFileFormatException("지원되지 않는 파일 형식입니다.");
         }
+
+        // 기존 이미지 엔티티 참조 (null일 수도 있음)
+        final ProfileImage oldProfileImage = member.getProfileImage();
+
+        final String bucketName = awsS3Config.getBucketName();
+
+        final String originalFilename = Optional.ofNullable(profileImageFile.getOriginalFilename()).orElse("profile");
+
+        final String s3SavedObjectName = buildS3SavedObjectName(originalFilename);
+
+        final String putKey = buildProfileImageS3RequestKey(s3SavedObjectName);
+
         try {
-
-            String bucketName = awsS3Config.getBucketName();
-
-            boolean isExistsProfileImage = profileImageRepository.existsByUsername(username);
-
-            // 기존 프로필 이미지가 있다면 S3에서 삭제
-            if (isExistsProfileImage) {
-                ProfileImageObjectNameProjection profileImageObjectNameProjection = profileImageRepository.findProfileImageObjectNameByUsername(username)
-                        .orElseThrow(() -> new ProfileImageRetrievalException("서버 문제로 기존 프로필 이미지 정보를 찾을 수 없습니다. 관리자에게 문의하세요."));
-
-                String profileImageSavedObjectName = profileImageObjectNameProjection.s3SavedObjectName();
-
-                String s3DeleteRequestKey = buildProfileImageS3RequestKey(profileImageSavedObjectName);
-
-                // DeleteObjectRequest 생성
-                DeleteObjectRequest deleteObjectRequest = buildDeleteObjectRequest(bucketName, s3DeleteRequestKey);
-
-                s3Client.deleteObject(deleteObjectRequest);
-
-                member.assignProfileImage(null);
-
-                profileImageRepository.deleteByS3SavedObjectName(profileImageSavedObjectName);
-            }
-
-            // 원본 파일명에서 확장자만 추출
-            String originalFilename = profileImageFile.getOriginalFilename();
-
-            String s3SavedObjectName = buildS3SavedObjectName(originalFilename);
-
-            String s3PutRequestKey = buildProfileImageS3RequestKey(s3SavedObjectName);
-
-            // PutObjectRequest 생성
-            PutObjectRequest putObjectRequest = buildPutObjectRequest(profileImageFile, bucketName, s3PutRequestKey);
+            // 업로드 먼저 (실패 시 기존 이미지 보존)
+            PutObjectRequest putObjectRequest = buildPutObjectRequest(profileImageFile, bucketName, putKey);
 
             RequestBody requestBody = convertRequestBody(profileImageFile);
-            // S3에 업로드
+
             s3Client.putObject(putObjectRequest, requestBody);
 
-            // 새로운 프로필 이미지 생성
+            // 새 엔티티 생성 및 연관관계 교체 -> DB 저장
             ProfileImage newProfileImage = ProfileImage.buildProfileImage(
                     originalFilename,
                     s3SavedObjectName
@@ -178,8 +160,24 @@ public class ProfileService {
 
             profileImageRepository.save(newProfileImage);
 
-        } catch (IOException e) {
+        } catch (SdkException | IOException exception) {
+            // 네트워크/자격/권한/타임아웃 등 포함
             throw new ProfileImageSaveException("프로필 이미지를 저장하는 동안 오류가 발생했습니다.");
+        }
+
+        // 6) 업로드/교체 성공 후, 이전 이미지 정리
+        if (oldProfileImage != null) {
+            final String deleteKey = buildProfileImageS3RequestKey(oldProfileImage.getS3SavedObjectName());
+
+            member.assignProfileImage(null);
+
+            try {
+                DeleteObjectRequest deleteObjectRequest = buildDeleteObjectRequest(bucketName, deleteKey);
+
+                s3Client.deleteObject(deleteObjectRequest);
+            } catch (software.amazon.awssdk.core.exception.SdkException exception) {
+                log.warn("이전 프로필 이미지 S3 삭제 실패 key={}", deleteKey, exception);
+            }
         }
     }
 }

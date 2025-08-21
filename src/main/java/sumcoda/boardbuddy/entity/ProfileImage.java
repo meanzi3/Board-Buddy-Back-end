@@ -44,21 +44,21 @@ public class ProfileImage {
 
     // ProfileImage 1 <-> 1 Member
     // 양방향 연관 관계 비공개 편의 메서드
-    void assignMember(Member newMember, boolean updateInverseSide) {
-        if (this.member == newMember) return;
+    void assignMember(Member member, boolean updateInverseSide) {
+        if (this.member == member) return;
 
         Member old = this.member;
-        this.member = newMember;
+        this.member = member;
 
         if (!updateInverseSide) return;
 
-        // 끊기
+        // 연관관계 끊기
         if (old != null && old.getProfileImage() == this) {
             old.assignProfileImage(null, false);
         }
-        // 연결
-        if (newMember != null && newMember.getProfileImage() != this) {
-            newMember.assignProfileImage(this, false);
+        // 연관관계 연결
+        if (member != null && member.getProfileImage() != this) {
+            member.assignProfileImage(this, false);
         }
     }
 }

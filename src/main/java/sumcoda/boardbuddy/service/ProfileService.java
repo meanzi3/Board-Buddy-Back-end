@@ -170,7 +170,7 @@ public class ProfileService {
         if (oldProfileImage != null) {
             final String deleteKey = buildProfileImageS3RequestKey(oldProfileImage.getS3SavedObjectName());
 
-            member.assignProfileImage(null);
+            profileImageRepository.delete(oldProfileImage);
 
             try {
                 DeleteObjectRequest deleteObjectRequest = buildDeleteObjectRequest(bucketName, deleteKey);

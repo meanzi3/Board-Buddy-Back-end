@@ -18,13 +18,12 @@ import sumcoda.boardbuddy.dto.client.MemberProfileInfoDTO;
 import sumcoda.boardbuddy.dto.MemberRequest;
 import sumcoda.boardbuddy.dto.fetch.BadgeImageInfoProjection;
 import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
-import sumcoda.boardbuddy.dto.fetch.ProfileImageObjectNameProjection;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.ProfileImage;
 import sumcoda.boardbuddy.exception.member.InvalidFileFormatException;
 import sumcoda.boardbuddy.exception.member.MemberNotFoundException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
-import sumcoda.boardbuddy.exception.profileImage.ProfileImageRetrievalException;
+import sumcoda.boardbuddy.exception.profileImage.ProfileImageDeleteException;
 import sumcoda.boardbuddy.exception.profileImage.ProfileImageSaveException;
 import sumcoda.boardbuddy.mapper.BadgeImageMapper;
 import sumcoda.boardbuddy.mapper.MemberProfileMapper;
@@ -122,11 +121,13 @@ public class ProfileService {
 
         // 업로드/교체 의도가 없으면 그대로 유지
         if (!isProfileImageNewUpload) {
-            return; // 텍스트 필드만 갱신하고 종료
+            // 텍스트 필드만 갱신하고 종료
+            return;
         }
 
         // 파일 검증
         final String contentType = profileImageFile.getContentType();
+
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new InvalidFileFormatException("지원되지 않는 파일 형식입니다.");
         }
@@ -150,22 +151,22 @@ public class ProfileService {
 
             s3Client.putObject(putObjectRequest, requestBody);
 
-            // 새 엔티티 생성 및 연관관계 교체 -> DB 저장
-            ProfileImage newProfileImage = ProfileImage.buildProfileImage(
-                    originalFilename,
-                    s3SavedObjectName
-            );
-
-            member.assignProfileImage(newProfileImage);
-
-            profileImageRepository.save(newProfileImage);
-
         } catch (SdkException | IOException exception) {
-            // 네트워크/자격/권한/타임아웃 등 포함
+            // 네트워크/자격/권한/타임아웃
             throw new ProfileImageSaveException("프로필 이미지를 저장하는 동안 오류가 발생했습니다.");
         }
 
-        // 6) 업로드/교체 성공 후, 이전 이미지 정리
+        // 새 엔티티 생성 및 연관관계 교체 -> DB 저장
+        ProfileImage newProfileImage = ProfileImage.buildProfileImage(
+                originalFilename,
+                s3SavedObjectName
+        );
+
+        member.assignProfileImage(newProfileImage);
+
+        profileImageRepository.save(newProfileImage);
+
+        // 업로드/교체 성공 후, 이전 이미지 정리
         if (oldProfileImage != null) {
             final String deleteKey = buildProfileImageS3RequestKey(oldProfileImage.getS3SavedObjectName());
 
@@ -175,8 +176,9 @@ public class ProfileService {
                 DeleteObjectRequest deleteObjectRequest = buildDeleteObjectRequest(bucketName, deleteKey);
 
                 s3Client.deleteObject(deleteObjectRequest);
-            } catch (software.amazon.awssdk.core.exception.SdkException exception) {
-                log.warn("이전 프로필 이미지 S3 삭제 실패 key={}", deleteKey, exception);
+            } catch (SdkException exception) {
+                // 네트워크/자격/권한/타임아웃
+                throw new ProfileImageDeleteException("프로필 이미지를 저장하는 동안 오류가 발생했습니다.");
             }
         }
     }

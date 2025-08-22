@@ -316,27 +316,27 @@ public class Member {
 //    }
 
     // 양방향 연관 관계 공개 편의 메서드
-    public void assignProfileImage(ProfileImage newProfileImage) {
-        assignProfileImage(newProfileImage, true);
+    public void assignProfileImage(ProfileImage profileimage) {
+        assignProfileImage(profileimage, true);
     }
 
     // Member 1 <-> 1 ProfileImage
     // 양방향 연관 관계 비공개 편의 메서드
-    void assignProfileImage(ProfileImage newProfileImage, boolean updateInverseSide) {
-        if (this.profileImage == newProfileImage) return;
+    void assignProfileImage(ProfileImage profileimage, boolean updateInverseSide) {
+        if (this.profileImage == profileimage) return;
 
         ProfileImage old = this.profileImage;
-        this.profileImage = newProfileImage;
+        this.profileImage = profileimage;
 
         if (!updateInverseSide) return;
 
-        // 1) 끊기
+        // 연관관계 끊기
         if (old != null && old.getMember() == this) {
-            old.assignMember(null, /*sync=*/false);
+            old.assignMember(null, false);
         }
-        // 2) 연결
-        if (newProfileImage != null && newProfileImage.getMember() != this) {
-            newProfileImage.assignMember(this, /*sync=*/false);
+        // 연관관계 연결
+        if (profileimage != null && profileimage.getMember() != this) {
+            profileimage.assignMember(this, false);
         }
     }
 

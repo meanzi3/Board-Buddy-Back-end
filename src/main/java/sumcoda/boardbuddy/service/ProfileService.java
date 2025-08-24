@@ -67,7 +67,7 @@ public class ProfileService {
      * @param nickname 유저 닉네임
      * @return 해당 닉네임의 유저 프로필
      **/
-    public MemberDetailDTO getMemberProfileByNickname(String nickname) {
+    public MemberDetailDTO getProfileByNickname(String nickname) {
 
         if (nickname == null) {
             throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");

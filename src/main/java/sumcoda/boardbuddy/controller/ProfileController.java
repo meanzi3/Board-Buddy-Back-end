@@ -31,10 +31,10 @@ public class ProfileController {
      * @return 프로필 조회가 성공했다면 약속된 SuccessResponse 반환
      **/
     @GetMapping("/api/profiles/{nickname}")
-    public ResponseEntity<ApiResponse<Map<String, MemberDetailDTO>>> getMemberProfileByNickname(@PathVariable String nickname) {
+    public ResponseEntity<ApiResponse<Map<String, MemberDetailDTO>>> getProfileByNickname(@PathVariable String nickname) {
         log.info("get member profile is working");
 
-        MemberDetailDTO profileInfoDTO = profileService.getMemberProfileByNickname(nickname);
+        MemberDetailDTO profileInfoDTO = profileService.getProfileByNickname(nickname);
 
         return buildSuccessResponseWithPairKeyData("profile", profileInfoDTO, "프로필이 조회되었습니다.", HttpStatus.OK);
     }

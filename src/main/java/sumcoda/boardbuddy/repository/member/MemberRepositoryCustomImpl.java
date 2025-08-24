@@ -5,8 +5,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
-import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
-import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
+import sumcoda.boardbuddy.dto.fetch.MemberDetailProjection;
+import sumcoda.boardbuddy.dto.fetch.MemberSummaryProjection;
 import sumcoda.boardbuddy.dto.fetch.MemberRankingProjection;
 import sumcoda.boardbuddy.entity.Member;
 
@@ -39,9 +39,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
      *          추후 사용자 요청 또는 트래픽 증가시 다시 활성화될 수 있음
      */
 //    @Override
-//    public Optional<MemberResponse.MemberAuthProfileDTO> findMemberDTOByUsername(String username) {
+//    public Optional<MemberResponse.MemberSummaryDTO> findMemberDTOByUsername(String username) {
 //        return Optional.ofNullable(jpaQueryFactory
-//                .select(Projections.fields(MemberResponse.MemberAuthProfileDTO.class,
+//                .select(Projections.fields(MemberResponse.MemberSummaryDTO.class,
 //                        member.nickname,
 //                        member.sido,
 //                        member.sgg,
@@ -61,9 +61,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
      *          앱 사용률 증가시 비활성화후에 기존 기능 활성화 예정
      */
     @Override
-    public Optional<MemberAuthProfileProjection> findMemberAuthProfileByUsername(String username) {
+    public Optional<MemberSummaryProjection> findMemberSummaryByUsername(String username) {
         return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.constructor(MemberAuthProfileProjection.class,
+                .select(Projections.constructor(MemberSummaryProjection.class,
                         member.nickname,
                         member.phoneNumber,
                         member.memberType,
@@ -99,9 +99,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Optional<MemberProfileProjection> findMemberProfileByNickname(String nickname) {
+    public Optional<MemberDetailProjection> findMemberDetailByNickname(String nickname) {
         return Optional.ofNullable(jpaQueryFactory
-                        .select(Projections.constructor(MemberProfileProjection.class,
+                        .select(Projections.constructor(MemberDetailProjection.class,
                                 profileImage.s3SavedObjectName,
                                 member.description,
                                 member.rank,

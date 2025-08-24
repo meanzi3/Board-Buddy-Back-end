@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sumcoda.boardbuddy.dto.client.MemberProfileInfoDTO;
+import sumcoda.boardbuddy.dto.client.MemberDetailDTO;
 import sumcoda.boardbuddy.dto.MemberRequest;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.ProfileService;
@@ -31,10 +31,10 @@ public class ProfileController {
      * @return 프로필 조회가 성공했다면 약속된 SuccessResponse 반환
      **/
     @GetMapping("/api/profiles/{nickname}")
-    public ResponseEntity<ApiResponse<Map<String, MemberProfileInfoDTO>>> getMemberProfileByNickname(@PathVariable String nickname) {
+    public ResponseEntity<ApiResponse<Map<String, MemberDetailDTO>>> getMemberProfileByNickname(@PathVariable String nickname) {
         log.info("get member profile is working");
 
-        MemberProfileInfoDTO profileInfoDTO = profileService.getMemberProfileByNickname(nickname);
+        MemberDetailDTO profileInfoDTO = profileService.getMemberProfileByNickname(nickname);
 
         return buildSuccessResponseWithPairKeyData("profile", profileInfoDTO, "프로필이 조회되었습니다.", HttpStatus.OK);
     }

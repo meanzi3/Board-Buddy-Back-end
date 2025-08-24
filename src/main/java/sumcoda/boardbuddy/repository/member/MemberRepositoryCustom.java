@@ -2,8 +2,8 @@ package sumcoda.boardbuddy.repository.member;
 
 import sumcoda.boardbuddy.dto.AuthResponse;
 import sumcoda.boardbuddy.dto.MemberResponse;
-import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
-import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
+import sumcoda.boardbuddy.dto.fetch.MemberDetailProjection;
+import sumcoda.boardbuddy.dto.fetch.MemberSummaryProjection;
 import sumcoda.boardbuddy.dto.fetch.MemberRankingProjection;
 import sumcoda.boardbuddy.entity.Member;
 
@@ -14,13 +14,13 @@ public interface MemberRepositoryCustom {
 
     Optional<AuthResponse.ProfileDTO> findAuthDTOByUsername(String username);
 
-    Optional<MemberAuthProfileProjection> findMemberAuthProfileByUsername(String username);
+    Optional<MemberSummaryProjection> findMemberSummaryByUsername(String username);
 
     List<MemberRankingProjection> findTop3RankingMembers();
 
     List<Member> findAllOrderedByRankScore();
 
-    Optional<MemberProfileProjection> findMemberProfileByNickname(String nickname);
+    Optional<MemberDetailProjection> findMemberDetailByNickname(String nickname);
 
     /**
      * @apiNote 현재는 사용률 저조로 메서드가 비활성화된 상태

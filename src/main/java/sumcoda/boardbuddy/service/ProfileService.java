@@ -14,10 +14,10 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import sumcoda.boardbuddy.config.AwsS3Config;
 import sumcoda.boardbuddy.dto.client.BadgeImageInfoDTO;
-import sumcoda.boardbuddy.dto.client.MemberProfileInfoDTO;
+import sumcoda.boardbuddy.dto.client.MemberDetailDTO;
 import sumcoda.boardbuddy.dto.MemberRequest;
 import sumcoda.boardbuddy.dto.fetch.BadgeImageInfoProjection;
-import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
+import sumcoda.boardbuddy.dto.fetch.MemberDetailProjection;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.entity.ProfileImage;
 import sumcoda.boardbuddy.exception.member.InvalidFileFormatException;
@@ -26,7 +26,7 @@ import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.profileImage.ProfileImageDeleteException;
 import sumcoda.boardbuddy.exception.profileImage.ProfileImageSaveException;
 import sumcoda.boardbuddy.mapper.BadgeImageMapper;
-import sumcoda.boardbuddy.mapper.MemberProfileMapper;
+import sumcoda.boardbuddy.mapper.MemberMapper;
 import sumcoda.boardbuddy.repository.profileImage.ProfileImageRepository;
 import sumcoda.boardbuddy.repository.badgeImage.BadgeImageRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
@@ -56,7 +56,7 @@ public class ProfileService {
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private final MemberProfileMapper memberProfileMapper;
+    private final MemberMapper memberMapper;
 
     private final BadgeImageMapper badgeImageMapper;
 
@@ -67,7 +67,7 @@ public class ProfileService {
      * @param nickname 유저 닉네임
      * @return 해당 닉네임의 유저 프로필
      **/
-    public MemberProfileInfoDTO getMemberProfileByNickname(String nickname) {
+    public MemberDetailDTO getProfileByNickname(String nickname) {
 
         if (nickname == null) {
             throw new MemberNotFoundException("해당 유저를 찾을 수 없습니다.");
@@ -77,10 +77,10 @@ public class ProfileService {
 
         List<BadgeImageInfoDTO> badgeImageInfoDTOList = badgeImageMapper.toBadgeImageInfoDTOList(badgeImageInfoProjections);
 
-        MemberProfileProjection memberProfileProjection = memberRepository.findMemberProfileByNickname(nickname)
+        MemberDetailProjection memberDetailProjection = memberRepository.findMemberDetailByNickname(nickname)
                 .orElseThrow(() -> new MemberRetrievalException("프로필을 조회할 수 없습니다. 관리자에게 문의하세요."));
 
-        return memberProfileMapper.toMemberProfileInfoDTO(memberProfileProjection, badgeImageInfoDTOList);
+        return memberMapper.toMemberDetailDTO(memberDetailProjection, badgeImageInfoDTOList);
     }
 
     /**

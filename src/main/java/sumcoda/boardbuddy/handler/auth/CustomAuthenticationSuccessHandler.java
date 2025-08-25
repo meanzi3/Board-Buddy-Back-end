@@ -12,10 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import sumcoda.boardbuddy.dto.client.MemberAuthProfileDTO;
-import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
+import sumcoda.boardbuddy.dto.client.MemberSummaryDTO;
+import sumcoda.boardbuddy.dto.fetch.MemberSummaryProjection;
 import sumcoda.boardbuddy.exception.auth.AuthenticationMissingException;
-import sumcoda.boardbuddy.mapper.MemberProfileMapper;
+import sumcoda.boardbuddy.mapper.MemberMapper;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final MemberRepository memberRepository;
 
-    private final MemberProfileMapper memberProfileMapper;
+    private final MemberMapper memberMapper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -49,17 +49,17 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         log.info("login user name : " + username);
 
-        MemberAuthProfileProjection projection = memberRepository.findMemberAuthProfileByUsername(username).orElseThrow(() ->
+        MemberSummaryProjection projection = memberRepository.findMemberSummaryByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
 
-        MemberAuthProfileDTO memberAuthProfileDTO = memberProfileMapper.toMemberAuthProfileDTO(projection);
+        MemberSummaryDTO memberSummaryDTO = memberMapper.toMemberSummaryDTO(projection);
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         responseData.put("status", "success");
-        responseData.put("data", Map.of("memberAuthProfileDTO", memberAuthProfileDTO));
+        responseData.put("data", Map.of("memberSummaryDTO", memberSummaryDTO));
         responseData.put("message", "로그인에 성공하였습니다.");
 
         objectMapper.writeValue(response.getWriter(), responseData);

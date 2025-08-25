@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import sumcoda.boardbuddy.dto.AuthRequest;
-import sumcoda.boardbuddy.dto.client.MemberAuthProfileDTO;
+import sumcoda.boardbuddy.dto.client.MemberSummaryDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.AuthService;
 
@@ -62,12 +62,12 @@ public class AuthController {
      * @return 사용자가 로그인한 상태라면 해당 사용자의 프로필을 기반으로한 약속된 SuccessResponse 반환
      **/
     @GetMapping("/api/auth/status")
-    public ResponseEntity<ApiResponse<Map<String, MemberAuthProfileDTO>>> checkMemberAuthenticationStatus(@RequestAttribute String username) {
+    public ResponseEntity<ApiResponse<Map<String, MemberSummaryDTO>>> checkMemberAuthenticationStatus(@RequestAttribute String username) {
         log.info("check session is working");
 
-        MemberAuthProfileDTO memberAuthProfileDTO = authService.checkMemberAuthenticationStatus(username);
+        MemberSummaryDTO memberSummaryDTO = authService.checkMemberAuthenticationStatus(username);
 
-        return buildSuccessResponseWithPairKeyData("profileDTO", memberAuthProfileDTO, "유효한 세션입니다.", HttpStatus.OK);
+        return buildSuccessResponseWithPairKeyData("profileDTO", memberSummaryDTO, "유효한 세션입니다.", HttpStatus.OK);
     }
 
     /**

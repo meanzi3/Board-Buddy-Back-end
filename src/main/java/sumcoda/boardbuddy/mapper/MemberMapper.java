@@ -3,10 +3,10 @@ package sumcoda.boardbuddy.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import sumcoda.boardbuddy.dto.client.BadgeImageInfoDTO;
-import sumcoda.boardbuddy.dto.client.MemberAuthProfileDTO;
-import sumcoda.boardbuddy.dto.client.MemberProfileInfoDTO;
-import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
-import sumcoda.boardbuddy.dto.fetch.MemberProfileProjection;
+import sumcoda.boardbuddy.dto.client.MemberDetailDTO;
+import sumcoda.boardbuddy.dto.client.MemberSummaryDTO;
+import sumcoda.boardbuddy.dto.fetch.MemberSummaryProjection;
+import sumcoda.boardbuddy.dto.fetch.MemberDetailProjection;
 import sumcoda.boardbuddy.generator.CloudFrontSignedUrlGenerator;
 
 import java.util.List;
@@ -14,23 +14,23 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class MemberProfileMapper {
+public class MemberMapper {
 
     private final CloudFrontSignedUrlGenerator cloudFrontSignedUrlGenerator;
 
     /**
-     * Projection 객체를 MemberProfileInfoDTO 객체로 변환
+     * Projection 객체를 MemberDetailDTO 객체로 변환
      *
-     * @param projection DB에서 조회된 MemberProfileProjection 객체
+     * @param projection DB에서 조회된 MemberDetailProjection 객체
      * @param badgeImageInfoDTOList 클라이언트에게 전달하기위해 가공된  BadgeImageInfoDTO 리스트
-     * @return MemberProfileInfoDTO 객체
+     * @return MemberDetailDTO 객체
      */
-    public MemberProfileInfoDTO toMemberProfileInfoDTO(MemberProfileProjection projection, List<BadgeImageInfoDTO> badgeImageInfoDTOList) {
+    public MemberDetailDTO toMemberDetailDTO(MemberDetailProjection projection, List<BadgeImageInfoDTO> badgeImageInfoDTOList) {
 
         // 프로필 이미지 S3 키 → CloudFront Signed URL 생성
         String profileImageSignedURL = cloudFrontSignedUrlGenerator.generateProfileImageSignedUrl(projection.s3SavedObjectName());
 
-        return MemberProfileInfoDTO.builder()
+        return MemberDetailDTO.builder()
                 .profileImageSignedURL(profileImageSignedURL)
                 .description(projection.description())
                 .rank(projection.rank())
@@ -44,17 +44,17 @@ public class MemberProfileMapper {
     }
 
     /**
-     * Projection 객체를 MemberAuthProfileDTO 객체로 변환
+     * Projection 객체를 MemberSummaryDTO 객체로 변환
      *
-     * @param projection DB에서 조회된 MemberAuthProfileProjection 객체
-     * @return MemberAuthProfileDTO 객체
+     * @param projection DB에서 조회된 MemberSummaryProjection 객체
+     * @return MemberSummaryDTO 객체
      */
-    public MemberAuthProfileDTO toMemberAuthProfileDTO(MemberAuthProfileProjection projection) {
+    public MemberSummaryDTO toMemberSummaryDTO(MemberSummaryProjection projection) {
 
         // 프로필 이미지 S3 키 → CloudFront Signed URL 생성
         String profileImageSignedURL = cloudFrontSignedUrlGenerator.generateProfileImageSignedUrl(projection.s3SavedObjectName());
 
-        return MemberAuthProfileDTO.builder()
+        return MemberSummaryDTO.builder()
                 .nickname(projection.nickname())
                 .isPhoneNumberVerified(projection.phoneNumber() != null)
                 .memberType(projection.memberType())

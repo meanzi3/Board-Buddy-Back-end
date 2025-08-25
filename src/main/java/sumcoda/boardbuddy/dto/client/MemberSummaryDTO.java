@@ -4,7 +4,7 @@ import lombok.Builder;
 import sumcoda.boardbuddy.enumerate.MemberType;
 
 @Builder
-public record MemberAuthProfileDTO(
+public record MemberSummaryDTO(
 
         String nickname,
 

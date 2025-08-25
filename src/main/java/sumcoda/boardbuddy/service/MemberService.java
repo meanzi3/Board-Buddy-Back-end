@@ -6,10 +6,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.*;
+import sumcoda.boardbuddy.dto.client.MemberSummaryDTO;
+import sumcoda.boardbuddy.dto.fetch.MemberSummaryProjection;
 import sumcoda.boardbuddy.entity.Member;
 import sumcoda.boardbuddy.enumerate.MemberType;
 import sumcoda.boardbuddy.enumerate.Role;
 import sumcoda.boardbuddy.exception.member.*;
+import sumcoda.boardbuddy.mapper.MemberMapper;
 import sumcoda.boardbuddy.repository.gatherArticle.GatherArticleRepository;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 
@@ -33,6 +36,8 @@ public class MemberService {
 
     // 비밀번호를 암호화 하기 위한 필드
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final MemberMapper memberMapper;
 
     /**
      * 아이디 중복검사
@@ -504,6 +509,20 @@ public class MemberService {
         if (isExists) {
             throw new MemberDeletionFailureException("회원 탈퇴에 실패했습니다. 관리자에게 문의하세요.");
         }
+    }
+
+    /**
+     * 사용자의 로그인 상태를 확인
+     *
+     * @param username 로그인 사용자 아이디
+     * @return 사용자가 로그인한 상태라면 해당 사용자의 프로필 반환 아니라면 null 반환
+     **/
+    public MemberSummaryDTO getMemberInfo(String username) {
+        MemberSummaryProjection projection = memberRepository.findMemberSummaryByUsername(username).orElseThrow(() ->
+                new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
+
+        return memberMapper.toMemberSummaryDTO(projection);
+
     }
 
     /**

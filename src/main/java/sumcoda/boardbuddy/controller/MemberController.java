@@ -6,8 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.boardbuddy.dto.MemberRequest;
+import sumcoda.boardbuddy.dto.client.MemberSummaryDTO;
 import sumcoda.boardbuddy.dto.common.ApiResponse;
 import sumcoda.boardbuddy.service.MemberService;
+
+import java.util.Map;
 
 import static sumcoda.boardbuddy.builder.ResponseBuilder.*;
 
@@ -95,6 +98,21 @@ public class MemberController {
         memberService.withdrawalMember(username);
 
         return buildSuccessResponseWithoutData("회원탈퇴가 완료되었습니다.", HttpStatus.OK);
+    }
+
+    /**
+     * 로그인한 사용자의 정보를 확인
+     *
+     * @param username 사용자 아이디
+     * @return 해당 사용자의 대략적 정보를 기반으로한 약속된 SuccessResponse 반환
+     **/
+    @GetMapping("/api/members/me")
+    public ResponseEntity<ApiResponse<Map<String, MemberSummaryDTO>>> getMemberInfo(@RequestAttribute String username) {
+        log.info("get member info is working");
+
+        MemberSummaryDTO memberSummaryDTO = memberService.getMemberInfo(username);
+
+        return buildSuccessResponseWithPairKeyData("memberInfo", memberSummaryDTO, "유저 정보를 성공적으로 조회 했습니다.", HttpStatus.OK);
     }
 
     /**

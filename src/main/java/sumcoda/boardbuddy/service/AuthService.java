@@ -7,15 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sumcoda.boardbuddy.dto.AuthRequest;
 import sumcoda.boardbuddy.dto.AuthResponse;
-import sumcoda.boardbuddy.dto.client.MemberAuthProfileDTO;
-import sumcoda.boardbuddy.dto.fetch.MemberAuthProfileProjection;
+import sumcoda.boardbuddy.dto.client.MemberSummaryDTO;
+import sumcoda.boardbuddy.dto.fetch.MemberSummaryProjection;
 import sumcoda.boardbuddy.exception.auth.InvalidPasswordException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationAttemptExceededException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationExpiredException;
 import sumcoda.boardbuddy.exception.auth.SMSCertificationNumberMismatchException;
 import sumcoda.boardbuddy.exception.member.MemberRetrievalException;
 import sumcoda.boardbuddy.exception.member.PhoneNumberAlreadyExistsException;
-import sumcoda.boardbuddy.mapper.MemberProfileMapper;
+import sumcoda.boardbuddy.mapper.MemberMapper;
 import sumcoda.boardbuddy.repository.member.MemberRepository;
 import sumcoda.boardbuddy.repository.SmsCertificationRepository;
 import sumcoda.boardbuddy.util.SmsCertificationUtil;
@@ -37,7 +37,7 @@ public class AuthService {
 
     private final CloudFrontSignedUrlService cloudFrontSignedUrlService;
 
-    private final MemberProfileMapper memberProfileMapper;
+    private final MemberMapper memberMapper;
 
 
     /**
@@ -139,11 +139,11 @@ public class AuthService {
      * @param username 로그인 사용자 아이디
      * @return 사용자가 로그인한 상태라면 해당 사용자의 프로필 반환 아니라면 null 반환
      **/
-    public MemberAuthProfileDTO checkMemberAuthenticationStatus(String username) {
-        MemberAuthProfileProjection projection = memberRepository.findMemberAuthProfileByUsername(username).orElseThrow(() ->
+    public MemberSummaryDTO checkMemberAuthenticationStatus(String username) {
+        MemberSummaryProjection projection = memberRepository.findMemberSummaryByUsername(username).orElseThrow(() ->
                 new MemberRetrievalException("해당 유저를 찾을 수 없습니다. 관리자에게 문의하세요."));
 
-        return memberProfileMapper.toMemberAuthProfileDTO(projection);
+        return memberMapper.toMemberSummaryDTO(projection);
     }
 
     /**

@@ -2,7 +2,7 @@ package sumcoda.boardbuddy.dto.fetch;
 
 import sumcoda.boardbuddy.enumerate.MemberType;
 
-public record MemberAuthProfileProjection(
+public record MemberSummaryProjection(
 
         String nickname,
 

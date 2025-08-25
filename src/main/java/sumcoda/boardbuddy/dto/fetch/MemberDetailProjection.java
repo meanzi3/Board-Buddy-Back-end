@@ -1,6 +1,6 @@
 package sumcoda.boardbuddy.dto.fetch;
 
-public record MemberProfileProjection(
+public record MemberDetailProjection(
 
         String s3SavedObjectName,
 

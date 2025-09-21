@@ -278,6 +278,7 @@ public class GatherArticleRepositoryCustomImpl implements GatherArticleRepositor
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
 
         if (GatherArticleStatus.SOON.getValue().equals(sort)) {
+            orderSpecifiers.add(gatherArticle.gatherArticleStatus.desc());
             orderSpecifiers.add(gatherArticle.startDateTime.asc());
         }
 
